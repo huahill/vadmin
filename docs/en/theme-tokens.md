@@ -2,7 +2,7 @@
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
-`vadmin-spring-boot-starter` owns the default Vaadin Flow shell. Its
+`vadmin` owns the default Vaadin Flow shell. Its
 `DefaultApplicationShell` explicitly loads Lumo; the bundled Ant resource is
 fully scoped and has no effect unless the host selects the `ant` language.
 Normal consumers and business modules do not define a competing shell or global
@@ -27,8 +27,8 @@ targeted `::part()` overrides implement Ant Design behavior. No module may
 depend on those selectors or tokens.
 
 Use `AdminIcon` and `AdminIconName` from `admin-flow` for standard actions.
-Do not import starter theme icons, assign `data-admin-icon`, or set icon-mask
-variables from a business module. The starter owns profile-specific icon assets
+Do not import VAdmin theme icons, assign `data-admin-icon`, or set icon-mask
+variables from a business module. VAdmin owns profile-specific icon assets
 and Vaadin fallbacks.
 
 ## Business Module CSS
@@ -54,4 +54,4 @@ shared `admin-flow` page patterns and normal Vaadin state APIs.
 Only a consumer deliberately replacing the complete shell owns an alternative
 `AppShellConfigurator`, `@Theme`, and token implementation. It must preserve a
 coherent accessible appearance for all assembled modules. Partial replacement
-of starter shell pieces or selected system pages is not supported.
+of default shell pieces or selected system pages is not supported.

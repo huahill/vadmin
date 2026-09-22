@@ -4,7 +4,7 @@ VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
 [简体中文](../zh-CN/extension-guide.md) | English
 
-`vadmin-spring-boot-starter` owns the default shell, theme, home page, and system
+`vadmin` owns the default shell, theme, home page, and system
 administration. Extend a normal consumer by contributing a business
 `AdminModule`; do not copy or create a shell, layout, theme, or system module.
 
@@ -93,7 +93,7 @@ inventory.items.title=库存项目
 inventory.items.intent=查看库存和可用性
 ```
 
-The composite `I18NProvider` combines these resources with the starter and
+The composite `I18NProvider` combines these resources with VAdmin's default administration module and
 other modules. Resolve module metadata with `getTranslation(page.titleKey())`
 and `getTranslation(page.intentKey())`; do not render raw message keys.
 
@@ -117,8 +117,8 @@ public final class InventoryApplication {
 ```
 
 Use `@Uses(InventoryView.class)` only for the consumer view. Do not put
-`@Route` on `InventoryView`, and do not add `@Uses` for the starter's system
-views: the starter owns those anchors.
+`@Route` on `InventoryView`, and do not add `@Uses` for VAdmin's system
+views: VAdmin owns those anchors.
 
 ## Page And Authorization Boundaries
 
@@ -139,13 +139,13 @@ or depend on VAdmin visual-language CSS.
 ## Intentional Shell Replacement
 
 A custom shell is an explicit complete replacement. Only choose it when the
-starter shell and theme cannot meet the product boundary. Provide an
+VAdmin's default shell and theme cannot meet the product boundary. Provide an
 `AdminHostLayout`, an `AppShellConfigurator`, and `@Theme` configuration owned
 by the consumer, then provide production anchors for every dynamic view it
 composes.
 
 Do not replace isolated system pages, selected shell components, or individual
-theme internals. A replacement still uses the starter's module assembly,
+theme internals. A replacement still uses VAdmin's module assembly,
 `AdminModuleRegistry`, composite translations, permission catalog, and route
 guards. Consumers that only add business pages should retain the default shell.
 
@@ -161,4 +161,4 @@ guards. Consumers that only add business pages should retain the default shell.
 - Authorize mutations in use cases and use shared Flow patterns and Vaadin
   component APIs.
 - Leave the default shell, theme, system administration, and its production
-  anchors to the starter unless intentionally replacing the complete shell.
+  anchors to VAdmin unless intentionally replacing the complete shell.

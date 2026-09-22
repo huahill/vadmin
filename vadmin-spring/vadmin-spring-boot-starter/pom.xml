@@ -9,6 +9,7 @@
     <artifactId>vadmin-spring-boot-starter</artifactId>
     <name>VAdmin Spring Boot Starter</name>
     <dependencies>
+        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-security</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-jpa</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-boot</artifactId><version>${project.version}</version></dependency>

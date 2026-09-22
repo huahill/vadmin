@@ -21,7 +21,7 @@ needed by a consumer.
 | UI | Vaadin Flow 25.3.0 | Flow is the only UI model; Hilla, React, Vue, and TypeScript are excluded. |
 | Database and migration | PostgreSQL 18 Compose baseline, Flyway 13.1.0 | Testcontainers coverage is not an additional deployment promise. |
 | Appearance | `vaadin` and `ant`; system/light/dark | Both visual languages preserve the same Flow, permission, module, and i18n contracts. |
-| UI locales | `zh-CN`, `en-US` | Starter and consumer module resources must support both locales. |
+| UI locales | `zh-CN`, `en-US` | VAdmin and consumer module resources must support both locales. |
 | External identity | Opt-in standard OIDC authorization-code login | Provider lifecycle, SCIM, SAML, LDAP, MFA, tenant, and data-scope policies remain consumer concerns. |
 
 Any Java, Maven, Spring Boot, or Vaadin upgrade needs a dedicated pull request,
@@ -39,7 +39,7 @@ updated compatibility evidence, and both normal and production verification.
    permissions, routes, icon keys, `zh-CN` and `en-US` resources, prototype
    view beans without `@Route`, and a host `@Uses` anchor for each consumer
    dynamic view.
-5. Keep the starter default shell, theme, and system administration unless the
+5. Keep the VAdmin default shell, theme, and system administration unless the
    consumer intentionally replaces the complete shell with its own
    `AdminHostLayout`, `AppShellConfigurator`, and `@Theme`.
 6. Preserve external secrets and deployment configuration. Changing
@@ -59,7 +59,7 @@ output, tool versions, image digest, release commit, and tag.
 - [ ] `CHANGELOG.md` moves release content out of `Unreleased`, includes the
   release date, and identifies breaking changes.
 - [ ] README, architecture, quick start, extension, and release guides agree
-  that `vadmin-spring-boot-starter` supplies the default shell, theme, and system
+  that `vadmin` supplies the default shell, theme, and system
   administration.
 - [ ] Current guides contain no retired example-domain references or claims
   that a normal consumer must provide a shell or default `AdminHostLayout`.
@@ -80,7 +80,7 @@ docker build -t vadmin:0.1.0-rc .
 - [ ] Both Maven commands complete with `BUILD SUCCESS`.
 - [ ] Unit, architecture, Testcontainers, OIDC, baseline browser, and visual
   profile browser suites report zero failures and errors.
-- [ ] Production output contains the starter system pages and consumer dynamic
+- [ ] Production output contains the VAdmin system pages and consumer dynamic
   module routes without the Vaadin development server.
 - [ ] Compose configuration renders without unresolved variables.
 - [ ] The image starts as a non-root runtime against a fresh PostgreSQL 18

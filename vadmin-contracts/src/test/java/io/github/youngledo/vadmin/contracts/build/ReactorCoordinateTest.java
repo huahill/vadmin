@@ -21,10 +21,10 @@ class ReactorCoordinateTest {
         String allPomContent = pomFiles.stream().map(this::read).reduce("", String::concat);
 
         assertThat(artifactIds).containsExactly(
-                "vadmin", "vadmin-contracts", "vadmin-platform", "vadmin-flow",
+                "vadmin-parent", "vadmin-contracts", "vadmin-platform", "vadmin-flow",
                 "vadmin-spring", "vadmin-spring-security", "vadmin-spring-jpa",
-                "vadmin-spring-boot", "vadmin-spring-flow", "vadmin-spring-boot-starter",
-                "vadmin-reference-app");
+                "vadmin-spring-boot", "vadmin-spring-flow", "vadmin",
+                "vadmin-spring-boot-starter", "vadmin-reference-app");
         assertThat(allPomContent)
                 .doesNotContain("io.github.youngledo.vadmin", "<artifactId>admin-");
         assertThat(pomFiles.stream().skip(1).map(ReactorCoordinateTest::parentGroupId))

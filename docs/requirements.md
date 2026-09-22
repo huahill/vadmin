@@ -7,7 +7,7 @@ Date: 2026-08-04
 
 ## 1. Product Definition
 
-VAdmin is a production-oriented starter for Java teams that
+VAdmin is a production-oriented administration baseline for Java teams that
 build internal business web applications. It is based on Vaadin Flow and offers
 a consistent application shell, security baseline, common business interaction
 patterns, operational defaults, and a runnable reference application.
@@ -34,7 +34,7 @@ development teams.
 1. A developer can start the reference application locally with a documented
    command and replace the example business module without rebuilding shared
    infrastructure.
-2. The starter provides coherent, secure-by-default patterns for authentication,
+2. VAdmin provides coherent, secure-by-default patterns for authentication,
    authorization, navigation, auditing, CRUD, error handling, and deployment.
 3. Reusable modules have Java and Vaadin Flow dependencies only, except where a
    deliberately defined adapter boundary is required.
@@ -159,7 +159,7 @@ development teams.
 - Audience: Java development teams; frontend developers are not a target user.
 - UI programming model: Vaadin Flow.
 - Release-1 UI boundary: Vaadin Flow only; a Hilla adapter is a possible future
-  extension, not a dependency of this starter.
+  extension, not a dependency of VAdmin.
 - Release-1 runtime: Spring Boot only.
 - Reference-application production database: PostgreSQL.
 - Database migration: Flyway with versioned SQL migrations.
@@ -174,7 +174,7 @@ development teams.
   capabilities are deferred as future optional modules.
 - Permission model: permission-code first; roles are permission collections;
   route, menu, action, and use-case checks share one vocabulary.
-- Product quality bar: production-oriented starter, not a visual showcase.
+- Product quality bar: production-oriented administration baseline, not a visual showcase.
 
 ## 8. Architecture Readiness
 

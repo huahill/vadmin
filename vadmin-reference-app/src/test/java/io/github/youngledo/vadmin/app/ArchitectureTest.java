@@ -22,7 +22,7 @@ class ArchitectureTest {
                     "org.springframework..", "jakarta.persistence..", "org.flywaydb..", "..app..");
 
     @ArchTest
-    static final ArchRule reference_app_does_not_own_starter_shell_or_system_administration = noClasses()
+    static final ArchRule reference_app_does_not_own_default_shell_or_system_administration = noClasses()
             .that().resideInAnyPackage("io.github.youngledo.vadmin.app..")
             .should().haveSimpleNameStartingWith("Default")
             .orShould().haveSimpleNameEndingWith("View")
@@ -37,8 +37,16 @@ class ArchitectureTest {
             .should().dependOnClassesThat().resideInAnyPackage("org.springframework..");
 
     @ArchTest
-    static final ArchRule only_the_starter_and_flow_adapter_depend_on_springflow = noClasses()
-            .that().resideOutsideOfPackages("..app..", "..springflow..", "..starter..")
+    static final ArchRule only_the_default_administration_and_flow_adapter_depend_on_springflow = noClasses()
+            .that().resideOutsideOfPackages("..app..", "..springflow..",
+                    "io.github.youngledo.vadmin",
+                    "io.github.youngledo.vadmin.administration..",
+                    "io.github.youngledo.vadmin.brand..",
+                    "io.github.youngledo.vadmin.localiam..",
+                    "io.github.youngledo.vadmin.modules..",
+                    "io.github.youngledo.vadmin.shell..",
+                    "io.github.youngledo.vadmin.theme..",
+                    "io.github.youngledo.vadmin.views..")
             .should().dependOnClassesThat().resideInAnyPackage("..springflow..");
 
     @ArchTest

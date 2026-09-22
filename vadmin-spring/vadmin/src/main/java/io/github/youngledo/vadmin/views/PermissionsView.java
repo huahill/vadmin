@@ -1,0 +1,70 @@
+package io.github.youngledo.vadmin.views;
+
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.HasDynamicTitle;
+import io.github.youngledo.vadmin.administration.AdministrationQueryService;
+import io.github.youngledo.vadmin.contracts.auth.AuthorizationService;
+import io.github.youngledo.vadmin.contracts.auth.CurrentUserProvider;
+import io.github.youngledo.vadmin.contracts.auth.PermissionCode;
+import io.github.youngledo.vadmin.flow.patterns.AdminPageFrame;
+import io.github.youngledo.vadmin.flow.patterns.CompactDataItem;
+import io.github.youngledo.vadmin.flow.patterns.DataWorkspace;
+import io.github.youngledo.vadmin.flow.patterns.PagedGrid;
+import io.github.youngledo.vadmin.flow.patterns.PageHeader;
+import io.github.youngledo.vadmin.flow.navigation.PermissionProtectedView;
+import io.github.youngledo.vadmin.localiam.ConditionalOnVadminLocalIam;
+import jakarta.annotation.security.PermitAll;
+
+@PermitAll
+@org.springframework.stereotype.Component
+@org.springframework.context.annotation.Scope(org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@ConditionalOnVadminLocalIam
+public final class PermissionsView extends PermissionProtectedView implements LocaleChangeObserver, HasDynamicTitle {
+    public static final PermissionCode REQUIRED_PERMISSION = PermissionCode.of("system:permission:read");
+    private final Grid<AdministrationQueryService.PermissionRow> grid = new Grid<>(AdministrationQueryService.PermissionRow.class, false);
+    private final Grid.Column<AdministrationQueryService.PermissionRow> codeColumn;
+    private final Grid.Column<AdministrationQueryService.PermissionRow> sourceColumn;
+    private final PagedGrid<AdministrationQueryService.PermissionRow> pages;
+
+    public PermissionsView(CurrentUserProvider currentUser, AuthorizationService authorization,
+                           AdministrationQueryService queries) {
+        super(currentUser, authorization);
+        codeColumn = grid.addColumn(AdministrationQueryService.PermissionRow::code).setAutoWidth(true);
+        sourceColumn = grid.addColumn(permission -> permission.systemManaged() ? getTranslation("system.permissions.system-managed") : getTranslation("system.permissions.custom"));
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setSizeFull();
+        var header = PageHeader.translated("system.permissions.title", "system.permissions.intent");
+        var workspace = new DataWorkspace<>(grid);
+        workspace.setCompactItemRenderer(this::compactItem, AdministrationQueryService.PermissionRow::code);
+        pages = new PagedGrid<>(workspace, queries::permissions, "code");
+        workspace.setSelectionBarVisible(false);
+        workspace.getElement().setAttribute("data-testid", "permissions-workspace");
+        workspace.setFooter(pages.getPaginationBar());
+        var frame = new AdminPageFrame(header, null, workspace);
+        add(frame);
+        expand(frame);
+        updateText();
+    }
+
+    private CompactDataItem compactItem(AdministrationQueryService.PermissionRow permission) {
+        var item = new CompactDataItem(permission.code());
+        item.setStatus(getTranslation(permission.systemManaged()
+                ? "system.permissions.system-managed" : "system.permissions.custom"));
+        return item;
+    }
+
+    @Override protected PermissionCode requiredPermission() { return REQUIRED_PERMISSION; }
+
+    @Override public void localeChange(LocaleChangeEvent event) { updateText(); pages.refresh(); updateBrowserTitle(); }
+
+    @Override public String getPageTitle() { return getTranslation("system.permissions.title"); }
+
+    private void updateText() {
+        codeColumn.setHeader(getTranslation("system.permissions.code"));
+        sourceColumn.setHeader(getTranslation("system.permissions.source"));
+    }
+
+    private void updateBrowserTitle() { getUI().ifPresent(ui -> ui.getPage().setTitle(getPageTitle())); }
+}

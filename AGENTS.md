@@ -34,7 +34,7 @@
 
 - VAdmin is an opinionated, ready-to-use administration product for Java
   applications, comparable in scope to an administration baseline rather than
-  a collection of individual Vaadin examples. The starter owns the responsive
+  a collection of individual Vaadin examples. The default administration module (`vadmin`) owns the responsive
   application shell, navigation, global utilities, system administration,
   common interaction patterns, and their accessibility behavior.
 - A normal host application configures deployment, authentication integration,

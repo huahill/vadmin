@@ -2,7 +2,7 @@ package io.github.youngledo.vadmin.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import io.github.youngledo.vadmin.starter.administration.AdministrationQueryService;
+import io.github.youngledo.vadmin.administration.AdministrationQueryService;
 import io.github.youngledo.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.youngledo.vadmin.contracts.auth.PermissionCode;
 import io.github.youngledo.vadmin.contracts.auth.CurrentUser;
@@ -92,9 +92,9 @@ class ApplicationContextIT {
     }
 
     @Test
-    void receivesTheDefaultStarterHostLayout() {
+    void receivesTheDefaultAdminHostLayout() {
         assertThat(applicationContext.getBean(AdminHostLayout.class).layoutType().getName())
-                .isEqualTo("io.github.youngledo.vadmin.starter.views.DefaultMainLayout");
+                .isEqualTo("io.github.youngledo.vadmin.views.DefaultMainLayout");
         assertThat(applicationContext.getBean("adminModuleNavigationAccessChecker", NavigationAccessChecker.class))
                 .isNotNull();
     }

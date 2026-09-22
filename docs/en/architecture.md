@@ -12,9 +12,9 @@ PostgreSQL, and Flyway SQL migrations. Spring Boot is the only runtime and
 Vaadin Flow is the only UI programming model.
 
 The reusable core remains independent of Spring, JPA, Flyway, and application
-business types. The starter composes the Spring adapters into a useful default
-experience; a consuming application owns its business domain and deployment
-configuration.
+business types. The `vadmin` default administration module composes the Spring
+adapters into a useful default experience; a consuming application owns its
+business domain and deployment configuration.
 
 ## Module Ownership
 
@@ -27,11 +27,14 @@ configuration.
 | `vadmin-spring-jpa` | JPA/Flyway RBAC and audit adapters. |
 | `vadmin-spring-boot` | Correlation and Problem Details configuration. |
 | `vadmin-spring-flow` | Module assembly, dynamic routes, composite translations, and locale preference. |
-| `vadmin-spring-boot-starter` | Default shell and theme, system administration UI and translations, and consumer-facing dependency composition. |
+| `vadmin` | Default shell and theme, system administration UI and translations, and the default `AdminModule`. |
+| `vadmin-spring-boot-starter` | Consumer-facing dependency composition for Spring Boot adoption. |
 | `vadmin-reference-app` | Thin starter consumer, launch configuration, seed data, and browser acceptance coverage. |
 
-`vadmin-spring-boot-starter` supplies the complete default administration experience,
-home page, and the Users, Roles, Permissions, and Audit administration module. `vadmin-reference-app`
+`vadmin` supplies the complete default administration experience, home page,
+and the Users, Roles, Permissions, and Audit administration module;
+`vadmin-spring-boot-starter` aggregates it with the Spring adapters as the
+adoption dependency. `vadmin-reference-app`
 does not own a copied baseline; it proves that a normal application can depend
 on the starter and contribute only its own functionality.
 
@@ -40,8 +43,8 @@ on the starter and contribute only its own functionality.
 ```text
 Consumer application
   -> vadmin-spring-boot-starter
+       -> vadmin (default shell/theme and system administration)
        -> Spring security, JPA, Boot, and Flow adapters
-       -> default shell/theme and system administration
   -> consumer AdminModule beans and Flow view beans
 ```
 
@@ -104,7 +107,7 @@ replacement, not a way to replace selected default pages or styles.
 The consumer still uses `AdminModuleRegistry`, module assembly, permissions,
 route guards, and the composite translation provider. It must supply a coherent
 layout and production anchors for all dynamic views it composes. Consumers that
-do not need this boundary should use the starter default unchanged.
+do not need this boundary should use the VAdmin default unchanged.
 
 ## Operations And Evolution
 
@@ -113,7 +116,7 @@ OIDC is an optional standard authorization-code adapter that maps an external
 identity to an existing enabled local account. It does not provision accounts,
 assign roles, synchronize groups, or expose provider tokens to Flow modules.
 
-The starter records audit outcomes for authentication and administration,
+VAdmin records audit outcomes for authentication and administration,
 propagates correlation IDs, and maps HTTP failures to RFC 9457 Problem Details.
 Deferred areas include multi-tenancy, data-scope authorization, SAML/LDAP/MFA,
 SCIM, non-Spring runtimes, a workflow engine, low-code UI construction, and

@@ -4,12 +4,12 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
 [English](../en/extension-guide.md) | 简体中文
 
-`vadmin-spring-boot-starter` 拥有默认外壳、主题、首页和系统管理。普通使用方通过贡献业务
+`vadmin` 拥有默认外壳、主题、首页和系统管理。普通使用方通过贡献业务
 `AdminModule` 扩展应用；不要复制或创建外壳、布局、主题或系统模块。
 
 ## 使用宿主认证
 
-默认情况下，starter 启用 VAdmin 本地 IAM：本地用户、角色、权限、审计和系统管理页面。
+默认情况下，VAdmin 启用本地 IAM：本地用户、角色、权限、审计和系统管理页面。
 如果宿主已经拥有账号、会话和授权边界，可设置下列配置关闭这些本地能力：
 
 ```yaml
@@ -121,7 +121,7 @@ inventory.items.title=库存项目
 inventory.items.intent=查看库存和可用性
 ```
 
-组合 `I18NProvider` 会将这些资源与 starter 及其他模块资源合并。模块元数据使用
+组合 `I18NProvider` 会将这些资源与 VAdmin 及其他模块资源合并。模块元数据使用
 `getTranslation(page.titleKey())` 和 `getTranslation(page.intentKey())` 解析；不要显示原始
 消息 key。
 
@@ -143,7 +143,7 @@ public final class InventoryApplication {
 ```
 
 只为使用方 View 使用 `@Uses(InventoryView.class)`。不要给 `InventoryView` 添加 `@Route`，
-也不要为 starter 系统 View 添加 `@Uses`：starter 自己拥有这些锚点。
+也不要为 VAdmin 系统 View 添加 `@Uses`：VAdmin 自己拥有这些锚点。
 
 ## 页面与授权边界
 
@@ -158,11 +158,11 @@ Vaadin 已公开的组件 API；模块不得注册全局 `@Theme`、修改全局
 
 ## 有意替换外壳
 
-自定义外壳是明确的完整替换。只有 starter 外壳和主题无法满足产品边界时才选择它。使用方需
+自定义外壳是明确的完整替换。只有 VAdmin 默认外壳和主题无法满足产品边界时才选择它。使用方需
 提供自己拥有的 `AdminHostLayout`、`AppShellConfigurator` 和 `@Theme` 配置，并为所组合的每个
 动态 View 提供生产锚点。
 
-不要替换零散系统页面、部分外壳组件或单独主题内部结构。替换方案仍使用 starter 的模块组装、
+不要替换零散系统页面、部分外壳组件或单独主题内部结构。替换方案仍使用 VAdmin 的模块组装、
 `AdminModuleRegistry`、组合翻译、权限目录和路由守卫。仅添加业务页面的使用方应保留默认
 外壳。
 
@@ -174,4 +174,4 @@ Vaadin 已公开的组件 API；模块不得注册全局 `@Theme`、修改全局
 - 每个动态注册 View 都是 Spring Bean，通常使用 prototype 作用域，且不声明 `@Route`。
 - 为每个使用方动态 View 增加一个宿主 `@Uses(ModuleView.class)` 生产锚点。
 - 在用例中授权变更操作，并使用共享 Flow 模式和 Vaadin 组件 API。
-- 除非有意完全替换外壳，否则将默认外壳、主题、系统管理及其生产锚点交由 starter 管理。
+- 除非有意完全替换外壳，否则将默认外壳、主题、系统管理及其生产锚点交由 VAdmin 管理。

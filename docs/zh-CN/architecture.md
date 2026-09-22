@@ -10,34 +10,35 @@ VAdmin 是面向 Java 内部业务应用的生产级基线。第 1 版支持 Jav
 Spring Boot 4.x、Vaadin Flow 25.x、PostgreSQL 和 Flyway SQL 迁移。Spring Boot 是唯一
 运行时，Vaadin Flow 是唯一 UI 编程模型。
 
-可复用核心不依赖 Spring、JPA、Flyway 或应用业务类型。starter 将 Spring 适配器组合为可直接
-使用的默认体验；使用方拥有自己的业务领域和部署配置。
+可复用核心不依赖 Spring、JPA、Flyway 或应用业务类型。`vadmin` 默认管理模块将 Spring 适配器
+组合为可直接使用的默认体验；使用方拥有自己的业务领域和部署配置。
 
 ## 模块职责
 
 | 模块 | 职责 |
 | --- | --- |
-| `admin-contracts` | 与框架无关的身份、授权、审计、错误和文件契约。 |
-| `admin-platform` | 与框架无关的 RBAC 用例和端口。 |
-| `admin-flow` | 无 Spring 依赖的 Flow 模式、路由守卫和模块元数据。 |
+| `vadmin-contracts` | 与框架无关的身份、授权、审计、错误和文件契约。 |
+| `vadmin-platform` | 与框架无关的 RBAC 用例和端口。 |
+| `vadmin-flow` | 无 Spring 依赖的 Flow 模式、路由守卫和模块元数据。 |
 | `vadmin-spring-security` | 本地认证及可选的标准 OIDC 适配器。 |
 | `vadmin-spring-jpa` | JPA/Flyway RBAC 与审计适配器。 |
 | `vadmin-spring-boot` | 关联 ID 与 Problem Details 配置。 |
 | `vadmin-spring-flow` | 模块组装、动态路由、组合翻译和语言偏好。 |
-| `vadmin-spring-boot-starter` | 默认外壳和主题、系统管理 UI 与翻译、面向使用方的依赖组合。 |
+| `vadmin` | 默认外壳和主题、系统管理 UI 与翻译、默认 `AdminModule`。 |
+| `vadmin-spring-boot-starter` | 面向使用方的 Spring Boot 接入依赖聚合。 |
 | `vadmin-reference-app` | 精简 starter 使用方、启动配置、种子数据和浏览器验收覆盖。 |
 
-`vadmin-spring-boot-starter` 提供完整的默认后台框架、首页，以及 Users、Roles、Permissions、
-Audit 系统管理模块。`vadmin-reference-app` 不再拥有复制的基线，而是验证普通应用仅依赖 starter
-并添加自身功能即可运行。
+`vadmin` 提供完整的默认后台框架、首页，以及 Users、Roles、Permissions、Audit 系统管理模块；
+`vadmin-spring-boot-starter` 将其与 Spring 适配器聚合为接入依赖。`vadmin-reference-app`
+不再拥有复制的基线，而是验证普通应用仅依赖 starter 并添加自身功能即可运行。
 
 ## 默认使用路径
 
 ```text
 使用方应用
   -> vadmin-spring-boot-starter
+       -> vadmin（默认外壳/主题和系统管理）
        -> Spring security、JPA、Boot 和 Flow 适配器
-       -> 默认外壳/主题和系统管理
   -> 使用方 AdminModule Bean 与 Flow View Bean
 ```
 
@@ -81,7 +82,7 @@ Flow View 类型和两套消息资源包。启动时，`vadmin-spring-flow` 校�
 页面或样式。
 
 使用方仍使用 `AdminModuleRegistry`、模块组装、权限、路由守卫和组合翻译提供器，并必须为
-所组合的动态 View 提供一致的布局及生产锚点。不需要此边界的使用方应直接使用 starter 默认
+所组合的动态 View 提供一致的布局及生产锚点。不需要此边界的使用方应直接使用 VAdmin 默认
 体验。
 
 ## 运行与演进
@@ -90,6 +91,6 @@ Flyway 在 JPA 适配器可用前运行。本地密码登录是基线；OIDC 是
 只会将外部身份映射到已有且已启用的本地账户。它不会创建账户、授予角色、同步组或向 Flow
 模块公开提供商 token。
 
-starter 会为认证和系统管理记录审计结果、传播关联 ID，并将 HTTP 失败映射为 RFC 9457
+VAdmin 会为认证和系统管理记录审计结果、传播关联 ID，并将 HTTP 失败映射为 RFC 9457
 Problem Details。多租户、数据范围授权、SAML/LDAP/MFA、SCIM、非 Spring 运行时、工作流
 引擎、低代码 UI 构建和任意 View 的运行时加载均不在当前范围内。

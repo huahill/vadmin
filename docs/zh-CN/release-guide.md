@@ -19,7 +19,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 | UI | Vaadin Flow 25.3.0 | Flow 是唯一 UI 模型；不包含 Hilla、React、Vue 或 TypeScript。 |
 | 数据库与迁移 | PostgreSQL 18 Compose 基线，Flyway 13.1.0 | Testcontainers 覆盖不构成额外部署承诺。 |
 | 外观 | `vaadin`、`ant`；跟随系统/浅色/深色 | 两种视觉语言共享同一套 Flow、权限、模块和 i18n 契约。 |
-| UI 语言 | `zh-CN`、`en-US` | starter 与使用方模块资源都必须支持这两种语言。 |
+| UI 语言 | `zh-CN`、`en-US` | VAdmin 与使用方模块资源都必须支持这两种语言。 |
 | 外部身份 | 可选的标准 OIDC 授权码登录 | 提供商生命周期、SCIM、SAML、LDAP、MFA、租户和数据范围策略由使用方负责。 |
 
 升级 Java、Maven、Spring Boot 或 Vaadin 必须使用独立 PR，更新兼容性证据，并完成普通和生产
@@ -34,7 +34,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 4. 保持文档化模块契约：`AdminModule` 元数据、已声明权限、路由、图标 key、`zh-CN` 与
    `en-US` 资源、没有 `@Route` 的 prototype View Bean，以及每个使用方动态 View 的宿主
    `@Uses` 锚点。
-5. 保留 starter 默认外壳、主题和系统管理，除非使用方有意使用自己拥有的
+5. 保留 VAdmin 默认外壳、主题和系统管理，除非使用方有意使用自己拥有的
    `AdminHostLayout`、`AppShellConfigurator` 和 `@Theme` 完全替换外壳。
 6. 保留外部提供的密钥和部署配置。更改 `APP_BOOTSTRAP_PASSWORD` 不会重置已有 `admin` 账户。
 7. 重新运行授权、语言、外观和代表性业务流测试。OIDC 使用方还必须验证已有本地账户映射。
@@ -48,7 +48,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 - [ ] 清理有意生成的制品后，`git status --short` 为空。
 - [ ] `git diff --check` 没有输出。
 - [ ] `CHANGELOG.md` 将发布内容移出 `Unreleased`，包含发布日期并标明不兼容变更。
-- [ ] README、架构、快速开始、扩展和发布指南一致说明：`vadmin-spring-boot-starter` 提供默认
+- [ ] README、架构、快速开始、扩展和发布指南一致说明：`vadmin` 提供默认
   外壳、主题和系统管理。
 - [ ] 当前指南不包含已移除的示例领域引用，也不声称普通使用方必须提供外壳或默认
   `AdminHostLayout`。
@@ -67,7 +67,7 @@ docker build -t vadmin:0.1.0-rc .
 - [ ] 两条 Maven 命令均以 `BUILD SUCCESS` 结束。
 - [ ] 单元、架构、Testcontainers、OIDC、基线浏览器和视觉 profile 浏览器套件均为零 failures、
   零 errors。
-- [ ] 生产输出包含 starter 系统页面和使用方动态模块路由，且不依赖 Vaadin 开发服务器。
+- [ ] 生产输出包含 VAdmin 系统页面和使用方动态模块路由，且不依赖 Vaadin 开发服务器。
 - [ ] Compose 配置渲染时没有未解析变量。
 - [ ] 镜像以非 root 运行时启动，并使用外部凭据连接全新的 PostgreSQL 18 服务。
 - [ ] 评审者登录后切换语言和浅色/深色，打开 Users、Roles、Permissions 和 Audit，再确认

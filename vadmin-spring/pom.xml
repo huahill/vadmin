@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>io.github.youngledo</groupId>
-        <artifactId>vadmin</artifactId>
+        <artifactId>vadmin-parent</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
 
@@ -19,6 +19,7 @@
         <module>vadmin-spring-jpa</module>
         <module>vadmin-spring-boot</module>
         <module>vadmin-spring-flow</module>
+        <module>vadmin</module>
         <module>vadmin-spring-boot-starter</module>
     </modules>
 </project>

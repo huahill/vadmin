@@ -16,7 +16,7 @@ class RootPomIdentityTest {
         Element project = document(rootPom()).getDocumentElement();
 
         assertThat(directText(project, "groupId")).isEqualTo("io.github.youngledo");
-        assertThat(directText(project, "artifactId")).isEqualTo("vadmin");
+        assertThat(directText(project, "artifactId")).isEqualTo("vadmin-parent");
         assertThat(directChildren(project, "parent")).isEmpty();
         assertThat(dependency(project, "spring-boot-dependencies").getTextContent())
                 .contains("org.springframework.boot", "pom", "import");

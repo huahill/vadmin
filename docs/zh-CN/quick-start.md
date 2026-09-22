@@ -4,7 +4,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
 [English](../en/quick-start.md) | 简体中文
 
-`vadmin-spring-boot-starter` 是正常接入时使用的依赖。它提供默认 Flow 外壳和主题、本地登录、
+`vadmin-spring-boot-starter` 是正常接入时使用的依赖。它聚合默认 Flow 外壳和主题、本地登录、
 系统管理、模块组装和 Spring 适配器。应用只需提供数据源、Flyway 迁移和业务模块。
 
 ## 前置条件
@@ -25,12 +25,11 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 </dependency>
 ```
 
-Starter 会自动登记默认外壳包供 Vaadin 发现。若应用显式声明了 `@EnableVaadin`，该声明会覆盖
-默认扫描根，此时应将 Starter 的 UI 包加入扫描范围。这是 Vaadin 的路由发现要求，不是自行组装外壳：
+VAdmin 会自动登记默认外壳包供 Vaadin 发现。若应用显式声明了 `@EnableVaadin`，该声明会覆盖
+默认扫描根，此时应将 VAdmin 根包加入扫描范围。这是 Vaadin 的路由发现要求，不是自行组装外壳：
 
 ```java
-@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin.starter",
-        "io.github.youngledo.vadmin.springsecurity.ui"})
+@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin"})
 @SpringBootApplication
 public class InventoryApplication {
 }
@@ -48,7 +47,7 @@ public class InventoryApplication {
 </dependency>
 ```
 
-在使用方应用中配置 PostgreSQL 和 Flyway。使用方的迁移位置应与 starter 迁移分开，且不得
+在使用方应用中配置 PostgreSQL 和 Flyway。使用方的迁移位置应与 VAdmin 迁移分开，且不得
 改写已经进入任何环境的迁移：
 
 ```yaml
@@ -68,7 +67,7 @@ spring:
 APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 ```
 
-访问 `http://localhost:8080`。starter 提供首页、导航、Users、Roles、Permissions、Audit、
+访问 `http://localhost:8080`。VAdmin 提供首页、导航、Users、Roles、Permissions、Audit、
 `zh-CN` 与 `en-US`、浅色/深色模式，以及所选视觉语言。普通使用方不定义 Flow 外壳、
 `AdminHostLayout`、`AppShellConfigurator` 或 `@Theme`。
 

@@ -8,9 +8,7 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 @SpringBootApplication(scanBasePackages = "io.github.youngledo.vadmin")
 @EnableVaadin({
         "io.github.youngledo.vadmin.app",
-        "io.github.youngledo.vadmin.flow.error",
-        "io.github.youngledo.vadmin.starter",
-        "io.github.youngledo.vadmin.springsecurity.ui"
+        "io.github.youngledo.vadmin"
 })
 @EntityScan(basePackages = "io.github.youngledo.vadmin.springjpa")
 public class Application {

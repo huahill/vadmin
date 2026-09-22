@@ -4,8 +4,8 @@ VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
 [简体中文](../zh-CN/quick-start.md) | English
 
-`vadmin-spring-boot-starter` is the normal adoption dependency. It supplies the
-default Flow shell and theme, local login, system administration, module
+`vadmin-spring-boot-starter` is the normal adoption dependency. It aggregates
+the default Flow shell and theme, local login, system administration, module
 assembly, and Spring adapters. Your application supplies its datasource,
 Flyway migrations, and business modules.
 
@@ -27,14 +27,13 @@ Add the single first-party dependency to a Spring Boot application:
 </dependency>
 ```
 
-The starter registers its default shell package for Vaadin discovery. If the
+VAdmin registers its default shell packages for Vaadin discovery. If the
 application declares `@EnableVaadin` explicitly, that declaration replaces the
-default scan roots. Include the starter UI packages in that case; this is
+default scan roots. Include the VAdmin root package in that case; this is
 Vaadin's route-discovery requirement, not custom shell composition:
 
 ```java
-@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin.starter",
-        "io.github.youngledo.vadmin.springsecurity.ui"})
+@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin"})
 @SpringBootApplication
 public class InventoryApplication {
 }
@@ -54,7 +53,7 @@ from the starter and is excluded from the production artifact:
 ```
 
 Configure PostgreSQL and Flyway in the consumer application. Keep its migration
-location separate from the starter's migrations and never rewrite a migration
+location separate from VAdmin's migrations and never rewrite a migration
 that has reached an environment:
 
 ```yaml
@@ -75,7 +74,7 @@ Changing the variable later does not reset an existing account.
 APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 ```
 
-Open `http://localhost:8080`. The starter supplies the home page, navigation,
+Open `http://localhost:8080`. VAdmin supplies the home page, navigation,
 Users, Roles, Permissions, Audit, `zh-CN` and `en-US`, light/dark mode, and
 the selected visual language. A normal consumer does not define a
 Flow shell, `AdminHostLayout`, `AppShellConfigurator`, or `@Theme`.

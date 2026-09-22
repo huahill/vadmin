@@ -12,7 +12,7 @@ The first release uses Java 25, Maven 4.0.0-rc-6, Spring Boot 4.1.1, Vaadin
 Flow 25.3.0, PostgreSQL, and Flyway. Flow is the only UI model in scope; Hilla,
 React, and TypeScript are not included.
 
-The starter owns the baseline experience. Consumers add business capabilities
+VAdmin owns the baseline experience through its default administration module. Consumers add business capabilities
 as `AdminModule` beans and Flow view beans; they do not create a shell, theme,
 or system-administration module for normal adoption. See the English
 [Extension Guide](docs/en/extension-guide.md) for the module, translation, and

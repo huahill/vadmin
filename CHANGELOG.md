@@ -8,6 +8,15 @@
 
 - 升级兼容性基线：Spring Boot 4.1.0 → 4.1.1（补丁），Vaadin Flow 25.2.6 →
   25.3.0（小版本）。
+- 拆分默认管理产品：外壳、系统管理视图、主题与翻译迁入新制品
+  `io.github.youngledo:vadmin`，`vadmin-spring-boot-starter` 改为纯依赖聚合且坐标不变。
+
+### Breaking changes
+
+- 坐标 `io.github.youngledo:vadmin` 含义变更：0.1.0 为聚合 POM，自本版本起为
+  默认管理产品 jar；根聚合 POM 更名为 `io.github.youngledo:vadmin-parent`。
+- Java 包 `io.github.youngledo.vadmin.starter.*` 迁移至 `io.github.youngledo.vadmin.*`。
+  仅依赖 `vadmin-spring-boot-starter` 坐标且不引用内部类的使用方不受影响。
 
 ## [0.1.0] - 2026-08-14
 
