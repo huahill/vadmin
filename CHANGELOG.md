@@ -10,6 +10,7 @@
   25.3.0（小版本）。
 - 拆分默认管理产品：外壳、系统管理视图、主题与翻译迁入新制品
   `io.github.youngledo:vadmin`，`vadmin-spring-boot-starter` 改为纯依赖聚合且坐标不变。
+- 文档同步：Flyway 13.3.0 基线、残留的旧模块名与快速开始示例版本号。
 
 ### Fixed
 

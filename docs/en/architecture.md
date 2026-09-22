@@ -20,9 +20,9 @@ business domain and deployment configuration.
 
 | Module | Responsibility |
 | --- | --- |
-| `admin-contracts` | Framework-free identity, authorization, audit, error, and file contracts. |
-| `admin-platform` | Framework-free RBAC use cases and ports. |
-| `admin-flow` | Spring-free Flow patterns, route guards, and module metadata. |
+| `vadmin-contracts` | Framework-free identity, authorization, audit, error, and file contracts. |
+| `vadmin-platform` | Framework-free RBAC use cases and ports. |
+| `vadmin-flow` | Spring-free Flow patterns, route guards, and module metadata. |
 | `vadmin-spring-security` | Local authentication and optional standards-based OIDC adapter. |
 | `vadmin-spring-jpa` | JPA/Flyway RBAC and audit adapters. |
 | `vadmin-spring-boot` | Correlation and Problem Details configuration. |

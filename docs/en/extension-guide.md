@@ -127,7 +127,7 @@ repositories. A page declaration controls navigation visibility and direct
 route access; every mutation must still authorize in the application or
 platform use case before changing state.
 
-Use the highest-level matching `admin-flow` pattern (`AdminPageFrame`,
+Use the highest-level matching `vadmin-flow` pattern (`AdminPageFrame`,
 `PageHeader`, `PageToolbar`, `DataWorkspace`, dialogs, and feedback patterns)
 for standard administration workflows. A repeated workflow missing from those
 patterns is a VAdmin extension concern, not an invitation for each consumer to
