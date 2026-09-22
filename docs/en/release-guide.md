@@ -17,8 +17,8 @@ needed by a consumer.
 | --- | --- | --- |
 | JDK | Java 25 | Java 25 is required to build and run a consumer. |
 | Build tool | Maven Wrapper 4.0.0-rc-6 | A Maven GA upgrade is independent work. |
-| Runtime | Spring Boot 4.1.0 | Spring Boot is the only supported runtime. |
-| UI | Vaadin Flow 25.2.5 | Flow is the only UI model; Hilla, React, Vue, and TypeScript are excluded. |
+| Runtime | Spring Boot 4.1.1 | Spring Boot is the only supported runtime. |
+| UI | Vaadin Flow 25.3.0 | Flow is the only UI model; Hilla, React, Vue, and TypeScript are excluded. |
 | Database and migration | PostgreSQL 18 Compose baseline, Flyway 13.1.0 | Testcontainers coverage is not an additional deployment promise. |
 | Appearance | `vaadin` and `ant`; system/light/dark | Both visual languages preserve the same Flow, permission, module, and i18n contracts. |
 | UI locales | `zh-CN`, `en-US` | Starter and consumer module resources must support both locales. |

@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- 升级兼容性基线：Spring Boot 4.1.0 → 4.1.1（补丁），Vaadin Flow 25.2.6 →
+  25.3.0（小版本）。
+
 ## [0.1.0] - 2026-08-14
 
 ### Added
