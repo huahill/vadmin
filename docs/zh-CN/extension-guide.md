@@ -24,7 +24,7 @@ vadmin:
 <dependency>
   <groupId>io.github.youngledo</groupId>
   <artifactId>vadmin-spring-boot-starter</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
   <exclusions>
     <exclusion>
       <groupId>io.github.youngledo</groupId>
@@ -150,7 +150,7 @@ public final class InventoryApplication {
 View 使用与框架无关的用例和授权契约，绝不直接使用 JPA repository。页面声明控制导航可见性
 和直接路由访问；每个变更操作仍必须在应用或平台用例中再次授权后才能改变状态。
 
-标准 Flow 管理工作流应优先使用 `admin-flow` 提供的高层模式：`AdminPageFrame`、`PageHeader`、
+标准 Flow 管理工作流应优先使用 `vadmin-flow` 提供的高层模式：`AdminPageFrame`、`PageHeader`、
 `PageToolbar`、`DataWorkspace`、对话框和反馈模式。缺少的重复管理工作流应当扩展到 VAdmin，
 而不是由每个使用方各自重建页面框架。真正领域专属的 CSS 必须限制在模块范围内，并基于
 Vaadin 已公开的组件 API；模块不得注册全局 `@Theme`、修改全局主题属性、定位组件内部结构，

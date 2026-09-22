@@ -94,6 +94,14 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
         var brand = createBrand(productMark, productName);
         setPrimarySection(Section.DRAWER);
         setDrawerOpened(true);
+        // An open overlay drawer covers the page and Vaadin aria-hides the covered
+        // content, so the default-open drawer must collapse on narrow viewports.
+        getElement().addEventListener("overlay-changed", event -> {
+            var overlay = event.getEventData().get("element.overlay");
+            if (overlay != null && overlay.asBoolean() && isDrawerOpened()) {
+                setDrawerOpened(false);
+            }
+        }).addEventData("element.overlay");
         // AppLayout exposes drawer width through this documented component property.
         getStyle().set("--vaadin-app-layout-drawer-width", "20rem");
         toggle.setAriaLabel(text("system.shell.navigation-toggle"));

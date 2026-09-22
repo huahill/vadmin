@@ -33,7 +33,7 @@ app:
 VAdmin 全局样式表、修改全局主题属性，或依赖 Ant 专用选择器及
 `--vadmin-ant-*` token。
 
-常见操作图标可使用 `admin-flow` 中的 `AdminIcon.of(AdminIconName)`。导航元数据仍必须使用
+常见操作图标可使用 `vadmin-flow` 中的 `AdminIcon.of(AdminIconName)`。导航元数据仍必须使用
 经过 `AdminIconCatalog` 校验的键。模块不得引用宿主 SVG 文件或 CSS mask 选择器；VAdmin 决定
 语义图标在所选视觉语言中的实际渲染方式。
 
