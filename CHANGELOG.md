@@ -10,6 +10,12 @@
   25.3.0（小版本）。
 - 拆分默认管理产品：外壳、系统管理视图、主题与翻译迁入新制品
   `io.github.youngledo:vadmin`，`vadmin-spring-boot-starter` 改为纯依赖聚合且坐标不变。
+- 文档同步：Flyway 13.3.0 基线、残留的旧模块名与快速开始示例版本号。
+
+### Fixed
+
+- 窄屏（overlay 抽屉）下默认外壳不再保持抽屉打开：Vaadin 25.3 会在覆盖式抽屉
+  打开时将主内容移出无障碍树，现进入 overlay 模式时自动收起抽屉；桌面宽屏仍默认展开。
 
 ### Breaking changes
 

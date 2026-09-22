@@ -36,7 +36,7 @@ register a global stylesheet, modify global theme properties, or depend on Ant-o
 selectors or `--vadmin-ant-*` tokens.
 
 For standard action icons, modules may use `AdminIcon.of(AdminIconName)` from
-`admin-flow`. Navigation metadata must keep using the validated
+`vadmin-flow`. Navigation metadata must keep using the validated
 `AdminIconCatalog` keys. Modules must not reference host SVG files or CSS mask
 selectors: VAdmin decides how each semantic icon is rendered for the selected
 visual language.

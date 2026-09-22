@@ -26,7 +26,7 @@ density setting.
 targeted `::part()` overrides implement Ant Design behavior. No module may
 depend on those selectors or tokens.
 
-Use `AdminIcon` and `AdminIconName` from `admin-flow` for standard actions.
+Use `AdminIcon` and `AdminIconName` from `vadmin-flow` for standard actions.
 Do not import VAdmin theme icons, assign `data-admin-icon`, or set icon-mask
 variables from a business module. VAdmin owns profile-specific icon assets
 and Vaadin fallbacks.
@@ -47,7 +47,7 @@ Keep CSS scoped to a module-owned component class:
 
 Do not hard-code a competing brand color, replace global page backgrounds, ship
 arbitrary global selectors, or target Flow overlay and Grid internals. Use the
-shared `admin-flow` page patterns and normal Vaadin state APIs.
+shared `vadmin-flow` page patterns and normal Vaadin state APIs.
 
 ## Full Shell Replacement
 
