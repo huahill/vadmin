@@ -1,5 +1,7 @@
 # VAdmin
 
+[简体中文](README.zh-CN.md) | English
+
 VAdmin is a Java-first administration baseline for Vaadin Flow. Its reusable
 core — identity and permission contracts, RBAC use cases, and the shared
 shell patterns — is framework-neutral, and runtime-specific behavior lives in
@@ -34,25 +36,25 @@ Open `http://localhost:8080` and sign in with `admin` and the value of
 
 **User guides**
 
-| Guide | English | 简体中文 |
-| --- | --- | --- |
-| Getting Started | [Read](docs/en/user/getting-started.md) | [阅读](docs/zh-CN/user/getting-started.md) |
-| Modules | [Read](docs/en/user/modules.md) | [阅读](docs/zh-CN/user/modules.md) |
-| Configuration | [Read](docs/en/user/configuration.md) | [阅读](docs/zh-CN/user/configuration.md) |
-| Appearance | [Read](docs/en/user/appearance.md) | [阅读](docs/zh-CN/user/appearance.md) |
-| Security | [Read](docs/en/user/security.md) | [阅读](docs/zh-CN/user/security.md) |
-| Deployment | [Read](docs/en/user/deployment.md) | [阅读](docs/zh-CN/user/deployment.md) |
-| Upgrade | [Read](docs/en/user/upgrade.md) | [阅读](docs/zh-CN/user/upgrade.md) |
+| Guide | Link |
+| --- | --- |
+| Getting Started | [Read](docs/en/user/getting-started.md) |
+| Modules | [Read](docs/en/user/modules.md) |
+| Configuration | [Read](docs/en/user/configuration.md) |
+| Appearance | [Read](docs/en/user/appearance.md) |
+| Security | [Read](docs/en/user/security.md) |
+| Deployment | [Read](docs/en/user/deployment.md) |
+| Upgrade | [Read](docs/en/user/upgrade.md) |
 
 **Developer guides**
 
-| Guide | English | 简体中文 |
-| --- | --- | --- |
-| Architecture | [Read](docs/en/dev/architecture.md) | [阅读](docs/zh-CN/dev/architecture.md) |
-| Theme Policy | [Read](docs/en/dev/theme-tokens.md) | [阅读](docs/zh-CN/dev/theme-tokens.md) |
-| Release Guide | [Read](docs/en/dev/release-guide.md) | [阅读](docs/zh-CN/dev/release-guide.md) |
-| Requirements | [Read](docs/dev/requirements.md) | -- |
-| Contributing | [Read](docs/dev/contributing.md) | [阅读](docs/dev/contributing.md) |
+| Guide | Link |
+| --- | --- |
+| Architecture | [Read](docs/en/dev/architecture.md) |
+| Theme Policy | [Read](docs/en/dev/theme-tokens.md) |
+| Release Guide | [Read](docs/en/dev/release-guide.md) |
+| Requirements | [Read](docs/dev/requirements.md) |
+| Contributing | [Read](docs/dev/contributing.md) |
 
 ## Verification
 
