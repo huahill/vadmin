@@ -1,7 +1,5 @@
 # VAdmin
 
-VAdmin is published as `io.github.youngledo:vadmin-spring-boot-starter`.
-
 VAdmin is a Java-first administration baseline for Vaadin Flow. Its reusable
 core — identity and permission contracts, RBAC use cases, and the shared
 shell patterns — is framework-neutral, and runtime-specific behavior lives in
