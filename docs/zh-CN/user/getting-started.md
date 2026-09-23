@@ -1,13 +1,11 @@
 # 快速开始
 
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
-
 [English](../../en/user/getting-started.md) | 简体中文
 
 向已有的 Spring Boot 应用添加一个依赖并启动，即可获得：引导管理员登录、
 按权限过滤的导航、默认外壳与主题、Users/Roles/Permissions/Audit 系统管理模块、
-`zh-CN` 与 `en-US` 语言、浅色/深色配色方案以及视觉语言选择。普通使用方不需要定义
-Flow 外壳、`AdminHostLayout`、`AppShellConfigurator` 或 `@Theme`。
+`zh-CN` 与 `en-US` 语言、浅色/深色配色方案以及视觉语言选择。你不需要构建布局、
+主题或系统页面——VAdmin 提供了它们。
 
 ## 前置条件
 

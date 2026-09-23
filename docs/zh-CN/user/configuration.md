@@ -1,7 +1,5 @@
 # 配置参考
 
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
-
 [English](../../en/user/configuration.md) | 简体中文
 
 所有配置都是普通的 Spring Boot 属性。只有数据源是必需项，其余配置都有可用默认值。

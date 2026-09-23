@@ -1,52 +1,50 @@
-# 部署与运维
-
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+# 部署
 
 [English](../../en/user/deployment.md) | 简体中文
 
-## 容器镜像
+VAdmin 是一个普通的 Spring Boot 库——按你已有的方式部署应用即可。本指南涵盖上线前
+需要检查的 VAdmin 相关事项。
 
-`Dockerfile` 在 Java 25 JDK 阶段执行生产构建，最终阶段使用 Java 25 JRE，只复制
-可执行 JAR，并以 UID `10001` 的非 root 用户运行。默认监听 8080，并设置
-`SPRING_PROFILES_ACTIVE=prod`。
+## 数据库
 
-```bash
-docker build -t vadmin:local .
-docker run --rm -p 8080:8080 \
-  -e DATABASE_URL=jdbc:postgresql://db.example:5432/vadmin \
-  -e DATABASE_USERNAME=vadmin \
-  -e DATABASE_PASSWORD='replace-me' \
-  -e APP_BOOTSTRAP_PASSWORD='replace-on-first-start' \
-  vadmin:local
+VAdmin 通过 Flyway 管理自己的表，并以 `ddl-auto: validate` 校验。确保生产 PostgreSQL
+可达，且 Flyway 能在 Hibernate 初始化前运行。
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://db.example:5432/vadmin
+    username: vadmin
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
 ```
 
-生产部署应让数据库密码、引导密码和任何对象存储凭据由平台的密钥机制提供。不要把
-这些值烘焙进镜像、Compose 文件或镜像标签。
+不得改写已进入任何环境的 Flyway 迁移。修复表结构或数据问题应新增下一个版本化迁移。
+升级前先在生产数据副本上验证迁移和回滚方案。
 
-## 数据库与迁移
+## 密钥
 
-Flyway 在 JPA 适配器可用前执行版本化 SQL 迁移，JPA 随后以 `ddl-auto: validate`
-校验模式。迁移文件一旦进入已部署环境便不可改写；修复模式或数据变更时新增下一个
-版本化迁移。应用升级前先在生产数据副本验证迁移和回滚方案。
+所有敏感值应通过运行平台的密钥机制提供，不要放在镜像层或 Compose 文件中：
 
-默认 PostgreSQL 地址、用户名与密码分别来自 `DATABASE_URL`、
-`DATABASE_USERNAME`、`DATABASE_PASSWORD`。将数据库连接限制在受信网络，并由运行平台执行
-TLS、访问控制、日志收集与健康检查策略。
+- `DATABASE_PASSWORD`——你的 PostgreSQL 凭据。
+- `APP_BOOTSTRAP_PASSWORD`——仅在空数据库首次启动时需要，用于创建初始 `admin`
+  账户。
 
-## 备份和恢复
+首次启动后修改 `APP_BOOTSTRAP_PASSWORD` 对已有账户无效。引导账户行为见
+[安全说明](security.md)。
 
-VAdmin 基线只持久化访问控制和审计数据，因此恢复备份必须包含 PostgreSQL 数据库及其
-Flyway schema history。业务模块如接入 `FileStorage` 或其它外部持久化能力，应由使用方
-明确记录其一致性边界、备份范围和恢复顺序，并在隔离环境完成恢复演练后再进行生产切换。
+## 容器
 
-## Compose 开发栈
+如果你将应用容器化，使用 JRE 基础镜像并以非 root 用户运行。VAdmin 本身不需要任何
+特殊容器配置——它是标准的 Spring Boot fat JAR。
 
-`docker-compose.yml` 使用 PostgreSQL 18 和 `postgres-data` 命名卷。PostgreSQL 的
-`pg_isready` 健康检查通过后，应用服务才会启动。检查渲染后的配置：
+VAdmin 仓库的 `Dockerfile` 可作为模板参考：用 JDK 阶段构建，最终镜像在 JRE 上以
+UID `10001` 运行，并设置 `SPRING_PROFILES_ACTIVE=prod`。
 
-```bash
-docker compose --env-file .env.example config
-```
+## 备份与恢复
 
-`.env.example` 是本地示例，不是生产密钥文件。部署中请创建受保护的 `.env` 或使用
-平台密钥注入，并避免把它提交到 Git。
+VAdmin 将访问控制和审计数据持久化在 PostgreSQL 中。恢复必须包含数据库及其 Flyway
+schema history。如果你的业务模块存储文件或其他外部数据，需要在切换生产前单独记录
+并演练其备份与恢复。

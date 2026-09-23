@@ -46,7 +46,7 @@ class CurrentDocumentationTest {
                             "InventoryViewProductionAnchor")
                     .doesNotContain("comfortable/compact", "舒适/紧凑", "semantic `--admin-*` tokens",
                             "语义主题 token")
-                    .contains("VAdmin", "io.github.youngledo", "vadmin-spring-boot-starter")
+                    .contains("VAdmin")
                     .doesNotContain("Vaadin Admin Starter", "vaadin-admin-starter",
                             "io.github.vaadinadminstarter", "admin-spring-starter");
         }

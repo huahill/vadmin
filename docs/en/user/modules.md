@@ -1,20 +1,16 @@
-# Extension Guide
-
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+# Modules
 
 [简体中文](../../zh-CN/user/modules.md) | English
 
-`vadmin` owns the default shell, theme, home page, and system
-administration. Extend a normal consumer by contributing a business
-`AdminModule`; do not copy or create a shell, layout, theme, or system module.
+VAdmin ships a complete administration shell out of the box. You add
+business pages by declaring a module — a small Spring configuration that
+tells VAdmin the page routes, permissions, translations, and view beans. No
+shell, layout, or theme work is needed.
 
-This guide uses a neutral `inventory` module. The module is assembled at
-startup, not installed as a runtime plugin.
+## Declare A Module
 
-## Inventory Module
-
-Declare a module ID, navigation group, page metadata, permission, and two
-translation bundles. Page title and intent keys must start with the module ID.
+A module is a `@Configuration` class that exposes an `AdminModule` bean.
+This example adds an `inventory` page with read permission:
 
 ```java
 package com.example.inventory;
@@ -62,22 +58,26 @@ final class InventoryView extends VerticalLayout {
 }
 ```
 
-The view intentionally has no `@Route`. `vadmin-spring-flow` registers the
-route from `AdminPage` and applies its required permission before construction.
-The permission must be declared in both the page and module. Duplicate module
-IDs, page IDs, routes, navigation groups, permissions, or incompatible
-translation resources fail application startup.
+Key points:
 
-## Translation Resources
+- **Module ID** (`"inventory"`) must be unique across the application.
+- **Page** declares a route (`inventory/items`), a required permission,
+  an icon key, and translation keys for title and intent — all prefixed with
+  the module ID.
+- **View** is a Spring bean (prototype scope) with no `@Route`. VAdmin
+  registers the route from the page metadata and checks the permission
+  before the view is constructed.
+- **Permission** appears in both the page and the module's permission set.
+  The format is `domain:resource:action`, e.g. `inventory:item:read`.
 
-Place two bundles on the consumer classpath:
+## Translations
+
+Provide both locales on the classpath:
 
 ```text
 src/main/resources/i18n/inventory_en_US.properties
 src/main/resources/i18n/inventory_zh_CN.properties
 ```
-
-For example:
 
 ```properties
 # inventory_en_US.properties
@@ -93,72 +93,46 @@ inventory.items.title=库存项目
 inventory.items.intent=查看库存和可用性
 ```
 
-The composite `I18NProvider` combines these resources with VAdmin's default administration module and
-other modules. Resolve module metadata with `getTranslation(page.titleKey())`
-and `getTranslation(page.intentKey())`; do not render raw message keys.
+VAdmin merges your translations with its own, so both the shell and your
+module render in the user's selected locale. In your view, resolve text with
+`getTranslation(page.titleKey())` rather than hard-coding labels.
 
-## Production Frontend Anchor
+## Production Build Anchor
 
-Because the route is registered dynamically, the host must provide one static
-Flow production anchor for every consumer dynamic view. Put the anchor on the
-consumer's existing Spring Boot application class; a normal consumer does not
-create a replacement layout:
+Vaadin's production frontend bundle needs a static reference to each view.
+Add `@Uses` on your application class — one per dynamic view:
 
 ```java
-package com.example.inventory;
-
-import com.vaadin.flow.component.dependency.Uses;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 @Uses(InventoryView.class)
 @SpringBootApplication
 public final class InventoryApplication {
 }
 ```
 
-Use `@Uses(InventoryView.class)` only for the consumer view. Do not put
-`@Route` on `InventoryView`, and do not add `@Uses` for VAdmin's system
-views: VAdmin owns those anchors.
+Do not add `@Route` to your view, and do not add `@Uses` for VAdmin's
+built-in system views — VAdmin handles those.
 
-## Page And Authorization Boundaries
+## Authorization
 
-Views use framework-neutral use cases and authorization contracts, never JPA
-repositories. A page declaration controls navigation visibility and direct
-route access; every mutation must still authorize in the application or
-platform use case before changing state.
+Navigation visibility and direct-route access are controlled by the
+permission declared in the page metadata. For write operations, check the
+permission again inside your service or command before changing state — the
+UI check improves the experience, but the service-level check is the
+authoritative boundary.
 
-Use the highest-level matching `vadmin-flow` pattern (`AdminPageFrame`,
-`PageHeader`, `PageToolbar`, `DataWorkspace`, dialogs, and feedback patterns)
-for standard administration workflows. A repeated workflow missing from those
-patterns is a VAdmin extension concern, not an invitation for each consumer to
-rebuild its own page chrome. Keep any truly domain-specific CSS local to a
-module and based on documented Vaadin component APIs. Modules must not register
-a global `@Theme`, mutate global theme properties, target component internals,
-or depend on VAdmin visual-language CSS.
+## Using Shared Page Patterns
 
-## Intentional Shell Replacement
+VAdmin provides high-level Flow patterns for common admin workflows:
+`AdminPageFrame`, `PageHeader`, `PageToolbar`, and `DataWorkspace`. Use these
+for standard list/detail/edit pages instead of assembling layout primitives
+yourself. Keep any domain-specific CSS scoped to your own component class and
+based on documented Vaadin component APIs.
 
-A custom shell is an explicit complete replacement. Only choose it when the
-VAdmin's default shell and theme cannot meet the product boundary. Provide an
-`AdminHostLayout`, an `AppShellConfigurator`, and `@Theme` configuration owned
-by the consumer, then provide production anchors for every dynamic view it
-composes.
+## Replacing The Shell
 
-Do not replace isolated system pages, selected shell components, or individual
-theme internals. A replacement still uses VAdmin's module assembly,
-`AdminModuleRegistry`, composite translations, permission catalog, and route
-guards. Consumers that only add business pages should retain the default shell.
-
-## Module Checklist
-
-- Depend on `vadmin-spring-boot-starter` in the application.
-- Contribute one `AdminModule` bean with module-owned IDs, routes, permissions,
-  icon keys, and both `zh-CN` and `en-US` message resources.
-- Make each dynamically registered View a Spring bean, normally with prototype
-  scope, and omit `@Route`.
-- Add one host `@Uses(ModuleView.class)` production anchor for each consumer
-  dynamic View.
-- Authorize mutations in use cases and use shared Flow patterns and Vaadin
-  component APIs.
-- Leave the default shell, theme, system administration, and its production
-  anchors to VAdmin unless intentionally replacing the complete shell.
+The default shell is intentionally all-or-nothing. Only replace it if the
+complete product boundary requires a different shell — not to tweak
+individual pages or styles. A replacement means owning the full
+`AppShellConfigurator`, `@Theme`, and layout, while still using VAdmin's
+module assembly, permissions, and route registration. Most consumers should
+keep the default shell unchanged.
