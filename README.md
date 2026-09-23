@@ -2,8 +2,12 @@
 
 VAdmin is published as `io.github.youngledo:vadmin-spring-boot-starter`.
 
-VAdmin is a Spring Boot and Vaadin Flow baseline for internal
-business applications. Add `vadmin-spring-boot-starter` to receive local login,
+VAdmin is a Java-first administration baseline for Vaadin Flow. Its reusable
+core — identity and permission contracts, RBAC use cases, and the shared
+shell patterns — is framework-neutral, and runtime-specific behavior lives in
+adapter modules, so runtimes beyond Spring Boot (such as Quarkus, Helidon, or
+Jakarta EE) remain possible future adapters. Spring Boot is the only supported
+runtime today: add `vadmin-spring-boot-starter` to receive local login,
 permission-filtered navigation, the default shell and theme, Users, Roles,
 Permissions, Audit, locale selection, and appearance controls. It is not a
 collection of showcase pages or a runtime plugin platform.
