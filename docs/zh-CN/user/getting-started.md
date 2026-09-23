@@ -10,11 +10,15 @@
 ## 前置条件
 
 - 基于 Java 25 的 Spring Boot 应用。
-- 一个 PostgreSQL 数据库（VAdmin 的表结构由 Flyway 迁移管理）。
 - classpath 上的 Vaadin Flow 25.x。
 
 如果你的应用尚未使用 Vaadin Flow，starter 会传递引入。VAdmin 不包含 Hilla、
 React 或 TypeScript。
+
+默认的本地 IAM（Users、Roles、Permissions、Audit）需要 PostgreSQL 数据库——
+VAdmin 通过 Flyway 管理自己的表结构。如果你的应用已经使用 PostgreSQL，直接指向
+它（第 2 步）。如果你自带身份与授权，用 `vadmin.local-iam.enabled=false` 关闭
+本地 IAM，则不需要数据库。
 
 ## 1. 添加依赖
 

@@ -12,11 +12,16 @@ or system pages — VAdmin provides them.
 ## Prerequisites
 
 - A Spring Boot application built with Java 25.
-- A PostgreSQL database (VAdmin owns its schema through Flyway migrations).
 - Vaadin Flow 25.x on the classpath.
 
 If your application does not yet use Vaadin Flow, the starter brings it in
 transitively. VAdmin does not include Hilla, React, or TypeScript.
+
+The default local IAM (Users, Roles, Permissions, Audit) needs a PostgreSQL
+database — VAdmin manages its own schema through Flyway. If your application
+already uses PostgreSQL, point VAdmin at it (step 2). If you bring your own
+identity and authorization, disable local IAM with
+`vadmin.local-iam.enabled=false` and no database is required.
 
 ## 1. Add The Dependency
 
