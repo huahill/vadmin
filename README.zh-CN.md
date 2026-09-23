@@ -1,6 +1,6 @@
 # VAdmin
 
-[English](README.md) | 简体中文
+简体中文 | [English](README.md)
 
 VAdmin 是一个 Java 优先、面向 Vaadin Flow 的管理基线。它的可复用核心——
 身份与权限契约、RBAC 用例和共享外壳模式——框架无关，运行时专属行为归入适配层，

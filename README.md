@@ -1,6 +1,6 @@
 # VAdmin
 
-[简体中文](README.zh-CN.md) | English
+English | [简体中文](README.zh-CN.md)
 
 VAdmin is a Java-first administration baseline for Vaadin Flow. Its reusable
 core — identity and permission contracts, RBAC use cases, and the shared
