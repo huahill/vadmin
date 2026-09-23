@@ -24,7 +24,7 @@ vadmin:
 <dependency>
   <groupId>io.github.youngledo</groupId>
   <artifactId>vadmin-spring-boot-starter</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1-SNAPSHOT</version>
   <exclusions>
     <exclusion>
       <groupId>io.github.youngledo</groupId>

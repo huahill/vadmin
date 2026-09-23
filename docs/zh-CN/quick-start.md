@@ -109,7 +109,7 @@ docker compose --env-file .env up --build
 ```bash
 ./mvnw -B -ntp -Pproduction -pl :vadmin-reference-app -am package -DskipTests
 SPRING_PROFILES_ACTIVE=prod \
-  java -jar vadmin-reference-app/target/vadmin-reference-app-0.2.0.jar
+  java -jar vadmin-reference-app/target/vadmin-reference-app-0.2.1-SNAPSHOT.jar
 ```
 
 清除本地演示数据会删除 Compose 卷。执行前确认没有需要保留的数据：
