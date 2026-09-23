@@ -14,6 +14,9 @@
 
 ### Fixed
 
+- `vadmin-spring-jpa` 显式声明 `tools.jackson.core:jackson-databind`：Hibernate 的
+  jsonb 审计列需要 JSON FormatMapper，此前依赖 flyway-core 的传递依赖，而 flyway
+  13.7.0 已将其改为 optional 导致解析失败。
 - 窄屏（overlay 抽屉）下默认外壳不再保持抽屉打开：Vaadin 25.3 会在覆盖式抽屉
   打开时将主内容移出无障碍树，现进入 overlay 模式时自动收起抽屉；桌面宽屏仍默认展开。
 
