@@ -8,6 +8,9 @@
     </parent>
     <artifactId>vadmin-reference-app</artifactId>
     <name>VAdmin Reference App</name>
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <dependencies>
         <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-spring-boot-starter</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-dev</artifactId><version>${vaadin.version}</version><optional>true</optional></dependency>
