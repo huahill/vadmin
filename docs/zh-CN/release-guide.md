@@ -6,12 +6,12 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
 ## 范围
 
-本指南定义首个公开 `0.1.0` 版本。该版本将 `vadmin-spring-boot-starter` 作为受支持的接入制品：
+本指南定义 `0.2.0` 版本。该版本将 `vadmin-spring-boot-starter` 作为受支持的接入制品：
 默认外壳和主题、系统管理、模块组装，以及使用方所需的 Spring 适配器。
 
 ## 已验证兼容性基线
 
-| 领域 | `0.1.0` 已验证基线 | 发布边界 |
+| 领域 | `0.2.0` 已验证基线 | 发布边界 |
 | --- | --- | --- |
 | JDK | Java 25 | 构建和运行使用方均要求 Java 25。 |
 | 构建工具 | Maven Wrapper 4.0.0-rc-6 | 升级到 Maven GA 属于独立工作。 |
@@ -61,7 +61,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.1.0-rc .
+docker build -t vadmin:0.2.0-rc .
 ```
 
 - [ ] 两条 Maven 命令均以 `BUILD SUCCESS` 结束。
@@ -106,7 +106,7 @@ annotated tag，且准确指向已验证的发布提交。
 ```
 
 该 profile 会等待 Central Portal 发布完成。然后在干净的使用方项目中确认
-`io.github.youngledo:vadmin-spring-boot-starter:0.1.0` 可以解析。
+`io.github.youngledo:vadmin-spring-boot-starter:0.2.0` 可以解析。
 
 ## SNAPSHOT 发布
 

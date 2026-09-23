@@ -120,7 +120,7 @@ production artifact excludes the Vaadin development server:
 ```bash
 ./mvnw -B -ntp -Pproduction -pl :vadmin-reference-app -am package -DskipTests
 SPRING_PROFILES_ACTIVE=prod \
-  java -jar vadmin-reference-app/target/vadmin-reference-app-0.1.2-SNAPSHOT.jar
+  java -jar vadmin-reference-app/target/vadmin-reference-app-0.2.0.jar
 ```
 
 Removing local demonstration data deletes Compose volumes. Confirm that no

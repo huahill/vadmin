@@ -6,14 +6,14 @@ VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
 ## Scope
 
-This guide defines the first public `0.1.0` release. The release delivers
+This guide defines the `0.2.0` release. The release delivers
 `vadmin-spring-boot-starter` as the supported adoption artifact: default shell
 and theme, system administration, module assembly, and the Spring adapters
 needed by a consumer.
 
 ## Verified Compatibility Baseline
 
-| Area | `0.1.0` verified baseline | Release boundary |
+| Area | `0.2.0` verified baseline | Release boundary |
 | --- | --- | --- |
 | JDK | Java 25 | Java 25 is required to build and run a consumer. |
 | Build tool | Maven Wrapper 4.0.0-rc-6 | A Maven GA upgrade is independent work. |
@@ -74,7 +74,7 @@ output, tool versions, image digest, release commit, and tag.
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.1.0-rc .
+docker build -t vadmin:0.2.0-rc .
 ```
 
 - [ ] Both Maven commands complete with `BUILD SUCCESS`.
@@ -133,7 +133,7 @@ For an exceptional local publication, credentials belong in the local Maven
 ```
 
 The profile waits for Central Portal publication to complete. Then verify a
-clean consumer resolves `io.github.youngledo:vadmin-spring-boot-starter:0.1.0`.
+clean consumer resolves `io.github.youngledo:vadmin-spring-boot-starter:0.2.0`.
 
 ## SNAPSHOT Publication
 
