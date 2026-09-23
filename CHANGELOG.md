@@ -4,6 +4,23 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-23
+
+### Changed
+
+- GitHub 组织迁移至 `huahill`，Maven groupId 改为 `io.github.huahill`，
+  Java 包名改为 `io.github.huahill.vadmin.*`。
+- 配置属性前缀统一到 `vadmin.*` 命名空间：`app.brand` → `vadmin.brand`、
+  `app.appearance` → `vadmin.appearance`、`app.shell` → `vadmin.shell`、
+  `app.bootstrap` → `vadmin.bootstrap`、`app.identity` → `vadmin.identity`。
+  环境变量名（`APP_BOOTSTRAP_PASSWORD` 等）不变。
+
+### Breaking changes
+
+- Maven groupId 从 `io.github.youngledo` 变更为 `io.github.huahill`。
+- Java 包从 `io.github.youngledo.vadmin.*` 变更为 `io.github.huahill.vadmin.*`。
+- 配置属性前缀从 `app.*` 变更为 `vadmin.*`。
+
 ## [0.2.0] - 2026-09-23
 
 ### Changed

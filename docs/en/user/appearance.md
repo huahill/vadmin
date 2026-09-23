@@ -14,7 +14,7 @@ preference from the shell's user menu.
 ## Configuration
 
 ```yaml
-app:
+vadmin:
   appearance:
     visual-language: ant # vaadin | ant
 ```

@@ -1,6 +1,6 @@
 # VAdmin - Architecture
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 English | [简体中文](../../zh-CN/dev/architecture.md)
 

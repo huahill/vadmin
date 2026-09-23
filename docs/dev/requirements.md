@@ -1,6 +1,6 @@
 # VAdmin - Requirements
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 Status: Draft 0.1  
 Date: 2026-08-04

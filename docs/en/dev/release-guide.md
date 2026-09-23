@@ -1,6 +1,6 @@
 # Release Guide
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 [简体中文](../../zh-CN/dev/release-guide.md) | English
 
@@ -29,7 +29,7 @@ updated compatibility evidence, and both normal and production verification.
 
 ## Consumer Upgrade Rules
 
-1. Update all `io.github.youngledo` dependencies to the same target
+1. Update all `io.github.huahill` dependencies to the same target
    version. Do not mix released artifacts with snapshot siblings.
 2. Run the consumer with Java 25 and align Spring Boot and Vaadin with the
    verified release table.
@@ -133,12 +133,12 @@ For an exceptional local publication, credentials belong in the local Maven
 ```
 
 The profile waits for Central Portal publication to complete. Then verify a
-clean consumer resolves `io.github.youngledo:vadmin-spring-boot-starter:0.2.0`.
+clean consumer resolves `io.github.huahill:vadmin-spring-boot-starter:0.2.0`.
 
 ## SNAPSHOT Publication
 
 Central Portal must have SNAPSHOT publishing enabled for the
-`io.github.youngledo` namespace. The `Snapshot` GitHub Actions workflow runs
+`io.github.huahill` namespace. The `Snapshot` GitHub Actions workflow runs
 automatically for non-documentation pushes to `main` and can also be started
 manually. It uses the `vadmin` environment and the same
 `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` secrets as the release

@@ -1,0 +1,72 @@
+package io.github.huahill.vadmin.flow.patterns;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import io.github.huahill.vadmin.contracts.error.BusinessFailure;
+import io.github.huahill.vadmin.contracts.error.ErrorCode;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.Test;
+
+class OperationFeedbackTest {
+    @Test
+    void supportsRedisSessionSerialization() throws Exception {
+        var bytes = new ByteArrayOutputStream();
+        try (var output = new ObjectOutputStream(bytes)) {
+            output.writeObject(new OperationFeedback());
+        }
+
+        try (var input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            assertThat(input.readObject()).isInstanceOf(OperationFeedback.class);
+        }
+    }
+
+    @Test
+    void presentsSuccessOnlyThroughTheConfiguredLocalPresenter() {
+        var message = new AtomicReference<String>();
+        var feedback = new OperationFeedback(message::set);
+
+        feedback.success("User disabled");
+
+        assertThat(message).hasValue("User disabled");
+    }
+
+    @Test
+    void presentsErrorsThroughTheConfiguredErrorPresenter() {
+        var message = new AtomicReference<String>();
+        var feedback = new OperationFeedback(ignored -> { }, message::set);
+
+        feedback.error("User update failed");
+
+        assertThat(message).hasValue("User update failed");
+    }
+
+    @Test
+    void sendsValidationFailuresToTheLocalFailureHandler() {
+        var handled = new AtomicReference<BusinessFailure>();
+        var feedback = new OperationFeedback(message -> { });
+        var validation = new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
+                Map.of("username", "required"));
+
+        feedback.handleFailure(validation, handled::set);
+
+        assertThat(handled).hasValue(validation);
+    }
+
+    @Test
+    void rethrowsAuthorizationAndUnexpectedFailuresForGlobalHandling() {
+        var feedback = new OperationFeedback(message -> { });
+        var authorization = new BusinessFailure(ErrorCode.AUTHORIZATION_DENIED, "authorization.denied", Map.of());
+        var unexpected = new IllegalStateException("unexpected");
+
+        assertThatThrownBy(() -> feedback.handleFailure(authorization, failure -> { }))
+                .isSameAs(authorization);
+        assertThatThrownBy(() -> feedback.handleFailure(unexpected, failure -> { }))
+                .isSameAs(unexpected);
+    }
+}

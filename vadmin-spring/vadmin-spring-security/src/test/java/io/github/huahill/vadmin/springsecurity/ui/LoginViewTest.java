@@ -1,0 +1,114 @@
+package io.github.huahill.vadmin.springsecurity.ui;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.login.LoginOverlay;
+import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.di.Instantiator;
+import com.vaadin.flow.function.DeploymentConfiguration;
+import com.vaadin.flow.i18n.I18NProvider;
+import com.vaadin.flow.router.Location;
+import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinService;
+import io.github.huahill.vadmin.springsecurity.OidcLoginAvailability;
+import io.github.huahill.vadmin.springsecurity.auth.LocalLoginAuthenticator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class LoginViewTest {
+    private VaadinService service;
+    private LocalLoginAuthenticator localLoginAuthenticator;
+
+    @BeforeEach
+    void installEnglishTranslations() {
+        var translations = mock(I18NProvider.class);
+        when(translations.getDefaultLocale()).thenReturn(Locale.US);
+        when(translations.getProvidedLocales()).thenReturn(List.of(Locale.US));
+        when(translations.getTranslation("flow.login.heading", Locale.US)).thenReturn("VAdmin");
+        when(translations.getTranslation("flow.login.title", Locale.US)).thenReturn("Sign in");
+        when(translations.getTranslation("flow.login.sso", Locale.US)).thenReturn("Continue with single sign-on");
+        when(translations.getTranslation("flow.login.denied", Locale.US)).thenReturn("Sign-in was not permitted");
+        var instantiator = mock(Instantiator.class);
+        when(instantiator.getI18NProvider()).thenReturn(translations);
+        service = mock(VaadinService.class, CALLS_REAL_METHODS);
+        when(service.getInstantiator()).thenReturn(instantiator);
+        var deploymentConfiguration = mock(DeploymentConfiguration.class);
+        when(deploymentConfiguration.getUrlSafeSchemes()).thenReturn(Set.of("http", "https"));
+        when(service.getDeploymentConfiguration()).thenReturn(deploymentConfiguration);
+        VaadinService.setCurrent(service);
+        localLoginAuthenticator = mock(LocalLoginAuthenticator.class);
+    }
+
+    @AfterEach
+    void clearVaadinService() {
+        service.setCurrentInstances(null, null);
+        VaadinService.setCurrent(null);
+    }
+
+    @Test
+    void rendersOneProviderNeutralExternalEntryWhenOidcIsAvailable() {
+        var view = new LoginView(new OidcLoginAvailability(true, "oidc"), localLoginAuthenticator);
+
+        var externalEntry = oidcEntry(view);
+        assertThat(externalEntry.getAttribute("href")).isEqualTo("/oauth2/authorization/oidc");
+        assertThat(externalEntry.hasAttribute("router-ignore")).isTrue();
+        assertThat(externalEntry.getText()).isEqualTo("Continue with single sign-on");
+        assertThat(view.getChildren()).anyMatch(LoginOverlay.class::isInstance);
+        assertThat(LoginView.class.getAnnotation(com.vaadin.flow.router.Route.class).autoLayout()).isFalse();
+    }
+
+    @Test
+    void usesTheConfiguredRegistrationIdForTheExternalEntry() {
+        var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
+
+        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("/oauth2/authorization/corp-sso");
+    }
+
+    @Test
+    void prefixesTheExternalEntryWithTheCurrentContextPath() {
+        var request = mock(VaadinRequest.class);
+        when(request.getContextPath()).thenReturn("/admin");
+        service.setCurrentInstances(request, null);
+
+        var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
+
+        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("/admin/oauth2/authorization/corp-sso");
+    }
+
+    @Test
+    void keepsTheExistingLocalLoginWithoutAnExternalEntryWhenOidcIsUnavailable() {
+        var view = new LoginView(new OidcLoginAvailability(false, "oidc"), localLoginAuthenticator);
+
+        assertThat(loginOverlay(view).getElement().getChildren()).noneMatch(element -> "a".equals(element.getTag()));
+        assertThat(loginOverlay(view).getAction()).isEmpty();
+    }
+
+    @Test
+    void showsTheGenericLoginFormErrorAfterLocalCredentialsAreRejected() {
+        var view = new LoginView(new OidcLoginAvailability(false, "oidc"), localLoginAuthenticator);
+        var event = mock(com.vaadin.flow.router.BeforeEnterEvent.class);
+        when(event.getLocation()).thenReturn(new Location("login", QueryParameters.of("error", "")));
+
+        view.beforeEnter(event);
+
+        assertThat(loginOverlay(view).isError()).isTrue();
+    }
+
+    private static LoginOverlay loginOverlay(LoginView view) {
+        return view.getChildren().filter(LoginOverlay.class::isInstance).map(LoginOverlay.class::cast).findFirst().orElseThrow();
+    }
+
+    private static Element oidcEntry(LoginView view) {
+        return loginOverlay(view).getElement().getChildren().filter(element -> "a".equals(element.getTag()))
+                .findFirst().orElseThrow();
+    }
+}

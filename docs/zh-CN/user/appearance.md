@@ -13,7 +13,7 @@ VAdmin 提供两种视觉语言，均支持跟随系统/浅色/深色配色方�
 ## 配置
 
 ```yaml
-app:
+vadmin:
   appearance:
     visual-language: ant # vaadin | ant
 ```

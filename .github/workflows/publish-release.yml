@@ -109,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          central_pom_url="https://repo.maven.apache.org/maven2/io/github/youngledo/vadmin-spring-boot-starter/${RELEASE_VERSION}/vadmin-spring-boot-starter-${RELEASE_VERSION}.pom"
+          central_pom_url="https://repo.maven.apache.org/maven2/io/github/huahill/vadmin-spring-boot-starter/${RELEASE_VERSION}/vadmin-spring-boot-starter-${RELEASE_VERSION}.pom"
           central_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --head "${central_pom_url}")"
           case "${central_status}" in
             200) echo "already_published=true" >> "${GITHUB_OUTPUT}" ;;
@@ -166,7 +166,7 @@ jobs:
           RELEASE_VERSION: ${{ steps.release_source.outputs.version }}
         run: |
           set -euo pipefail
-          printf 'Maven Central already contains io.github.youngledo:vadmin-spring-boot-starter:%s. Deployment was not retried.\n' \
+          printf 'Maven Central already contains io.github.huahill:vadmin-spring-boot-starter:%s. Deployment was not retried.\n' \
             "${RELEASE_VERSION}" > central-deploy.log
 
       - name: Verify Maven Central publication
@@ -176,7 +176,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          central_pom_url="https://repo.maven.apache.org/maven2/io/github/youngledo/vadmin-spring-boot-starter/${RELEASE_VERSION}/vadmin-spring-boot-starter-${RELEASE_VERSION}.pom"
+          central_pom_url="https://repo.maven.apache.org/maven2/io/github/huahill/vadmin-spring-boot-starter/${RELEASE_VERSION}/vadmin-spring-boot-starter-${RELEASE_VERSION}.pom"
           for attempt in $(seq 1 40); do
             central_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --head \
               --connect-timeout 5 --max-time 5 "${central_pom_url}")"
@@ -205,7 +205,7 @@ jobs:
           consumer_repository="${RUNNER_TEMP}/vadmin-central-consumer-repository"
           mvn -B -ntp -Dmaven.repo.local="${consumer_repository}" \
             org.apache.maven.plugins:maven-dependency-plugin:3.8.1:get \
-            -Dartifact="io.github.youngledo:vadmin-spring-boot-starter:${RELEASE_VERSION}"
+            -Dartifact="io.github.huahill:vadmin-spring-boot-starter:${RELEASE_VERSION}"
 
       - name: Capture Maven Central deployment details
         if: always()
@@ -216,7 +216,7 @@ jobs:
           mkdir -p release-evidence
           {
             echo "release_version=${RELEASE_VERSION}"
-            echo "central_repository_group=io.github.youngledo"
+            echo "central_repository_group=io.github.huahill"
             echo "central_repository_artifact=vadmin-spring-boot-starter"
             echo "central_repository_published=${{ steps.central_publication_complete.outputs.published }}"
             echo

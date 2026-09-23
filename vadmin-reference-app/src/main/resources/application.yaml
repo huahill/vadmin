@@ -10,7 +10,7 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
-app:
+vadmin:
   bootstrap:
     password: ${APP_BOOTSTRAP_PASSWORD:}
   appearance:

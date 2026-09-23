@@ -26,8 +26,8 @@ property changes.
 - **If you only depend on `vadmin-spring-boot-starter`**: no changes needed.
   Your build keeps working.
 - **If your code imported VAdmin internal classes**: packages moved from
-  `io.github.youngledo.vadmin.starter.*` to `io.github.youngledo.vadmin.*`.
+  `io.github.huahill.vadmin.starter.*` to `io.github.huahill.vadmin.*`.
   Update your imports and the `@EnableVaadin` package list (now just
-  `io.github.youngledo.vadmin`).
+  `io.github.huahill.vadmin`).
 - **Narrow screens**: the navigation drawer no longer stays open by default
   on phone-width viewports. Desktop behavior is unchanged.

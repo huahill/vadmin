@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.youngledo</groupId>
+        <groupId>io.github.huahill</groupId>
         <artifactId>vadmin-parent</artifactId>
-        <version>0.2.1-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>vadmin-flow</artifactId>
     <name>VAdmin Flow</name>
     <dependencies>
         <dependency>
-            <groupId>io.github.youngledo</groupId>
+            <groupId>io.github.huahill</groupId>
             <artifactId>vadmin-platform</artifactId>
             <version>${project.version}</version>
         </dependency>

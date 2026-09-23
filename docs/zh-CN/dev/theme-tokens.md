@@ -1,6 +1,6 @@
 # 主题策略
 
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 [English](../../en/dev/theme-tokens.md) | 简体中文
 

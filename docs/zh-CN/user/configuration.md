@@ -8,12 +8,12 @@
 
 | 属性 | 默认值 | 用途 |
 | --- | --- | --- |
-| `app.brand.name` | `VAdmin` | 外壳品牌区展示的产品名称，留空回退默认值。 |
-| `app.appearance.visual-language` | `vaadin` | 外壳视觉语言：`vaadin`（原生 Lumo）或 `ant`（Ant Design 风格），未知值回退 `vaadin`。 |
-| `app.shell.workplace-enabled` | `true` | 显示或隐藏内置的工作台首页入口。 |
+| `vadmin.brand.name` | `VAdmin` | 外壳品牌区展示的产品名称，留空回退默认值。 |
+| `vadmin.appearance.visual-language` | `vaadin` | 外壳视觉语言：`vaadin`（原生 Lumo）或 `ant`（Ant Design 风格），未知值回退 `vaadin`。 |
+| `vadmin.shell.workplace-enabled` | `true` | 显示或隐藏内置的工作台首页入口。 |
 
 ```yaml
-app:
+vadmin:
   brand:
     name: 库存运营台
   appearance:
@@ -36,7 +36,7 @@ OIDC 登录只会将已认证的外部身份映射到已有且启用的本地账
 
 | 属性 | 来源 | 用途 |
 | --- | --- | --- |
-| `app.bootstrap.password` | 通常为 `${APP_BOOTSTRAP_PASSWORD}` | 数据库为空时创建初始 `admin` 账户所用的密码。`development` profile 回退为 `change-me`；其他 profile 在空数据库启动时缺少该值会拒绝启动。 |
+| `vadmin.bootstrap.password` | 通常为 `${APP_BOOTSTRAP_PASSWORD}` | 数据库为空时创建初始 `admin` 账户所用的密码。`development` profile 回退为 `change-me`；其他 profile 在空数据库启动时缺少该值会拒绝启动。 |
 
 引导密码只用于创建第一个管理员，不会重置已有账户，事后修改对已有用户没有影响。
 

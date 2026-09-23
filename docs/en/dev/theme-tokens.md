@@ -1,6 +1,6 @@
 # Theme Policy
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 [简体中文](../../zh-CN/dev/theme-tokens.md) | English
 

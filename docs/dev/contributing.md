@@ -1,6 +1,6 @@
 # 贡献指南
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 ## 兼容性基线
 

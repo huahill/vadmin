@@ -1,6 +1,6 @@
 # VAdmin - 架构
 
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 [English](../../en/dev/architecture.md) | 简体中文
 

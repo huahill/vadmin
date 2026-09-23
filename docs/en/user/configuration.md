@@ -9,12 +9,12 @@ required; everything else has a working default.
 
 | Property | Default | Purpose |
 | --- | --- | --- |
-| `app.brand.name` | `VAdmin` | Product name shown in the shell brand area. Blank values fall back to the default. |
-| `app.appearance.visual-language` | `vaadin` | Shell visual language: `vaadin` (native Lumo) or `ant` (Ant-Design-inspired). Unknown values fall back to `vaadin`. |
-| `app.shell.workplace-enabled` | `true` | Shows or hides the built-in workplace home entry. |
+| `vadmin.brand.name` | `VAdmin` | Product name shown in the shell brand area. Blank values fall back to the default. |
+| `vadmin.appearance.visual-language` | `vaadin` | Shell visual language: `vaadin` (native Lumo) or `ant` (Ant-Design-inspired). Unknown values fall back to `vaadin`. |
+| `vadmin.shell.workplace-enabled` | `true` | Shows or hides the built-in workplace home entry. |
 
 ```yaml
-app:
+vadmin:
   brand:
     name: Inventory Operations
   appearance:
@@ -38,7 +38,7 @@ local account. It never provisions accounts or synchronizes roles; see the
 
 | Property | Source | Purpose |
 | --- | --- | --- |
-| `app.bootstrap.password` | usually `${APP_BOOTSTRAP_PASSWORD}` | Password assigned to the initial `admin` account when the database is empty. The `development` profile falls back to `change-me`; any other profile refuses to start on an empty database without it. |
+| `vadmin.bootstrap.password` | usually `${APP_BOOTSTRAP_PASSWORD}` | Password assigned to the initial `admin` account when the database is empty. The `development` profile falls back to `change-me`; any other profile refuses to start on an empty database without it. |
 
 The bootstrap password is only used to create the first administrator. It
 never resets an existing account, and changing it later has no effect on

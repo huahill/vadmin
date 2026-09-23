@@ -60,7 +60,7 @@ void fallsBackToSafeValuesForUnknownAppearanceValues() {
 }
 ```
 
-Extend `ApplicationConfigurationTest` to pass `app.appearance.visual-language=ant` and `app.appearance.density=compact` to its existing context runner, then assert the single `AdminAppearanceProperties` bean resolves to `ANT` and `COMPACT`.
+Extend `ApplicationConfigurationTest` to pass `vadmin.appearance.visual-language=ant` and `vadmin.appearance.density=compact` to its existing context runner, then assert the single `AdminAppearanceProperties` bean resolves to `ANT` and `COMPACT`.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -239,7 +239,7 @@ Create a self-contained Playwright/Testcontainers class based on the minimal fix
 
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"app.appearance.visual-language=ant", "app.appearance.density=comfortable"})
+        properties = {"vadmin.appearance.visual-language=ant", "app.appearance.density=comfortable"})
 @Testcontainers
 @ActiveProfiles("development")
 class AntVisualLanguageE2EIT { }
@@ -255,7 +255,7 @@ Expected: test fails until host attributes and Ant tokens exist. Docker and Play
 
 - [ ] **Step 3: Write the failing Ant compact tests**
 
-Create the same focused fixture with `app.appearance.density=compact`. Assert the root attributes, compare computed compact `--admin-control-height` and `--admin-grid-cell-padding` against the comfortable values, and prove both are smaller. At a 390px mobile viewport, open the drawer, navigate to Customers, and use the existing `assertNarrowShellDoesNotOverflow` bounding-box algorithm. Select dark mode and verify compact density remains active while the Customer create/edit dialog is visible and usable.
+Create the same focused fixture with `vadmin.appearance.density=compact`. Assert the root attributes, compare computed compact `--admin-control-height` and `--admin-grid-cell-padding` against the comfortable values, and prove both are smaller. At a 390px mobile viewport, open the drawer, navigate to Customers, and use the existing `assertNarrowShellDoesNotOverflow` bounding-box algorithm. Select dark mode and verify compact density remains active while the Customer create/edit dialog is visible and usable.
 
 - [ ] **Step 4: Run it to verify it fails**
 
@@ -294,7 +294,7 @@ git commit -m "test: cover Flow visual language profiles"
 
 - [ ] **Step 1: Write failing documentation assertions**
 
-Extend `AdminThemeTokenTest.documentsEveryRequiredSemanticToken` so the new control-height and grid-padding tokens are required in `docs/en/theme-tokens.md`. Add a test reading `docs/en/appearance-profiles.md` that asserts it contains `app.appearance.visual-language`, `app.appearance.density`, `vaadin`, `ant`, `comfortable`, and `compact`.
+Extend `AdminThemeTokenTest.documentsEveryRequiredSemanticToken` so the new control-height and grid-padding tokens are required in `docs/en/theme-tokens.md`. Add a test reading `docs/en/appearance-profiles.md` that asserts it contains `vadmin.appearance.visual-language`, `vadmin.appearance.density`, `vaadin`, `ant`, `comfortable`, and `compact`.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -307,7 +307,7 @@ Expected: failure because the new public contract is undocumented.
 Update `docs/en/theme-tokens.md` to explain the independent visual-language, color-mode, and density axes; document the two new tokens; and forbid module-level profile selection or global Lumo mutation. Create `docs/en/appearance-profiles.md` and `docs/zh-CN/appearance-profiles.md` with this exact configuration example:
 
 ```yaml
-app:
+vadmin:
   appearance:
     visual-language: ant # vaadin | ant
     density: compact # comfortable | compact

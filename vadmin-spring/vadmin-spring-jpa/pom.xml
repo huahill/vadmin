@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.youngledo</groupId>
+        <groupId>io.github.huahill</groupId>
         <artifactId>vadmin-spring</artifactId>
-        <version>0.2.1-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>vadmin-spring-jpa</artifactId>
     <name>VAdmin Spring JPA</name>
     <dependencies>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-platform</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-platform</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-flyway</artifactId></dependency>
         <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-core</artifactId><version>${flyway.version}</version></dependency>

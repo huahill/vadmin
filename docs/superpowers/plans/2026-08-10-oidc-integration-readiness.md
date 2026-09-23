@@ -264,7 +264,7 @@ Expected: FAIL because the reference mapper and typed configuration are absent.
 
 - [ ] **Step 3: Implement explicit configuration-only linking**
 
-Define a typed `app.identity.oidc.links` list with an `issuer`, `subject`, and
+Define a typed `vadmin.identity.oidc.links` list with an `issuer`, `subject`, and
 `username` record for each link. Resolve it through
 `LocalUserAccountLookup`; return empty for unknown, disabled, or invalid links.
 Do not create accounts, inspect groups, or assign roles. Register the mapper

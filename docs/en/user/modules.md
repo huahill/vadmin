@@ -16,11 +16,11 @@ This example adds an `inventory` page with read permission:
 package com.example.inventory;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import io.github.youngledo.vadmin.contracts.auth.PermissionCode;
-import io.github.youngledo.vadmin.flow.navigation.AdminMessageBundle;
-import io.github.youngledo.vadmin.flow.navigation.AdminModule;
-import io.github.youngledo.vadmin.flow.navigation.AdminNavigationGroup;
-import io.github.youngledo.vadmin.flow.navigation.AdminPage;
+import io.github.huahill.vadmin.contracts.auth.PermissionCode;
+import io.github.huahill.vadmin.flow.navigation.AdminMessageBundle;
+import io.github.huahill.vadmin.flow.navigation.AdminModule;
+import io.github.huahill.vadmin.flow.navigation.AdminNavigationGroup;
+import io.github.huahill.vadmin.flow.navigation.AdminPage;
 import java.util.List;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;

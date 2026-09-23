@@ -20,7 +20,7 @@ React 或 TypeScript。
 
 ```xml
 <dependency>
-  <groupId>io.github.youngledo</groupId>
+  <groupId>io.github.huahill</groupId>
   <artifactId>vadmin-spring-boot-starter</artifactId>
   <version>${vadmin.version}</version>
 </dependency>
@@ -30,7 +30,7 @@ React 或 TypeScript。
 与系统视图。这是 Vaadin 的路由发现要求，不是自行组装外壳：
 
 ```java
-@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin"})
+@EnableVaadin({"com.example.inventory", "io.github.huahill.vadmin"})
 @SpringBootApplication
 public class InventoryApplication {
 }
@@ -84,7 +84,7 @@ APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 可选地设置外壳中展示的产品名称，无需替换布局：
 
 ```yaml
-app:
+vadmin:
   brand:
     name: 库存运营台
 ```

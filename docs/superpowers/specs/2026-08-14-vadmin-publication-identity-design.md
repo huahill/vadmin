@@ -16,14 +16,14 @@ inherits Spring Boot's application parent.
 
 1. The product and GitHub repository name is **VAdmin** and the repository is
    `youngledo/vadmin`.
-2. The Maven ownership namespace is `io.github.youngledo`.
+2. The Maven ownership namespace is `io.github.huahill`.
 3. Public artifacts use the `vadmin-` prefix:
    `vadmin-contracts`, `vadmin-platform`, `vadmin-flow`,
    `vadmin-spring-security`, `vadmin-spring-jpa`, `vadmin-spring-boot`,
    `vadmin-spring-flow`, and `vadmin-spring-boot-starter`.
 4. The reference consumer is `vadmin-reference-app`; the Spring aggregator is
    `vadmin-spring`.
-5. Java packages use `io.github.youngledo.vadmin` as their root, with the
+5. Java packages use `io.github.huahill.vadmin` as their root, with the
    existing bounded suffixes (`contracts`, `platform`, `flow`, `springsecurity`,
    `springjpa`, `springboot`, `springflow`, `starter`, and `app`).
 6. No compatibility coordinates, old package aliases, relocation POMs, or
@@ -42,8 +42,8 @@ The public identity is separated into four layers:
 | --- | --- | --- |
 | Product | VAdmin | Human-facing name in README, shell brand, docs, and release notes. |
 | GitHub | `youngledo/vadmin` | Repository and issue URL root. |
-| Maven | `io.github.youngledo:vadmin-*` | Stable ownership namespace plus artifact prefix. |
-| Java | `io.github.youngledo.vadmin.*` | Package namespace follows Maven ownership and product identity. |
+| Maven | `io.github.huahill:vadmin-*` | Stable ownership namespace plus artifact prefix. |
+| Java | `io.github.huahill.vadmin.*` | Package namespace follows Maven ownership and product identity. |
 
 The product must not use `Pro` in its name. That word implies a commercial or
 feature-tier distinction that this community project does not provide. Vaadin
@@ -59,7 +59,7 @@ management. It must not inherit application defaults from Spring Boot.
 It declares complete publication metadata at the root: `VAdmin` as name, a
 Java/Vaadin Flow administration-baseline description, the Apache-2.0 license,
 `youngledo` as developer, and the Git/SCM URLs for
-`https://github.com/youngledo/vadmin`. Child modules inherit this metadata
+`https://github.com/huahill/vadmin`. Child modules inherit this metadata
 unless a module has a materially different public description.
 
 The dependency management section imports the Spring Boot BOM:
@@ -98,7 +98,7 @@ the supported runtime. A consumer still depends on one starter:
 
 ```xml
 <dependency>
-    <groupId>io.github.youngledo</groupId>
+    <groupId>io.github.huahill</groupId>
     <artifactId>vadmin-spring-boot-starter</artifactId>
 </dependency>
 ```
@@ -113,7 +113,7 @@ disclaimer remains.
 The migration is accepted only when all of the following are true:
 
 1. A Maven model test confirms the root has no `<parent>`, imports the Spring
-   Boot BOM, and exposes `io.github.youngledo` plus `vadmin` coordinates.
+   Boot BOM, and exposes `io.github.huahill` plus `vadmin` coordinates.
 2. A module-coordinate test confirms every reactor module has a `vadmin-`
    artifact ID and no dependency or module path contains the old coordinates.
 3. A package-reference test or compile scan confirms no production source,
@@ -122,7 +122,7 @@ The migration is accepted only when all of the following are true:
 4. The normal reactor test suite passes with Java 25.
 5. The production profile test suite and Vaadin frontend generation pass.
 6. The starter dependency test resolves
-   `io.github.youngledo:vadmin-spring-boot-starter` and rejects the old starter
+   `io.github.huahill:vadmin-spring-boot-starter` and rejects the old starter
    coordinate.
 7. The reference consumer browser tests still cover local login, system
    administration, module permissions, i18n, appearance profiles, and narrow

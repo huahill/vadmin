@@ -1,6 +1,6 @@
 # 发布指南
 
-VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 [English](../../en/dev/release-guide.md) | 简体中文
 
@@ -27,7 +27,7 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
 ## 使用方升级规则
 
-1. 将所有 `io.github.youngledo` 依赖升级到相同目标版本。不得混用已发布制品和
+1. 将所有 `io.github.huahill` 依赖升级到相同目标版本。不得混用已发布制品和
    snapshot 同级制品。
 2. 使用 Java 25 运行使用方，并让 Spring Boot 与 Vaadin 与已验证版本表保持一致。
 3. 在类生产数据库副本上审查 Flyway 迁移。每个迁移只执行一次，且不得改写已应用的迁移。
@@ -106,11 +106,11 @@ annotated tag，且准确指向已验证的发布提交。
 ```
 
 该 profile 会等待 Central Portal 发布完成。然后在干净的使用方项目中确认
-`io.github.youngledo:vadmin-spring-boot-starter:0.2.0` 可以解析。
+`io.github.huahill:vadmin-spring-boot-starter:0.2.0` 可以解析。
 
 ## SNAPSHOT 发布
 
-必须先在 Central Portal 中为 `io.github.youngledo` 命名空间启用 SNAPSHOT 发布。对于推送到
+必须先在 Central Portal 中为 `io.github.huahill` 命名空间启用 SNAPSHOT 发布。对于推送到
 `main` 的非文档变更，`Snapshot` GitHub Actions 工作流会自动运行，也可以从 Actions 页面
 手动启动。该工作流使用 `vadmin` Environment，并复用正式发布工作流所用的
 `MAVEN_CENTRAL_USERNAME` 和 `MAVEN_CENTRAL_PASSWORD` secrets。

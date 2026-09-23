@@ -2,18 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.youngledo</groupId>
+        <groupId>io.github.huahill</groupId>
         <artifactId>vadmin-spring</artifactId>
-        <version>0.2.1-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>vadmin-spring-boot-starter</artifactId>
     <name>VAdmin Spring Boot Starter</name>
     <dependencies>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-security</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-jpa</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-boot</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>io.github.youngledo</groupId><artifactId>vadmin-spring-flow</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-spring-security</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-spring-jpa</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-spring-boot</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-spring-flow</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter</artifactId></dependency>
         <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-dev</artifactId><version>${vaadin.version}</version><optional>true</optional></dependency>
         <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><scope>runtime</scope></dependency>

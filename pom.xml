@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.youngledo</groupId>
+    <groupId>io.github.huahill</groupId>
     <artifactId>vadmin-parent</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
 
     <name>VAdmin</name>
     <description>A Java-first, framework-neutral administration baseline for Vaadin Flow with a first-class Spring Boot runtime.</description>
-    <url>https://github.com/youngledo/vadmin</url>
+    <url>https://github.com/huahill/vadmin</url>
 
     <licenses>
         <license>
@@ -23,15 +23,15 @@
 
     <developers>
         <developer>
-            <id>youngledo</id>
-            <name>youngledo</name>
+            <id>huahill</id>
+            <name>huahill</name>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/youngledo/vadmin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/youngledo/vadmin.git</developerConnection>
-        <url>https://github.com/youngledo/vadmin</url>
+        <connection>scm:git:git://github.com/huahill/vadmin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/huahill/vadmin.git</developerConnection>
+        <url>https://github.com/huahill/vadmin</url>
         <tag>HEAD</tag>
     </scm>
 

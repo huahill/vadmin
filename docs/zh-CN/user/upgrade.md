@@ -20,7 +20,7 @@
 
 - **运行时基线**：Spring Boot 4.1.1、Vaadin Flow 25.3.0、Flyway 13.7.0。
 - **仅依赖 `vadmin-spring-boot-starter`**：无需任何改动，构建照常。
-- **代码中导入过 VAdmin 内部类**：包从 `io.github.youngledo.vadmin.starter.*` 迁移
-  到 `io.github.youngledo.vadmin.*`。更新导入和 `@EnableVaadin` 包列表（现在只需
-  `io.github.youngledo.vadmin`）。
+- **代码中导入过 VAdmin 内部类**：包从 `io.github.huahill.vadmin.starter.*` 迁移
+  到 `io.github.huahill.vadmin.*`。更新导入和 `@EnableVaadin` 包列表（现在只需
+  `io.github.huahill.vadmin`）。
 - **窄屏**：手机宽度视口下导航抽屉不再默认保持打开。桌面行为不变。

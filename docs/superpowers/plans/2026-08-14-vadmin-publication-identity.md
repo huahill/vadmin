@@ -9,7 +9,7 @@ than inheriting `spring-boot-starter-parent`.
 **Architecture:** The root POM becomes the stable VAdmin build parent and
 publication descriptor. Reactor directory and artifact names migrate to the
 `vadmin-` prefix first; all Java package roots then move atomically from
-`io.github.vaadinadminstarter` to `io.github.youngledo.vadmin`. Current docs,
+`io.github.vaadinadminstarter` to `io.github.huahill.vadmin`. Current docs,
 runtime identity strings, and deployment assets follow the same identity.
 
 **Tech Stack:** Java 25, Maven 4 RC6, Spring Boot 4.1.0 BOM, Vaadin Flow
@@ -20,9 +20,9 @@ runtime identity strings, and deployment assets follow the same identity.
 ## Global Constraints
 
 - Product name is `VAdmin`; GitHub identity is `youngledo/vadmin`.
-- Maven group is exactly `io.github.youngledo`; public artifact IDs use the
+- Maven group is exactly `io.github.huahill`; public artifact IDs use the
   `vadmin-` prefix.
-- Java package root is exactly `io.github.youngledo.vadmin`.
+- Java package root is exactly `io.github.huahill.vadmin`.
 - Root `pom.xml` has no parent and imports
   `org.springframework.boot:spring-boot-dependencies:${spring-boot.version}`.
 - Do not retain old coordinates, package aliases, relocation POMs, or duplicate
@@ -39,7 +39,7 @@ runtime identity strings, and deployment assets follow the same identity.
 - Modify: root `pom.xml` and every current reactor child `pom.xml`
 - Create: `admin-contracts/src/test/java/io/github/vaadinadminstarter/contracts/build/RootPomIdentityTest.java`
 
-**Interfaces:** The root reactor exposes `io.github.youngledo:vadmin` and has
+**Interfaces:** The root reactor exposes `io.github.huahill:vadmin` and has
 no POM parent. Dependency management imports the Spring Boot BOM. The root
 plugin management supplies `org.springframework.boot:spring-boot-maven-plugin`
 at `${spring-boot.version}` so the reference application can retain its plugin
@@ -49,13 +49,13 @@ declaration without inheriting the Boot parent.
 
 Create `RootPomIdentityTest` using `DocumentBuilderFactory`. Resolve the root
 with `Path.of("..").toAbsolutePath().normalize().resolve("pom.xml")`. Assert
-the root project has direct `groupId` `io.github.youngledo`, direct `artifactId`
+the root project has direct `groupId` `io.github.huahill`, direct `artifactId`
 `vadmin`, no direct `parent` element, a dependency-management entry for
 `spring-boot-dependencies` with type `pom` and scope `import`, and plugin
 management entry `spring-boot-maven-plugin` with version `${spring-boot.version}`.
 
 ```java
-assertThat(directText(project, "groupId")).isEqualTo("io.github.youngledo");
+assertThat(directText(project, "groupId")).isEqualTo("io.github.huahill");
 assertThat(directText(project, "artifactId")).isEqualTo("vadmin");
 assertThat(directChildren(project, "parent")).isEmpty();
 assertThat(dependency("spring-boot-dependencies").getTextContent())
@@ -79,9 +79,9 @@ coordinates, and no imported Spring Boot BOM.
 In root `pom.xml`:
 
 1. Delete the complete `<parent>` block.
-2. Set the root coordinates to `io.github.youngledo:vadmin`.
+2. Set the root coordinates to `io.github.huahill:vadmin`.
 3. Add Maven Central metadata: name `VAdmin`, the Java/Vaadin Flow baseline
-   description, `https://github.com/youngledo/vadmin`, Apache-2.0 license,
+   description, `https://github.com/huahill/vadmin`, Apache-2.0 license,
    developer ID/name `youngledo`, and SCM connection, developer connection,
    URL, and `HEAD` tag for `youngledo/vadmin`.
 4. Add Spring Boot's BOM as the first imported dependency-management POM,
@@ -91,7 +91,7 @@ In root `pom.xml`:
    settings unchanged.
 
 Update every child POM that currently names the root as parent to parent
-`io.github.youngledo:vadmin:0.1.0-SNAPSHOT`; this includes the contracts,
+`io.github.huahill:vadmin:0.1.0-SNAPSHOT`; this includes the contracts,
 platform, Flow, Spring aggregator, and reference-app POMs. Leave all child
 artifact IDs and the Spring-child parent artifact `admin-spring` unchanged in
 this task. Do not add `spring-boot-starter-parent` to any child.
@@ -136,13 +136,13 @@ git commit -m "build: establish independent VAdmin root"
 `vadmin-spring-security`, `vadmin-spring-jpa`, `vadmin-spring-boot`,
 `vadmin-spring-flow`, `vadmin-spring-boot-starter`, and
 `vadmin-reference-app`. Internal dependencies use group
-`io.github.youngledo` and these exact artifact IDs.
+`io.github.huahill` and these exact artifact IDs.
 
 - [ ] **Step 1: Write the failing reactor-coordinate test**
 
 Create `ReactorCoordinateTest` beside `RootPomIdentityTest`. It parses every
 reactor POM from the current root and asserts the exact artifact sequence
-above, parent group `io.github.youngledo`, no `admin-` artifact IDs, and no
+above, parent group `io.github.huahill`, no `admin-` artifact IDs, and no
 `io.github.vaadinadminstarter` dependency group.
 
 ```java
@@ -170,7 +170,7 @@ coordinates retain the `admin-` naming.
 
 Use `git mv` for the directories listed above. Update root and Spring
 aggregator `<subprojects>` entries to the new directory names. Set every POM
-parent and internal dependency group to `io.github.youngledo`, then update
+parent and internal dependency group to `io.github.huahill`, then update
 artifact IDs using this mapping:
 
 | Old | New |
@@ -215,7 +215,7 @@ git commit -m "refactor: rename reactor artifacts to VAdmin"
 **Files:**
 - Rename in every `vadmin-*` module: `src/main/java/io/github/vaadinadminstarter/`
   and `src/test/java/io/github/vaadinadminstarter/` to
-  `src/*/java/io/github/youngledo/vadmin/`
+  `src/*/java/io/github/huahill/vadmin/`
 - Modify: all Java sources and tests, Flow service-loader file under
   `vadmin-flow/src/main/resources/META-INF/services/`, both Spring
   `AutoConfiguration.imports` files, `Application.java`, architecture tests,
@@ -224,7 +224,7 @@ git commit -m "refactor: rename reactor artifacts to VAdmin"
 
 **Interfaces:** Application component scanning, Vaadin package scanning, JPA
 entity scanning, Spring auto-configuration import names, service providers, and
-all public Java classes use `io.github.youngledo.vadmin` with their existing
+all public Java classes use `io.github.huahill.vadmin` with their existing
 suffixes. No class keeps the old package root.
 
 - [ ] **Step 1: Write the failing namespace migration test**
@@ -235,12 +235,12 @@ below the root, excludes its own old-namespace negative assertion, and fails
 when production source/resource content contains
 `io.github.vaadinadminstarter`. It also asserts that the reference application
 source contains `@SpringBootApplication(scanBasePackages =
-"io.github.youngledo.vadmin")`.
+"io.github.huahill.vadmin")`.
 
 ```java
 assertThat(productionFiles).allSatisfy(file ->
         assertThat(Files.readString(file)).doesNotContain("io.github.vaadinadminstarter"));
-assertThat(applicationSource).contains("io.github.youngledo.vadmin");
+assertThat(applicationSource).contains("io.github.huahill.vadmin");
 ```
 
 - [ ] **Step 2: Verify the test is red**
@@ -257,24 +257,24 @@ Expected: FAIL with old package references reported from production sources.
 - [ ] **Step 3: Perform the path-aware package migration**
 
 For each module source root, use `git mv` to move
-`io/github/vaadinadminstarter` to `io/github/youngledo/vadmin`. Rewrite Java
+`io/github/vaadinadminstarter` to `io/github/huahill/vadmin`. Rewrite Java
 `package` and `import` declarations, annotation package arrays, reflection
 class-name strings, test source ownership assertions, service provider class
 names, and Spring auto-configuration class names from
-`io.github.vaadinadminstarter` to `io.github.youngledo.vadmin`.
+`io.github.vaadinadminstarter` to `io.github.huahill.vadmin`.
 
 Preserve all package suffixes and class names. In the renamed reference app,
 update the following scanning declarations explicitly:
 
 ```java
-@SpringBootApplication(scanBasePackages = "io.github.youngledo.vadmin")
+@SpringBootApplication(scanBasePackages = "io.github.huahill.vadmin")
 @EnableVaadin({
-        "io.github.youngledo.vadmin.app",
-        "io.github.youngledo.vadmin.flow.error",
-        "io.github.youngledo.vadmin.starter",
-        "io.github.youngledo.vadmin.springsecurity.ui"
+        "io.github.huahill.vadmin.app",
+        "io.github.huahill.vadmin.flow.error",
+        "io.github.huahill.vadmin.starter",
+        "io.github.huahill.vadmin.springsecurity.ui"
 })
-@EntityScan(basePackages = "io.github.youngledo.vadmin.springjpa")
+@EntityScan(basePackages = "io.github.huahill.vadmin.springjpa")
 ```
 
 - [ ] **Step 4: Verify the namespace migration**
@@ -312,24 +312,24 @@ git commit -m "refactor: move Java packages to VAdmin namespace"
 - Rename: `docs/diagrams/vaadin-admin-starter-architecture-options.drawio` to
   `docs/diagrams/vadmin-architecture-options.drawio`
 - Modify: renamed `CurrentDocumentationTest` in
-  `vadmin-reference-app/src/test/java/io/github/youngledo/vadmin/app/`
+  `vadmin-reference-app/src/test/java/io/github/huahill/vadmin/app/`
 
 **Interfaces:** The visible product name is `VAdmin`; users depend on
-`io.github.youngledo:vadmin-spring-boot-starter`; the reference application
+`io.github.huahill:vadmin-spring-boot-starter`; the reference application
 name, Docker image examples, default database naming, Problem Details type URN,
 and Keycloak fixture description use `vadmin`.
 
 - [ ] **Step 1: Update the documentation identity guard first**
 
 Rename and edit `CurrentDocumentationTest` to require `VAdmin`,
-`io.github.youngledo`, and `vadmin-spring-boot-starter` in every current guide.
+`io.github.huahill`, and `vadmin-spring-boot-starter` in every current guide.
 It must reject `Vaadin Admin Starter`, `vaadin-admin-starter`,
 `io.github.vaadinadminstarter`, and `admin-spring-starter`, while continuing
 to reject retired business samples and required consumer shell assembly.
 
 ```java
 assertThat(content)
-        .contains("VAdmin", "io.github.youngledo", "vadmin-spring-boot-starter")
+        .contains("VAdmin", "io.github.huahill", "vadmin-spring-boot-starter")
         .doesNotContain("Vaadin Admin Starter", "vaadin-admin-starter",
                 "io.github.vaadinadminstarter", "admin-spring-starter");
 ```
@@ -410,11 +410,11 @@ Run:
 ```bash
 ./mvnw -B -ntp -pl :vadmin-spring-boot-starter -am test
 ./mvnw -B -ntp -pl :vadmin-reference-app dependency:tree \
-  -Dincludes=io.github.youngledo
+  -Dincludes=io.github.huahill
 ```
 
 Expected: starter tests pass and the dependency tree contains only
-`io.github.youngledo:vadmin-*` project coordinates.
+`io.github.huahill:vadmin-*` project coordinates.
 
 - [ ] **Step 2: Run full normal and production verification**
 

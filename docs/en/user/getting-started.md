@@ -22,7 +22,7 @@ transitively. VAdmin does not include Hilla, React, or TypeScript.
 
 ```xml
 <dependency>
-  <groupId>io.github.youngledo</groupId>
+  <groupId>io.github.huahill</groupId>
   <artifactId>vadmin-spring-boot-starter</artifactId>
   <version>${vadmin.version}</version>
 </dependency>
@@ -33,7 +33,7 @@ package so Vaadin discovers the default shell and system views. This is
 Vaadin's route-discovery requirement, not custom shell composition:
 
 ```java
-@EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin"})
+@EnableVaadin({"com.example.inventory", "io.github.huahill.vadmin"})
 @SpringBootApplication
 public class InventoryApplication {
 }
@@ -93,7 +93,7 @@ Optionally set the product name shown in the shell without replacing the
 layout:
 
 ```yaml
-app:
+vadmin:
   brand:
     name: Inventory Operations
 ```

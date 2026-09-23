@@ -1,0 +1,397 @@
+package io.github.huahill.vadmin.app.e2e;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.ViewportSize;
+import java.util.UUID;
+import io.github.huahill.vadmin.app.testsupport.PlaywrightBrowserSupport;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import io.github.huahill.vadmin.app.fixture.ExternalSampleFixture;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+@ActiveProfiles("development")
+@Import(ExternalSampleFixture.class)
+class BrowserE2EIT {
+    @Container
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
+    private static Playwright playwright;
+    private static Browser browser;
+
+    @Autowired JdbcTemplate jdbcTemplate;
+    @Autowired PasswordEncoder passwordEncoder;
+    @LocalServerPort int port;
+    private BrowserContext browserContext;
+    private Page page;
+
+    @DynamicPropertySource
+    static void databaseProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
+    }
+
+    @BeforeAll
+    static void launchBrowser() {
+        playwright = PlaywrightBrowserSupport.createPlaywright();
+        browser = PlaywrightBrowserSupport.launchChromium(playwright);
+    }
+
+    @AfterAll
+    static void closeBrowser() { browser.close(); playwright.close(); }
+
+    @BeforeEach
+    void setUp() {
+        resetData();
+        browserContext = browser.newContext(new Browser.NewContextOptions().setLocale("zh-CN"));
+        page = browserContext.newPage();
+        page.setDefaultTimeout(10_000);
+    }
+
+    @AfterEach
+    void closeContext() { browserContext.close(); }
+
+    @Test
+    void starterConsumerReceivesTheCompleteSystemAdministrationShell() {
+        signInAs("admin", "change-me");
+        assertThat(page.getByText("VAdmin", new Page.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(page.getByLabel("系统管理").getByRole(AriaRole.LINK,
+                new com.microsoft.playwright.Locator.GetByRoleOptions().setName("用户"))).isVisible();
+        assertThat(page.getByLabel("系统管理").getByRole(AriaRole.LINK,
+                new com.microsoft.playwright.Locator.GetByRoleOptions().setName("角色"))).isVisible();
+        assertThat(page.getByLabel("示例业务").getByRole(AriaRole.LINK,
+                new com.microsoft.playwright.Locator.GetByRoleOptions().setName("示例记录"))).isVisible();
+        assertThat(page.getByTestId("workplace-shortcuts").getByText("示例记录",
+                new com.microsoft.playwright.Locator.GetByTextOptions().setExact(true))).isVisible();
+        page.navigate(baseUrl() + "/sample");
+        assertThat(page.getByTestId("external-sample-workspace")).isVisible();
+        page.navigate(baseUrl() + "/users");
+        assertThat(page.getByTestId("users-workspace").locator("vaadin-grid")).isVisible();
+        assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("新增用户"))).isVisible();
+    }
+
+    @Test
+    void starterShellTranslatesAndSwitchesColorMode() {
+        signInAs("admin", "change-me");
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(page.getByLabel("语言"));
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(
+                page.getByText("English", new Page.GetByTextOptions().setExact(true)));
+        assertThat(page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Workplace"))).isVisible();
+        assertThat(page.getByLabel("System administration").getByRole(AriaRole.LINK,
+                new com.microsoft.playwright.Locator.GetByRoleOptions().setName("Users"))).isVisible();
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(page.getByLabel("Current user menu"));
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(
+                page.getByText("Theme settings", new Page.GetByTextOptions().setExact(true)));
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(page.getByLabel("Appearance"));
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(
+                page.getByText("Dark mode", new Page.GetByTextOptions().setExact(true)));
+        page.waitForFunction("() => document.documentElement.style.colorScheme === 'dark'");
+    }
+
+    @Test
+    void starterShellSeparatesNavigationFromGlobalUtilities() {
+        signInAs("admin", "change-me");
+        var brand = page.locator(".admin-shell-brand");
+        var utilities = page.locator(".admin-shell-utilities");
+
+        var brandBox = brand.boundingBox();
+        var utilitiesBox = utilities.boundingBox();
+        org.assertj.core.api.Assertions.assertThat(brandBox).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(utilitiesBox).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(utilitiesBox.x)
+                .isGreaterThan(brandBox.x + brandBox.width);
+    }
+
+    @Test
+    void routeAndNavigationAreFilteredForAnUnassignedUser() {
+        createUser("unassigned", "password", null);
+        signInAs("unassigned", "password");
+        assertThat(page.getByLabel("系统管理")).not().isVisible();
+        page.navigate(baseUrl() + "/users");
+        assertThat(page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("无权访问"))).isVisible();
+    }
+
+    @Test
+    void narrowStarterShellKeepsUtilityControlsReachable() {
+        browserContext.close();
+        browserContext = browser.newContext(new Browser.NewContextOptions().setViewportSize(new ViewportSize(390, 844)).setLocale("zh-CN"));
+        page = browserContext.newPage();
+        page.setDefaultTimeout(10_000);
+        signInAs("admin", "change-me");
+        var appLayout = page.locator("vaadin-app-layout");
+        var width = ((Number) page.evaluate("() => window.innerWidth")).doubleValue();
+        org.assertj.core.api.Assertions.assertThat(((Number) appLayout.evaluate("element => element.scrollWidth")).doubleValue())
+                .isLessThanOrEqualTo(width + 1);
+        var userMenu = page.getByLabel("当前用户菜单");
+        assertThat(userMenu).isVisible();
+        var userMenuBounds = userMenu.boundingBox();
+        org.assertj.core.api.Assertions.assertThat(userMenuBounds).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(userMenuBounds.x + userMenuBounds.width).isLessThanOrEqualTo(width + 1);
+    }
+
+    @Test
+    void narrowUsersWorkspaceSupportsExplicitBulkSelection() {
+        browserContext.close();
+        browserContext = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(new ViewportSize(390, 844))
+                .setLocale("zh-CN"));
+        page = browserContext.newPage();
+        page.setDefaultTimeout(10_000);
+        signInAs("admin", "change-me");
+        page.navigate(baseUrl() + "/users");
+
+        var workspace = page.getByTestId("users-workspace");
+        var compactList = workspace.locator("vaadin-virtual-list");
+        var grid = workspace.locator("vaadin-grid");
+        var selectionBar = workspace.locator(".admin-page-selection-bar");
+        var selectionTrigger = workspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("选择").setExact(true));
+        var cancelSelection = workspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("取消选择").setExact(true));
+        var detailsAction = compactList.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("查看用户详情").setExact(true));
+        var disableRowAction = compactList.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("停用用户").setExact(true));
+        var adminCheckbox = workspace.getByLabel("选择 admin",
+                new Locator.GetByLabelOptions().setExact(true));
+        var enableSelected = workspace.getByLabel("启用所选用户",
+                new Locator.GetByLabelOptions().setExact(true));
+        var disableSelected = workspace.getByLabel("停用所选用户",
+                new Locator.GetByLabelOptions().setExact(true));
+
+        assertThat(compactList).isVisible();
+        assertThat(grid).not().isVisible();
+        assertThat(selectionTrigger).isVisible();
+        assertThat(detailsAction).isVisible();
+        assertThat(disableRowAction).isVisible();
+        assertThat(adminCheckbox).not().isVisible();
+        assertDocumentDoesNotOverflowHorizontally();
+
+        selectionTrigger.click();
+
+        assertThat(adminCheckbox).isVisible();
+        assertThat(detailsAction).not().isVisible();
+        assertThat(disableRowAction).not().isVisible();
+        assertThat(workspace.getByText("已选择 0 项", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(enableSelected).isDisabled();
+        assertThat(disableSelected).isDisabled();
+        assertThat(cancelSelection).isVisible();
+        org.assertj.core.api.Assertions.assertThat(
+                selectionBar.evaluate("element => getComputedStyle(element).position")).isEqualTo("sticky");
+        org.assertj.core.api.Assertions.assertThat(
+                selectionBar.evaluate("element => getComputedStyle(element).bottom")).isEqualTo("0px");
+        var selectionBarBounds = selectionBar.boundingBox();
+        org.assertj.core.api.Assertions.assertThat(selectionBarBounds).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(selectionBarBounds.y + selectionBarBounds.height)
+                .isLessThanOrEqualTo(845);
+
+        adminCheckbox.check();
+
+        assertThat(workspace.getByText("已选择 1 项", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(enableSelected).isEnabled();
+        assertThat(disableSelected).isEnabled();
+
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(cancelSelection);
+
+        assertThat(adminCheckbox).not().isVisible();
+        assertThat(selectionBar).not().isVisible();
+        assertThat(selectionTrigger).isVisible();
+        assertThat(detailsAction).isVisible();
+        assertThat(disableRowAction).isVisible();
+
+        selectionTrigger.click();
+        assertThat(workspace.getByText("已选择 0 项", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(adminCheckbox).not().isChecked();
+        adminCheckbox.check();
+        page.setViewportSize(641, 844);
+
+        assertThat(grid).isVisible();
+        assertThat(compactList).not().isVisible();
+        org.assertj.core.api.Assertions.assertThat(
+                selectionBar.evaluate("element => getComputedStyle(element).position")).isNotEqualTo("sticky");
+
+        page.setViewportSize(390, 844);
+
+        assertThat(compactList).isVisible();
+        assertThat(grid).not().isVisible();
+        assertThat(selectionTrigger).isVisible();
+        assertThat(adminCheckbox).not().isVisible();
+        assertThat(selectionBar).not().isVisible();
+        assertDocumentDoesNotOverflowHorizontally();
+    }
+
+    @Test
+    void filteringUsersClearsCompactSelectionForTheNewResultSet() {
+        createUser("analyst", "password", null);
+        browserContext.close();
+        browserContext = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(new ViewportSize(390, 844))
+                .setLocale("zh-CN"));
+        page = browserContext.newPage();
+        page.setDefaultTimeout(10_000);
+        signInAs("admin", "change-me");
+        page.navigate(baseUrl() + "/users");
+
+        var workspace = page.getByTestId("users-workspace");
+        var selectionTrigger = workspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("选择").setExact(true));
+        var adminCheckbox = workspace.getByLabel("选择 admin",
+                new Locator.GetByLabelOptions().setExact(true));
+        var analystCheckbox = workspace.getByLabel("选择 analyst",
+                new Locator.GetByLabelOptions().setExact(true)).first();
+        var enableSelected = workspace.getByLabel("启用所选用户",
+                new Locator.GetByLabelOptions().setExact(true));
+        var disableSelected = workspace.getByLabel("停用所选用户",
+                new Locator.GetByLabelOptions().setExact(true));
+
+        selectionTrigger.click();
+        adminCheckbox.check();
+        assertThat(workspace.getByText("已选择 1 项", new Locator.GetByTextOptions().setExact(true))).isVisible();
+
+        page.getByLabel("搜索用户", new Page.GetByLabelOptions().setExact(true)).fill("analyst");
+
+        assertThat(adminCheckbox).not().isVisible();
+        assertThat(analystCheckbox).isVisible();
+        assertThat(analystCheckbox).not().isChecked();
+        assertThat(workspace.getByText("已选择 0 项", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(enableSelected).isDisabled();
+        assertThat(disableSelected).isDisabled();
+        assertDocumentDoesNotOverflowHorizontally();
+    }
+
+    @Test
+    void narrowReadOnlyWorkspacesUseCompactServerPages() {
+        createCustomPermissions(51);
+        createAuditEntries();
+        browserContext.close();
+        browserContext = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(new ViewportSize(390, 844))
+                .setLocale("zh-CN"));
+        page = browserContext.newPage();
+        page.setDefaultTimeout(10_000);
+        signInAs("admin", "change-me");
+
+        page.navigate(baseUrl() + "/permissions");
+        var permissionsWorkspace = page.getByTestId("permissions-workspace");
+        var permissionsList = permissionsWorkspace.locator("vaadin-virtual-list");
+        var permissionsGrid = permissionsWorkspace.locator("vaadin-grid");
+        var permissionCount = jdbcTemplate.queryForObject("select count(*) from permissions", Long.class);
+        assertThat(permissionsList).isVisible();
+        assertThat(permissionsGrid).not().isVisible();
+        assertThat(permissionsList.getByText("system:audit:read", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(permissionsList.getByText("系统管理", new Locator.GetByTextOptions().setExact(true)).first()).isVisible();
+        assertThat(permissionsWorkspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("选择").setExact(true))).not().isVisible();
+        assertThat(permissionsWorkspace.getByText("第 1 / 2 页，共 " + permissionCount + " 条",
+                new Locator.GetByTextOptions().setExact(true))).isVisible();
+        PlaywrightBrowserSupport.clickThroughInjectedOverlay(permissionsWorkspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("下一页").setExact(true)));
+        assertThat(permissionsList.getByText("zz:test:permission:050",
+                new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(permissionsWorkspace.getByText("第 2 / 2 页，共 " + permissionCount + " 条",
+                new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertDocumentDoesNotOverflowHorizontally();
+
+        page.navigate(baseUrl() + "/audit");
+        var auditWorkspace = page.getByTestId("audit-workspace");
+        var auditList = auditWorkspace.locator("vaadin-virtual-list");
+        var auditGrid = auditWorkspace.locator("vaadin-grid");
+        assertThat(auditList).isVisible();
+        assertThat(auditGrid).not().isVisible();
+        assertThat(auditList.getByText("user.disable", new Locator.GetByTextOptions().setExact(true))).isVisible();
+        assertThat(auditList.getByText("SUCCESS", new Locator.GetByTextOptions().setExact(true)).first()).isVisible();
+        assertThat(auditList.getByText("对象类型", new Locator.GetByTextOptions().setExact(true)).first()).isVisible();
+        assertThat(auditList.getByText("对象 ID", new Locator.GetByTextOptions().setExact(true)).first()).isVisible();
+        assertThat(auditList.getByText("admin", new Locator.GetByTextOptions().setExact(true)).first()).isVisible();
+        assertThat(auditWorkspace.getByRole(AriaRole.BUTTON,
+                new Locator.GetByRoleOptions().setName("选择").setExact(true))).not().isVisible();
+        assertDocumentDoesNotOverflowHorizontally();
+
+        page.setViewportSize(641, 844);
+        assertThat(auditGrid).isVisible();
+        assertThat(auditList).not().isVisible();
+        page.setViewportSize(390, 844);
+        assertThat(auditList).isVisible();
+        assertThat(auditGrid).not().isVisible();
+    }
+
+    private void signInAs(String username, String password) {
+        page.navigate(baseUrl() + "/login");
+        var form = page.locator("vaadin-login-overlay");
+        page.locator("#vaadinLoginUsername").waitFor();
+        var credentials = form.locator("input:not([type=hidden])");
+        credentials.nth(0).fill(username);
+        credentials.nth(1).fill(password);
+        form.locator("vaadin-button[slot=submit]").click();
+        page.waitForURL(baseUrl() + "/");
+    }
+
+    private void createUser(String username, String password, UUID roleId) {
+        var userId = UUID.randomUUID();
+        jdbcTemplate.update("insert into users (id, username, password_hash, enabled, auth_version) values (?, ?, ?, true, 0)",
+                userId, username, passwordEncoder.encode(password));
+        if (roleId != null) jdbcTemplate.update("insert into user_roles (user_id, role_id) values (?, ?)", userId, roleId);
+    }
+
+    private void createCustomPermissions(int count) {
+        for (var index = 0; index < count; index++) {
+            jdbcTemplate.update("insert into permissions (id, code, system_managed) values (?, ?, false)",
+                    UUID.randomUUID(), "zz:test:permission:" + String.format("%03d", index));
+        }
+    }
+
+    private void createAuditEntries() {
+        jdbcTemplate.update("""
+                insert into audit_entries
+                    (id, actor_user_id, action_code, target_type, target_id, outcome, occurred_at, correlation_id)
+                values (?, (select id from users where username = 'admin'),
+                    'user.disable', 'user', 'admin', 'SUCCESS', current_timestamp, 'compact-audit-1')
+                """, UUID.randomUUID());
+        jdbcTemplate.update("""
+                insert into audit_entries
+                    (id, actor_user_id, action_code, target_type, target_id, outcome, occurred_at, correlation_id)
+                values (?, (select id from users where username = 'admin'),
+                    'user.enable', 'user', 'admin', 'SUCCESS', current_timestamp - interval '1 minute', 'compact-audit-2')
+                """, UUID.randomUUID());
+    }
+
+    private void resetData() {
+        jdbcTemplate.update("delete from audit_entries");
+        jdbcTemplate.update("delete from user_roles where user_id <> (select id from users where username = 'admin')");
+        jdbcTemplate.update("delete from role_permissions where role_id not in (select id from roles where code = 'administrator')");
+        jdbcTemplate.update("delete from roles where code <> 'administrator'");
+        jdbcTemplate.update("delete from users where username <> 'admin'");
+        jdbcTemplate.update("delete from permissions where system_managed = false");
+    }
+
+    private void assertDocumentDoesNotOverflowHorizontally() {
+        var documentWidth = ((Number) page.evaluate("() => document.documentElement.scrollWidth")).doubleValue();
+        var viewportWidth = ((Number) page.evaluate("() => window.innerWidth")).doubleValue();
+        org.assertj.core.api.Assertions.assertThat(documentWidth).isLessThanOrEqualTo(viewportWidth + 1);
+    }
+
+    private String baseUrl() { return "http://localhost:" + port; }
+}
