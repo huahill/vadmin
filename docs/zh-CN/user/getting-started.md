@@ -4,20 +4,21 @@ VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
 [English](../../en/user/getting-started.md) | 简体中文
 
-向 Spring Boot 应用添加一个依赖，即可获得可运行的管理基线：引导管理员登录、
+向已有的 Spring Boot 应用添加一个依赖并启动，即可获得：引导管理员登录、
 按权限过滤的导航、默认外壳与主题、Users/Roles/Permissions/Audit 系统管理模块、
-`zh-CN` 与 `en-US` 语言、浅色/深色配色方案以及视觉语言选择。应用只需提供数据源、
-Flyway 迁移和业务模块。
+`zh-CN` 与 `en-US` 语言、浅色/深色配色方案以及视觉语言选择。普通使用方不需要定义
+Flow 外壳、`AdminHostLayout`、`AppShellConfigurator` 或 `@Theme`。
 
 ## 前置条件
 
-- JDK 25。
-- Docker Desktop，用于 PostgreSQL 或完整 Compose 栈。
-- 可访问 Maven Central 的网络。仓库自带 Maven 4 RC6 Wrapper。
+- 基于 Java 25 的 Spring Boot 应用。
+- 一个 PostgreSQL 数据库（VAdmin 的表结构由 Flyway 迁移管理）。
+- classpath 上的 Vaadin Flow 25.x。
 
-## 添加 Starter
+如果你的应用尚未使用 Vaadin Flow，starter 会传递引入。VAdmin 不包含 Hilla、
+React 或 TypeScript。
 
-向 Spring Boot 应用添加唯一的第一方依赖：
+## 1. 添加依赖
 
 ```xml
 <dependency>
@@ -27,8 +28,8 @@ Flyway 迁移和业务模块。
 </dependency>
 ```
 
-VAdmin 会自动登记默认外壳包供 Vaadin 发现。若应用显式声明了 `@EnableVaadin`，该声明会覆盖
-默认扫描根，此时应将 VAdmin 根包加入扫描范围。这是 Vaadin 的路由发现要求，不是自行组装外壳：
+如果应用显式声明了 `@EnableVaadin`，请加入 VAdmin 根包，让 Vaadin 发现默认外壳
+与系统视图。这是 Vaadin 的路由发现要求，不是自行组装外壳：
 
 ```java
 @EnableVaadin({"com.example.inventory", "io.github.youngledo.vadmin"})
@@ -37,8 +38,8 @@ public class InventoryApplication {
 }
 ```
 
-通过 `spring-boot:run` 使用开发模式时，使用方还需直接声明 Vaadin 的可选开发服务器。它有意
-不从 starter 传递，并且不会进入生产制品：
+通过 `spring-boot:run` 开发时，还需直接声明 Vaadin 的可选开发服务器。它有意不
+传递，且不进入生产制品：
 
 ```xml
 <dependency>
@@ -49,8 +50,10 @@ public class InventoryApplication {
 </dependency>
 ```
 
-在使用方应用中配置 PostgreSQL 和 Flyway。使用方的迁移位置应与 VAdmin 迁移分开，且不得
-改写已经进入任何环境的迁移：
+## 2. 指向你的 PostgreSQL
+
+VAdmin 使用标准 Spring Boot 数据源。如果你的应用已经配置了 PostgreSQL，无需额外
+的数据库设置——VAdmin 通过 Flyway 管理自己的表，与你已有的迁移并列运行：
 
 ```yaml
 spring:
@@ -58,22 +61,29 @@ spring:
     url: jdbc:postgresql://localhost:5432/inventory
     username: inventory
     password: change-me
+  jpa:
+    hibernate:
+      ddl-auto: validate
   flyway:
     locations: classpath:db/migration
 ```
 
-启动应用。空数据库首次启动时，提供高强度 `APP_BOOTSTRAP_PASSWORD`；初始 `admin` 账户会
-使用该密码。之后更改此变量不会重置已有账户。
+使用方的迁移应与 VAdmin 自身的迁移放在不同位置，且不得改写已进入任何环境的
+迁移。迁移操作见[部署与运维](deployment.md)。
+
+## 3. 启动应用
+
+空数据库首次启动时设置一次 `APP_BOOTSTRAP_PASSWORD`，初始 `admin` 账户使用该
+密码。之后更改不会重置已有账户。
 
 ```bash
 APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 ```
 
-访问 `http://localhost:8080`。VAdmin 提供首页、导航、Users、Roles、Permissions、Audit、
-`zh-CN` 与 `en-US`、浅色/深色模式，以及所选视觉语言。普通使用方不定义 Flow 外壳、
-`AdminHostLayout`、`AppShellConfigurator` 或 `@Theme`。
+访问 `http://localhost:8080`，以 `admin` 登录。这就是完整的基线——无需构建外壳、
+主题或系统页面。
 
-可选地用配置指定宿主应用显示在默认外壳中的产品名称，而无需替换布局：
+可选地设置外壳中展示的产品名称，无需替换布局：
 
 ```yaml
 app:
@@ -81,49 +91,24 @@ app:
     name: 库存运营台
 ```
 
-## 运行参考应用
+其余属性均有可用默认值；需要调优时参见[配置参考](configuration.md)。
 
-仓库中的参考应用是精简的 starter 使用方和验收夹具。使用 PostgreSQL 在本地运行：
+## 体验参考应用
 
-```bash
-cp .env.example .env
-docker compose --env-file .env up -d postgres
-set -a
-. ./.env
-set +a
-export DATABASE_URL="jdbc:postgresql://localhost:5432/${POSTGRES_DB}"
-export DATABASE_USERNAME="${POSTGRES_USER}"
-export DATABASE_PASSWORD="${POSTGRES_PASSWORD}"
-SPRING_PROFILES_ACTIVE=development \
-  ./mvnw -B -ntp -pl :vadmin-reference-app -am spring-boot:run
-```
-
-启动完整容器栈：
+仓库内附带一个精简的使用方应用，端到端演示接入路径。它不属于 starter——它证明
+普通应用只需依赖 starter 并贡献自身功能即可运行。
 
 ```bash
 cp .env.example .env
 docker compose --env-file .env up --build
 ```
 
-开发 profile 只使用本地空数据库的示例密码。生产类数据库必须通过受保护渠道设置
-`APP_BOOTSTRAP_PASSWORD`。生产制品不包含 Vaadin 开发服务器：
-
-```bash
-./mvnw -B -ntp -Pproduction -pl :vadmin-reference-app -am package -DskipTests
-SPRING_PROFILES_ACTIVE=prod \
-  java -jar vadmin-reference-app/target/vadmin-reference-app-0.2.1-SNAPSHOT.jar
-```
-
-清除本地演示数据会删除 Compose 卷。执行前确认没有需要保留的数据：
-
-```bash
-docker compose down --volumes
-```
+访问 `http://localhost:8080`，用 `admin` 和 `.env` 中的 `APP_BOOTSTRAP_PASSWORD`
+登录。
 
 ## 下一步
 
 - 用[模块开发](modules.md)指南添加业务页面。
-- 用[配置参考](configuration.md)调优外壳。
 - 上线前阅读[安全说明](security.md)。
 - 用[部署与运维](deployment.md)指南完成部署。
 - 用[升级指南](upgrade.md)在版本间迁移。

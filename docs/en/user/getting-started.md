@@ -4,22 +4,23 @@ VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
 [简体中文](../../zh-CN/user/getting-started.md) | English
 
-Add one dependency to a Spring Boot application and you get a running
-administration baseline: sign-in with a bootstrap administrator,
-permission-filtered navigation, the default shell and theme, the Users, Roles,
-Permissions, and Audit administration module, `zh-CN` and `en-US` locales,
-light/dark color schemes, and a choice of visual languages. Your application
-supplies its datasource, Flyway migrations, and business modules.
+Add one dependency to an existing Spring Boot application and start it. You
+get sign-in with a bootstrap administrator, permission-filtered navigation,
+the default shell and theme, the Users, Roles, Permissions, and Audit
+administration module, `zh-CN` and `en-US` locales, light/dark color schemes,
+and a choice of visual languages. A normal consumer does not define a Flow
+shell, `AdminHostLayout`, `AppShellConfigurator`, or `@Theme`.
 
 ## Prerequisites
 
-- JDK 25.
-- Docker Desktop for PostgreSQL or the full Compose stack.
-- Access to Maven Central. The repository includes a Maven 4 RC6 wrapper.
+- A Spring Boot application built with Java 25.
+- A PostgreSQL database (VAdmin owns its schema through Flyway migrations).
+- Vaadin Flow 25.x on the classpath.
 
-## Add The Starter
+If your application does not yet use Vaadin Flow, the starter brings it in
+transitively. VAdmin does not include Hilla, React, or TypeScript.
 
-Add the single first-party dependency to a Spring Boot application:
+## 1. Add The Dependency
 
 ```xml
 <dependency>
@@ -29,9 +30,8 @@ Add the single first-party dependency to a Spring Boot application:
 </dependency>
 ```
 
-VAdmin registers its default shell packages for Vaadin discovery. If the
-application declares `@EnableVaadin` explicitly, that declaration replaces the
-default scan roots. Include the VAdmin root package in that case; this is
+If your application declares `@EnableVaadin` explicitly, add the VAdmin root
+package so Vaadin discovers the default shell and system views. This is
 Vaadin's route-discovery requirement, not custom shell composition:
 
 ```java
@@ -41,9 +41,9 @@ public class InventoryApplication {
 }
 ```
 
-For `spring-boot:run` development mode, add Vaadin's optional development
-server directly to the consumer as well. It is intentionally not transitive
-from the starter and is excluded from the production artifact:
+For `spring-boot:run` development, also add Vaadin's optional development
+server directly. It is intentionally not transitive and is excluded from the
+production artifact:
 
 ```xml
 <dependency>
@@ -54,9 +54,12 @@ from the starter and is excluded from the production artifact:
 </dependency>
 ```
 
-Configure PostgreSQL and Flyway in the consumer application. Keep its migration
-location separate from VAdmin's migrations and never rewrite a migration
-that has reached an environment:
+## 2. Point At Your PostgreSQL
+
+VAdmin works with a standard Spring Boot datasource. If your application
+already configures PostgreSQL, no extra database setup is needed — VAdmin
+manages its own tables through Flyway, alongside any migrations you already
+have:
 
 ```yaml
 spring:
@@ -64,25 +67,32 @@ spring:
     url: jdbc:postgresql://localhost:5432/inventory
     username: inventory
     password: change-me
+  jpa:
+    hibernate:
+      ddl-auto: validate
   flyway:
     locations: classpath:db/migration
 ```
 
-Start the application. On an empty database, provide a strong
-`APP_BOOTSTRAP_PASSWORD`; the initial `admin` account receives that password.
-Changing the variable later does not reset an existing account.
+Keep your migrations in a location separate from VAdmin's own and never
+rewrite a migration that has reached any environment. See the
+[Deployment](deployment.md) guide for migration operations.
+
+## 3. Start The Application
+
+On an empty database, set `APP_BOOTSTRAP_PASSWORD` once; the initial `admin`
+account receives that password. Changing it later does not reset an existing
+account.
 
 ```bash
 APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 ```
 
-Open `http://localhost:8080`. VAdmin supplies the home page, navigation,
-Users, Roles, Permissions, Audit, `zh-CN` and `en-US`, light/dark mode, and
-the selected visual language. A normal consumer does not define a
-Flow shell, `AdminHostLayout`, `AppShellConfigurator`, or `@Theme`.
+Open `http://localhost:8080` and sign in as `admin`. That is the complete
+baseline — no shell, theme, or system pages to build.
 
-Optionally set the product name shown by the default shell without replacing
-that layout:
+Optionally set the product name shown in the shell without replacing the
+layout:
 
 ```yaml
 app:
@@ -90,52 +100,27 @@ app:
     name: Inventory Operations
 ```
 
-## Run The Reference Application
+Every other property has a working default; see the
+[Configuration Reference](configuration.md) when you need to tune something.
 
-The repository reference application is a thin starter consumer and acceptance
-fixture. Run it locally with PostgreSQL:
+## Try The Reference Application
 
-```bash
-cp .env.example .env
-docker compose --env-file .env up -d postgres
-set -a
-. ./.env
-set +a
-export DATABASE_URL="jdbc:postgresql://localhost:5432/${POSTGRES_DB}"
-export DATABASE_USERNAME="${POSTGRES_USER}"
-export DATABASE_PASSWORD="${POSTGRES_PASSWORD}"
-SPRING_PROFILES_ACTIVE=development \
-  ./mvnw -B -ntp -pl :vadmin-reference-app -am spring-boot:run
-```
-
-For the complete container stack:
+The repository includes a thin consumer application that demonstrates the
+adoption path end-to-end. It is not part of the starter — it proves that a
+normal application can depend on the starter and contribute only its own
+functionality.
 
 ```bash
 cp .env.example .env
 docker compose --env-file .env up --build
 ```
 
-The development profile uses the local empty-database password only. Use a
-protected `APP_BOOTSTRAP_PASSWORD` for a production-like database. The
-production artifact excludes the Vaadin development server:
-
-```bash
-./mvnw -B -ntp -Pproduction -pl :vadmin-reference-app -am package -DskipTests
-SPRING_PROFILES_ACTIVE=prod \
-  java -jar vadmin-reference-app/target/vadmin-reference-app-0.2.1-SNAPSHOT.jar
-```
-
-Removing local demonstration data deletes Compose volumes. Confirm that no
-data must be retained before running:
-
-```bash
-docker compose down --volumes
-```
+Open `http://localhost:8080` and sign in with `admin` and the value of
+`APP_BOOTSTRAP_PASSWORD` in `.env`.
 
 ## Next Steps
 
 - Add business pages with the [Modules](modules.md) guide.
-- Tune the shell with the [Configuration Reference](configuration.md).
 - Review the [Security](security.md) model before production.
 - Deploy with the [Deployment](deployment.md) guide.
 - Move between versions with the [Upgrade](upgrade.md) guide.
