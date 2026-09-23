@@ -19,7 +19,7 @@ React, and TypeScript are not included.
 VAdmin owns the baseline experience through its default administration module. Consumers add business capabilities
 as `AdminModule` beans and Flow view beans; they do not create a shell, theme,
 or system-administration module for normal adoption. See the English
-[Extension Guide](docs/en/extension-guide.md) for the module, translation, and
+[Modules](docs/en/user/modules.md) guide for the module, translation, and
 production-anchor contract.
 
 ## Quick Start
@@ -34,15 +34,27 @@ Open `http://localhost:8080` and sign in with `admin` and the value of
 
 ## Documentation
 
+**User guides**
+
 | Guide | English | 简体中文 |
 | --- | --- | --- |
-| Quick Start | [Read](docs/en/quick-start.md) | [阅读](docs/zh-CN/quick-start.md) |
-| Architecture | [Read](docs/en/architecture.md) | [阅读](docs/zh-CN/architecture.md) |
-| Extension Guide | [Read](docs/en/extension-guide.md) | [阅读](docs/zh-CN/extension-guide.md) |
-| Theme Tokens | [Read](docs/en/theme-tokens.md) | -- |
-| Release Guide | [Read](docs/en/release-guide.md) | [阅读](docs/zh-CN/release-guide.md) |
-| Security | -- | [阅读](docs/security.md) |
-| Contributing | -- | [阅读](docs/contributing.md) |
+| Getting Started | [Read](docs/en/user/getting-started.md) | [阅读](docs/zh-CN/user/getting-started.md) |
+| Modules | [Read](docs/en/user/modules.md) | [阅读](docs/zh-CN/user/modules.md) |
+| Configuration | [Read](docs/en/user/configuration.md) | [阅读](docs/zh-CN/user/configuration.md) |
+| Appearance | [Read](docs/en/user/appearance.md) | [阅读](docs/zh-CN/user/appearance.md) |
+| Security | [Read](docs/en/user/security.md) | [阅读](docs/zh-CN/user/security.md) |
+| Deployment | [Read](docs/en/user/deployment.md) | [阅读](docs/zh-CN/user/deployment.md) |
+| Upgrade | [Read](docs/en/user/upgrade.md) | [阅读](docs/zh-CN/user/upgrade.md) |
+
+**Developer guides**
+
+| Guide | English | 简体中文 |
+| --- | --- | --- |
+| Architecture | [Read](docs/en/dev/architecture.md) | [阅读](docs/zh-CN/dev/architecture.md) |
+| Theme Policy | [Read](docs/en/dev/theme-tokens.md) | [阅读](docs/zh-CN/dev/theme-tokens.md) |
+| Release Guide | [Read](docs/en/dev/release-guide.md) | [阅读](docs/zh-CN/dev/release-guide.md) |
+| Requirements | [Read](docs/dev/requirements.md) | -- |
+| Contributing | [Read](docs/dev/contributing.md) | [阅读](docs/dev/contributing.md) |
 
 ## Verification
 

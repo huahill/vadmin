@@ -1,6 +1,8 @@
 # 部署与运维
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+
+[English](../../en/user/deployment.md) | 简体中文
 
 ## 容器镜像
 

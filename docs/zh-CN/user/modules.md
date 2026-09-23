@@ -2,7 +2,7 @@
 
 VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
-[English](../en/extension-guide.md) | 简体中文
+[English](../../en/user/modules.md) | 简体中文
 
 `vadmin` 拥有默认外壳、主题、首页和系统管理。普通使用方通过贡献业务
 `AdminModule` 扩展应用；不要复制或创建外壳、布局、主题或系统模块。

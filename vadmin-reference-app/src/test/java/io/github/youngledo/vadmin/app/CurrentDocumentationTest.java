@@ -11,21 +11,28 @@ import org.junit.jupiter.api.Test;
 class CurrentDocumentationTest {
     private static final List<String> CURRENT_GUIDES = List.of(
             "README.md",
-            "docs/requirements.md",
-            "docs/contributing.md",
-            "docs/deployment.md",
-            "docs/security.md",
-            "docs/en/architecture.md",
-            "docs/en/quick-start.md",
-            "docs/en/extension-guide.md",
-            "docs/en/release-guide.md",
-            "docs/en/theme-tokens.md",
-            "docs/en/appearance-profiles.md",
-            "docs/zh-CN/architecture.md",
-            "docs/zh-CN/quick-start.md",
-            "docs/zh-CN/extension-guide.md",
-            "docs/zh-CN/release-guide.md",
-            "docs/zh-CN/appearance-profiles.md");
+            "docs/dev/requirements.md",
+            "docs/dev/contributing.md",
+            "docs/en/user/getting-started.md",
+            "docs/en/user/modules.md",
+            "docs/en/user/configuration.md",
+            "docs/en/user/appearance.md",
+            "docs/en/user/security.md",
+            "docs/en/user/deployment.md",
+            "docs/en/user/upgrade.md",
+            "docs/en/dev/architecture.md",
+            "docs/en/dev/release-guide.md",
+            "docs/en/dev/theme-tokens.md",
+            "docs/zh-CN/user/getting-started.md",
+            "docs/zh-CN/user/modules.md",
+            "docs/zh-CN/user/configuration.md",
+            "docs/zh-CN/user/appearance.md",
+            "docs/zh-CN/user/security.md",
+            "docs/zh-CN/user/deployment.md",
+            "docs/zh-CN/user/upgrade.md",
+            "docs/zh-CN/dev/architecture.md",
+            "docs/zh-CN/dev/release-guide.md",
+            "docs/zh-CN/dev/theme-tokens.md");
 
     @Test
     void currentAdoptionGuidesDescribeTheStarterInsteadOfRetiredExamplesOrARequiredCustomShell() throws IOException {

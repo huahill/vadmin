@@ -1,13 +1,15 @@
-# Quick Start
+# Getting Started
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
-[简体中文](../zh-CN/quick-start.md) | English
+[简体中文](../../zh-CN/user/getting-started.md) | English
 
-`vadmin-spring-boot-starter` is the normal adoption dependency. It aggregates
-the default Flow shell and theme, local login, system administration, module
-assembly, and Spring adapters. Your application supplies its datasource,
-Flyway migrations, and business modules.
+Add one dependency to a Spring Boot application and you get a running
+administration baseline: sign-in with a bootstrap administrator,
+permission-filtered navigation, the default shell and theme, the Users, Roles,
+Permissions, and Audit administration module, `zh-CN` and `en-US` locales,
+light/dark color schemes, and a choice of visual languages. Your application
+supplies its datasource, Flyway migrations, and business modules.
 
 ## Prerequisites
 
@@ -130,6 +132,14 @@ data must be retained before running:
 docker compose down --volumes
 ```
 
-To add a business page, follow the [Extension Guide](extension-guide.md).
+## Next Steps
+
+- Add business pages with the [Modules](modules.md) guide.
+- Tune the shell with the [Configuration Reference](configuration.md).
+- Review the [Security](security.md) model before production.
+- Deploy with the [Deployment](deployment.md) guide.
+- Move between versions with the [Upgrade](upgrade.md) guide.
+- Change the look with the [Appearance](appearance.md) guide.
+
 Only a deliberate full shell replacement needs a consumer `AdminHostLayout`
 and `AppShellConfigurator`.

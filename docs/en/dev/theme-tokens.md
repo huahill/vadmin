@@ -2,6 +2,8 @@
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
+[简体中文](../../zh-CN/dev/theme-tokens.md) | English
+
 `vadmin` owns the default Vaadin Flow shell. Its
 `DefaultApplicationShell` explicitly loads Lumo; the bundled Ant resource is
 fully scoped and has no effect unless the host selects the `ant` language.

@@ -2,6 +2,8 @@
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
+[简体中文](../../zh-CN/user/appearance.md) | English
+
 VAdmin has one optional visual-language choice:
 
 | Visual language | Owner | Behavior |

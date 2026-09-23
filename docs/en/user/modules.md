@@ -2,7 +2,7 @@
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
-[简体中文](../zh-CN/extension-guide.md) | English
+[简体中文](../../zh-CN/user/modules.md) | English
 
 `vadmin` owns the default shell, theme, home page, and system
 administration. Extend a normal consumer by contributing a business

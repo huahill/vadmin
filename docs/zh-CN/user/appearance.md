@@ -2,6 +2,8 @@
 
 VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
+[English](../../en/user/appearance.md) | 简体中文
+
 VAdmin 只有一个可选的视觉语言维度：
 
 | 视觉语言 | 所有者 | 行为 |

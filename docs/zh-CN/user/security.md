@@ -1,6 +1,8 @@
 # 安全说明
 
-VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
+VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
+
+[English](../../en/user/security.md) | 简体中文
 
 ## 身份与引导账户
 

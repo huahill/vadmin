@@ -2,7 +2,7 @@
 
 VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
-[English](../en/release-guide.md) | 简体中文
+[English](../../en/dev/release-guide.md) | 简体中文
 
 ## 范围
 

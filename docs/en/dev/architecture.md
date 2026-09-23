@@ -2,7 +2,7 @@
 
 VAdmin publication coordinate: `io.github.youngledo:vadmin-spring-boot-starter`.
 
-English | [简体中文](../zh-CN/architecture.md)
+English | [简体中文](../../zh-CN/dev/architecture.md)
 
 ## Scope
 

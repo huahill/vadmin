@@ -2,10 +2,12 @@
 
 VAdmin 的发布坐标为 `io.github.youngledo:vadmin-spring-boot-starter`。
 
-[English](../en/quick-start.md) | 简体中文
+[English](../../en/user/getting-started.md) | 简体中文
 
-`vadmin-spring-boot-starter` 是正常接入时使用的依赖。它聚合默认 Flow 外壳和主题、本地登录、
-系统管理、模块组装和 Spring 适配器。应用只需提供数据源、Flyway 迁移和业务模块。
+向 Spring Boot 应用添加一个依赖，即可获得可运行的管理基线：引导管理员登录、
+按权限过滤的导航、默认外壳与主题、Users/Roles/Permissions/Audit 系统管理模块、
+`zh-CN` 与 `en-US` 语言、浅色/深色配色方案以及视觉语言选择。应用只需提供数据源、
+Flyway 迁移和业务模块。
 
 ## 前置条件
 
@@ -118,5 +120,14 @@ SPRING_PROFILES_ACTIVE=prod \
 docker compose down --volumes
 ```
 
-添加业务页面请阅读[扩展指南](extension-guide.md)。只有有意完全替换外壳时，使用方才需要
-提供 `AdminHostLayout` 和 `AppShellConfigurator`。
+## 下一步
+
+- 用[模块开发](modules.md)指南添加业务页面。
+- 用[配置参考](configuration.md)调优外壳。
+- 上线前阅读[安全说明](security.md)。
+- 用[部署与运维](deployment.md)指南完成部署。
+- 用[升级指南](upgrade.md)在版本间迁移。
+- 用[外观配置](appearance.md)调整外观。
+
+只有有意完全替换外壳时，使用方才需要提供 `AdminHostLayout` 和
+`AppShellConfigurator`。
