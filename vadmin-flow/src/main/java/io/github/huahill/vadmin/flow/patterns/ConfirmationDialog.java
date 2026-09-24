@@ -27,6 +27,7 @@ public final class ConfirmationDialog extends AdminDialog {
         this.titleKey = Objects.requireNonNull(titleKey);
         this.consequenceKey = Objects.requireNonNull(consequenceKey);
         this.confirmActionKey = Objects.requireNonNull(confirmActionKey);
+        consequence.addClassName("admin-confirmation-consequence");
         failure.getElement().setAttribute("role", "alert");
         failure.setVisible(false);
         add(consequence, failure);
@@ -51,7 +52,6 @@ public final class ConfirmationDialog extends AdminDialog {
 
     @Override
     void onLocaleChange(com.vaadin.flow.i18n.LocaleChangeEvent event) {
-        consequence.addClassName("admin-confirmation-consequence");
         consequence.setText(text(consequenceKey));
     }
 
