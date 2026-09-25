@@ -56,8 +56,6 @@ output, tool versions, image digest, release commit, and tag.
 
 - [ ] `git status --short` is empty after intentional generated-artifact cleanup.
 - [ ] `git diff --check` has no output.
-- [ ] `CHANGELOG.md` moves release content out of `Unreleased`, includes the
-  release date, and identifies breaking changes.
 - [ ] README, architecture, quick start, extension, and release guides agree
   that `vadmin` supplies the default shell, theme, and system
   administration.
@@ -74,7 +72,7 @@ output, tool versions, image digest, release commit, and tag.
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.2.0-rc .
+docker build -t vadmin:0.4.0 .
 ```
 
 - [ ] Both Maven commands complete with `BUILD SUCCESS`.

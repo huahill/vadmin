@@ -47,7 +47,6 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 - [ ] 清理有意生成的制品后，`git status --short` 为空。
 - [ ] `git diff --check` 没有输出。
-- [ ] `CHANGELOG.md` 将发布内容移出 `Unreleased`，包含发布日期并标明不兼容变更。
 - [ ] README、架构、快速开始、扩展和发布指南一致说明：`vadmin` 提供默认
   外壳、主题和系统管理。
 - [ ] 当前指南不包含已移除的示例领域引用，也不声称普通使用方必须提供外壳或默认
@@ -61,7 +60,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.2.0-rc .
+docker build -t vadmin:0.4.0 .
 ```
 
 - [ ] 两条 Maven 命令均以 `BUILD SUCCESS` 结束。
