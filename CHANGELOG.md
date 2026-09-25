@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Default shell loads Vaadin Aura with `@StyleSheet(Aura.STYLESHEET)` instead of
+  pinning Lumo through the deprecated `@Theme` annotation.
+
+### Removed
+
+- The `ant` visual language, Ant-scoped CSS and icon overlay, and the
+  `vadmin.appearance.visual-language` configuration.
+
+### Breaking changes
+
+- The default appearance is Vaadin Aura rather than Lumo.
+- `vadmin.appearance.visual-language` and `APP_APPEARANCE_VISUAL_LANGUAGE` are
+  removed. The Ant visual language is no longer available.
+
 ## [0.3.0] - 2026-09-23
 
 ### Changed

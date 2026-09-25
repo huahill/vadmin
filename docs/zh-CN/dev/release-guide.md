@@ -18,7 +18,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 | 运行时 | Spring Boot 4.1.1 | Spring Boot 是唯一受支持的运行时。 |
 | UI | Vaadin Flow 25.3.0 | Flow 是唯一 UI 模型；不包含 Hilla、React、Vue 或 TypeScript。 |
 | 数据库与迁移 | PostgreSQL 18 Compose 基线，Flyway 13.7.0 | Testcontainers 覆盖不构成额外部署承诺。 |
-| 外观 | `vaadin`、`ant`；跟随系统/浅色/深色 | 两种视觉语言共享同一套 Flow、权限、模块和 i18n 契约。 |
+| 外观 | Aura；跟随系统/浅色/深色 | Aura 与配色方案选择共享同一套 Flow、权限、模块和 i18n 契约。 |
 | UI 语言 | `zh-CN`、`en-US` | VAdmin 与使用方模块资源都必须支持这两种语言。 |
 | 外部身份 | 可选的标准 OIDC 授权码登录 | 提供商生命周期、SCIM、SAML、LDAP、MFA、租户和数据范围策略由使用方负责。 |
 
@@ -35,7 +35,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
    `en-US` 资源、没有 `@Route` 的 prototype View Bean，以及每个使用方动态 View 的宿主
    `@Uses` 锚点。
 5. 保留 VAdmin 默认外壳、主题和系统管理，除非使用方有意使用自己拥有的
-   `AdminHostLayout`、`AppShellConfigurator` 和 `@Theme` 完全替换外壳。
+   `AdminHostLayout`、`AppShellConfigurator` 和样式表完全替换外壳。
 6. 保留外部提供的密钥和部署配置。更改 `APP_BOOTSTRAP_PASSWORD` 不会重置已有 `admin` 账户。
 7. 重新运行授权、语言、外观和代表性业务流测试。OIDC 使用方还必须验证已有本地账户映射。
 
@@ -71,7 +71,7 @@ docker build -t vadmin:0.2.0-rc .
 - [ ] Compose 配置渲染时没有未解析变量。
 - [ ] 镜像以非 root 运行时启动，并使用外部凭据连接全新的 PostgreSQL 18 服务。
 - [ ] 评审者登录后切换语言和浅色/深色，打开 Users、Roles、Permissions 和 Audit，再确认
-  按权限过滤的使用方模块页面能在所选视觉语言和色彩模式下正常显示。
+  按权限过滤的使用方模块页面能在 Aura 和所选色彩模式下正常显示。
 
 ## 发布
 

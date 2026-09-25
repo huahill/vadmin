@@ -13,8 +13,6 @@ spring:
 vadmin:
   bootstrap:
     password: ${APP_BOOTSTRAP_PASSWORD:}
-  appearance:
-    visual-language: ${APP_APPEARANCE_VISUAL_LANGUAGE:vaadin}
   identity:
     oidc:
       links: []

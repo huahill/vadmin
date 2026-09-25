@@ -121,6 +121,6 @@ VAdmin 为常见管理场景提供了高层 Flow 模式：`AdminPageFrame`、`Pa
 ## 替换外壳
 
 默认外壳是有意的整体替换设计。只有完整产品边界需要不同外壳时才替换——不能用于
-零散修改个别页面或样式。替换意味着拥有完整的 `AppShellConfigurator`、`@Theme` 和
+零散修改个别页面或样式。替换意味着拥有完整的 `AppShellConfigurator`、样式表和
 布局，同时仍使用 VAdmin 的模块装配、权限和路由注册。大多数使用方应保留默认外壳
 不变。

@@ -30,8 +30,6 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import io.github.huahill.vadmin.brand.AdminBrandProperties;
 import io.github.huahill.vadmin.shell.AdminShellProperties;
-import io.github.huahill.vadmin.theme.AdminAppearanceProperties;
-import io.github.huahill.vadmin.theme.AdminVisualLanguage;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUser;
 import io.github.huahill.vadmin.contracts.auth.CurrentUserProvider;
@@ -59,7 +57,6 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
     private final AuthorizationService authorization;
     private final AdminLocalePreference localePreference;
     private final I18NProvider translations;
-    private final AdminAppearanceProperties appearance;
     private final AdminShellProperties shell;
     private final VerticalLayout drawer = new VerticalLayout();
     private final DrawerToggle toggle = new DrawerToggle();
@@ -69,13 +66,12 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
 
     public DefaultMainLayout(AdminModuleRegistry modules, CurrentUserProvider currentUser,
                       AuthorizationService authorization, AdminLocalePreference localePreference,
-                      I18NProvider translations, AdminAppearanceProperties appearance,
-                      AdminBrandProperties brandProperties, AdminShellProperties shell) {
+                      I18NProvider translations, AdminBrandProperties brandProperties,
+                      AdminShellProperties shell) {
         this.modules = modules;
         this.authorization = authorization;
         this.localePreference = localePreference;
         this.translations = translations;
-        this.appearance = appearance;
         this.shell = shell;
         var currentUserValue = currentUser.currentUser();
         authenticated = currentUserValue.isPresent();
@@ -138,8 +134,8 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
 
     private void addHeader(HorizontalLayout navigation, HorizontalLayout utilities) {
         // Flow's full-width navbar children otherwise extend through AppLayout's slot inset.
-        navigation.getElement().getStyle().set("margin-inline-start", "var(--lumo-space-m)");
-        utilities.getElement().getStyle().set("margin-inline-end", "var(--lumo-space-m)");
+        navigation.getElement().getStyle().set("margin-inline-start", "var(--vaadin-padding-m)");
+        utilities.getElement().getStyle().set("margin-inline-end", "var(--vaadin-padding-m)");
         navigation.getElement().getStyle().set("flex-grow", "1");
         addToNavbar(navigation, utilities);
     }
@@ -147,7 +143,6 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        applyHostAppearance();
         applyColorScheme(sessionColorScheme());
     }
 
@@ -227,7 +222,6 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
     }
 
     private Component navigationIcon(String iconKey) {
-        if (appearance.visualLanguage() == AdminVisualLanguage.ANT) return AdminIconCatalog.createAdminIcon(iconKey);
         return AdminIconCatalog.create(iconKey);
     }
 
@@ -240,11 +234,6 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
         var scheme = VaadinSession.getCurrent().getAttribute(COLOR_SCHEME_KEY);
         if ("light".equals(scheme) || "dark".equals(scheme)) return (String) scheme;
         return "system";
-    }
-
-    private void applyHostAppearance() {
-        var root = UI.getCurrent().getElement();
-        root.setAttribute("data-vadmin-visual-language", appearance.visualLanguage().cssValue());
     }
 
     private void applyColorScheme(String colorScheme) {

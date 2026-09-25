@@ -11,7 +11,6 @@ import io.github.huahill.vadmin.springflow.i18n.AdminLocalePreference;
 import io.github.huahill.vadmin.springflow.i18n.CompositeAdminI18NProvider;
 import io.github.huahill.vadmin.brand.AdminBrandProperties;
 import io.github.huahill.vadmin.shell.AdminShellProperties;
-import io.github.huahill.vadmin.theme.AdminAppearanceProperties;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
@@ -27,7 +26,6 @@ class DefaultMainLayoutSerializationTest {
                 new PermitNothingAuthorizationService(),
                 new AdminLocalePreference(),
                 new CompositeAdminI18NProvider(List.of()),
-                new AdminAppearanceProperties(),
                 new AdminBrandProperties(),
                 new AdminShellProperties());
 

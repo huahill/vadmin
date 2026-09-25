@@ -9,15 +9,12 @@
 | 属性 | 默认值 | 用途 |
 | --- | --- | --- |
 | `vadmin.brand.name` | `VAdmin` | 外壳品牌区展示的产品名称，留空回退默认值。 |
-| `vadmin.appearance.visual-language` | `vaadin` | 外壳视觉语言：`vaadin`（原生 Lumo）或 `ant`（Ant Design 风格），未知值回退 `vaadin`。 |
 | `vadmin.shell.workplace-enabled` | `true` | 显示或隐藏内置的工作台首页入口。 |
 
 ```yaml
 vadmin:
   brand:
     name: 库存运营台
-  appearance:
-    visual-language: ant
   shell:
     workplace-enabled: true
 ```

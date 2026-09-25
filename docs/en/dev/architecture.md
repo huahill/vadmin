@@ -51,8 +51,8 @@ Consumer application
 A normal consumer configures its datasource and Flyway migration location,
 depends on `vadmin-spring-boot-starter`, and starts the application. It receives
 local login, the permission-filtered shell, Users, Roles, Permissions, Audit,
-`zh-CN`/`en-US` translations, system/light/dark color schemes, and Vaadin or Ant-inspired
-appearance profiles without defining a layout, theme, or system pages.
+`zh-CN`/`en-US` translations, system/light/dark color schemes, and the Aura
+appearance without defining a layout, theme, or system pages.
 
 The default administration shell is a VAdmin product responsibility. It supplies
 responsive navigation, global utilities, system administration, accessibility,
@@ -76,21 +76,19 @@ route guard also checks direct navigation before the view is constructed; use
 cases authorize mutations again. Navigation controls improve the user
 experience, while the use-case check is the authoritative boundary.
 
-## Default Experience And Visual Languages
+## Default Experience And Appearance
 
-The default `vaadin` language preserves the native Vaadin Lumo appearance.
-VAdmin may compose a complete administration experience through public APIs on
-`AppLayout`, `SideNav`, `MenuBar`, `Avatar`, `Notification`, and Flow layout
-components. It must not register global CSS that changes Lumo's appearance,
-override component `part`s, or introduce color, radius, spacing, density, or
-notification token systems. Structural composition and recreating a visual
-language are different responsibilities.
+The default appearance preserves native Vaadin Aura. VAdmin may compose a
+complete administration experience through public APIs on `AppLayout`,
+`SideNav`, `MenuBar`, `Avatar`, `Notification`, and Flow layout components. It
+must not register global CSS that changes Aura's appearance, override component
+`part`s, or introduce color, radius, spacing, density, or notification token
+systems. Structural composition and recreating a visual language are different
+responsibilities.
 
-The explicit `ant` language owns scoped CSS overrides to reproduce an
-Ant Design-inspired visual language. Modules consume the shared Flow patterns;
-they do not register a global theme, mutate global theme properties, or depend
-on Ant-only CSS. System, light, and dark modes use only `ColorScheme` and
-`Page.setColorScheme()`.
+Modules consume the shared Flow patterns; they do not register a global theme
+or mutate global theme properties. System, light, and dark modes use only
+`ColorScheme` and `Page.setColorScheme()`.
 
 Dynamic routes need a static production frontend anchor. A consumer that adds
 a dynamic business view declares `@Uses(ThatView.class)` once on a host-owned
@@ -101,7 +99,7 @@ module metadata is the source of route registration.
 
 The default path is all-or-nothing baseline ownership. A consumer that needs a
 different shell may deliberately provide `AdminHostLayout` and own its
-`AppShellConfigurator` and `@Theme` configuration. That is a complete shell
+`AppShellConfigurator` and stylesheet configuration. That is a complete shell
 replacement, not a way to replace selected default pages or styles.
 
 The consumer still uses `AdminModuleRegistry`, module assembly, permissions,

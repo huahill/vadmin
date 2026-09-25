@@ -20,7 +20,7 @@ needed by a consumer.
 | Runtime | Spring Boot 4.1.1 | Spring Boot is the only supported runtime. |
 | UI | Vaadin Flow 25.3.0 | Flow is the only UI model; Hilla, React, Vue, and TypeScript are excluded. |
 | Database and migration | PostgreSQL 18 Compose baseline, Flyway 13.7.0 | Testcontainers coverage is not an additional deployment promise. |
-| Appearance | `vaadin` and `ant`; system/light/dark | Both visual languages preserve the same Flow, permission, module, and i18n contracts. |
+| Appearance | Aura; system/light/dark | Aura plus color-scheme selection preserve the same Flow, permission, module, and i18n contracts. |
 | UI locales | `zh-CN`, `en-US` | VAdmin and consumer module resources must support both locales. |
 | External identity | Opt-in standard OIDC authorization-code login | Provider lifecycle, SCIM, SAML, LDAP, MFA, tenant, and data-scope policies remain consumer concerns. |
 
@@ -41,7 +41,7 @@ updated compatibility evidence, and both normal and production verification.
    dynamic view.
 5. Keep the VAdmin default shell, theme, and system administration unless the
    consumer intentionally replaces the complete shell with its own
-   `AdminHostLayout`, `AppShellConfigurator`, and `@Theme`.
+   `AdminHostLayout`, `AppShellConfigurator`, and stylesheets.
 6. Preserve external secrets and deployment configuration. Changing
    `APP_BOOTSTRAP_PASSWORD` does not reset an existing `admin` account.
 7. Re-run authorization, locale, appearance, and representative business-flow
@@ -87,7 +87,7 @@ docker build -t vadmin:0.2.0-rc .
   service using externally supplied credentials.
 - [ ] A reviewer signs in, changes locale and light/dark mode, opens Users,
   Roles, Permissions, and Audit, then confirms a permission-filtered consumer
-  module page under the selected visual language and color scheme.
+  module page under Aura and the selected color scheme.
 
 ## Publication
 

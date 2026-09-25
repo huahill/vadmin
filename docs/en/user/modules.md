@@ -133,6 +133,6 @@ based on documented Vaadin component APIs.
 The default shell is intentionally all-or-nothing. Only replace it if the
 complete product boundary requires a different shell — not to tweak
 individual pages or styles. A replacement means owning the full
-`AppShellConfigurator`, `@Theme`, and layout, while still using VAdmin's
+`AppShellConfigurator`, stylesheets, and layout, while still using VAdmin's
 module assembly, permissions, and route registration. Most consumers should
 keep the default shell unchanged.

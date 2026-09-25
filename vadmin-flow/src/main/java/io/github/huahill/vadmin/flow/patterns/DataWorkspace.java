@@ -16,7 +16,6 @@ import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -378,14 +377,22 @@ public final class DataWorkspace<T> extends VerticalLayout implements LocaleChan
     }
 
     private void updateSelectionBarClasses(boolean compactBottomBar) {
-        var compactClasses = new String[] {LumoUtility.Background.BASE, LumoUtility.Border.TOP,
-                LumoUtility.BorderColor.CONTRAST_20, LumoUtility.Padding.SMALL};
         if (compactBottomBar) {
-            selectionBar.addClassNames(compactClasses);
-            selectionBar.getStyle().set("position", "sticky").set("bottom", "0").set("z-index", "1");
+            selectionBar.getStyle()
+                    .set("background", "var(--vaadin-background-color)")
+                    .set("border-top", "1px solid var(--vaadin-border-color-secondary)")
+                    .set("padding", "var(--vaadin-padding-s)")
+                    .set("position", "sticky")
+                    .set("bottom", "0")
+                    .set("z-index", "1");
         } else {
-            selectionBar.removeClassNames(compactClasses);
-            selectionBar.getStyle().remove("position").remove("bottom").remove("z-index");
+            selectionBar.getStyle()
+                    .remove("background")
+                    .remove("border-top")
+                    .remove("padding")
+                    .remove("position")
+                    .remove("bottom")
+                    .remove("z-index");
         }
     }
 

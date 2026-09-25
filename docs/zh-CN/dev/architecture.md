@@ -44,7 +44,7 @@ Spring Boot 4.x、Vaadin Flow 25.x、PostgreSQL 和 Flyway SQL 迁移。Spring B
 
 普通使用方配置数据源和 Flyway 迁移位置、依赖 `vadmin-spring-boot-starter` 后即可启动。无需定义
 布局、主题或系统页面，即可获得本地登录、按权限过滤的响应式后台外壳、Users、Roles、Permissions、
-Audit、`zh-CN`/`en-US` 翻译、跟随系统/浅色/深色配色方案以及 Vaadin 或 Ant 风格外观。
+Audit、`zh-CN`/`en-US` 翻译、跟随系统/浅色/深色配色方案以及 Aura 外观。
 
 默认后台外壳是 VAdmin 的产品职责，而不是让业务模块从 Flow 的基础布局组件开始拼装。它提供
 响应式导航、全局操作区、系统管理、无障碍行为和统一的页面工作流；业务模块只补充领域数据、
@@ -60,16 +60,15 @@ Flow View 类型和两套消息资源包。启动时，`vadmin-spring-flow` 校�
 导航是按授权过滤后的已组装页面投影。路由守卫也会在创建 View 前检查直接访问；用例会再次
 授权变更操作。导航控制改善用户体验，用例检查才是权威安全边界。
 
-## 默认体验与视觉语言
+## 默认体验与外观
 
-默认 `vaadin` 语言以 Vaadin Lumo 的原生组件外观为准。VAdmin 可以通过 `AppLayout`、
+默认外观以 Vaadin Aura 的原生组件为准。VAdmin 可以通过 `AppLayout`、
 `SideNav`、`MenuBar`、`Avatar`、`Notification` 及 Flow 布局组件的公开 API 组合完整的后台
-体验，但不得注册改变 Lumo 外观的全局 CSS、组件 `part` 覆写，或自建颜色、圆角、间距、密度和
+体验，但不得注册改变 Aura 外观的全局 CSS、组件 `part` 覆写，或自建颜色、圆角、间距、密度和
 通知 token。结构组合与重造视觉样式是两个不同的职责。
 
-显式 `ant` 语言拥有其自身作用域内的 CSS 覆写，以复现 Ant Design 风格。模块使用共享 Flow
-模式，不注册全局主题、不修改全局主题属性，也不依赖 Ant 专用 CSS。系统、浅色和深色模式仅
-通过 `ColorScheme` 与 `Page.setColorScheme()` 处理。
+模块使用共享 Flow 模式，不注册全局主题、不修改全局主题属性。系统、浅色和深色模式仅通过
+`ColorScheme` 与 `Page.setColorScheme()` 处理。
 
 动态路由需要静态生产前端锚点。使用方新增动态业务 View 时，在自己拥有的应用配置类型上
 为该 View 声明一次 `@Uses(该View.class)`。View 本身不声明 `@Route`；模块元数据才是路由
@@ -78,7 +77,7 @@ Flow View 类型和两套消息资源包。启动时，`vadmin-spring-flow` 校�
 ## 有意的完全替换
 
 默认路径采用完整基线所有权。确实需要不同外壳的使用方可以有意提供 `AdminHostLayout`，并
-自行拥有 `AppShellConfigurator` 和 `@Theme` 配置。这是完整外壳替换，不能用于零散替换默认
+自行拥有 `AppShellConfigurator` 和样式表配置。这是完整外壳替换，不能用于零散替换默认
 页面或样式。
 
 使用方仍使用 `AdminModuleRegistry`、模块组装、权限、路由守卫和组合翻译提供器，并必须为

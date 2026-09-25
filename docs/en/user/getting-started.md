@@ -5,8 +5,8 @@
 Add one dependency to an existing Spring Boot application and start it. You
 get sign-in with a bootstrap administrator, permission-filtered navigation,
 the default shell and theme, the Users, Roles, Permissions, and Audit
-administration module, `zh-CN` and `en-US` locales, light/dark color schemes,
-and a choice of visual languages. You do not need to build a layout, theme,
+administration module, `zh-CN` and `en-US` locales, and light/dark color schemes.
+You do not need to build a layout, theme,
 or system pages — VAdmin provides them.
 
 ## Prerequisites

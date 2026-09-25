@@ -5,33 +5,24 @@ VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 [简体中文](../../zh-CN/dev/theme-tokens.md) | English
 
 `vadmin` owns the default Vaadin Flow shell. Its
-`DefaultApplicationShell` explicitly loads Lumo; the bundled Ant resource is
-fully scoped and has no effect unless the host selects the `ant` language.
+`DefaultApplicationShell` loads Aura with `@StyleSheet(Aura.STYLESHEET)`.
 Normal consumers and business modules do not define a competing shell or global
 theme.
 
-## Default Vaadin Language
+## Aura Appearance
 
-`vaadin` is the default visual language. It uses Lumo and Vaadin base-style
-properties directly: `--lumo-*` and `--vaadin-*`. Use component variants before
-writing CSS. Color scheme selection uses `ColorScheme` and
-`Page.setColorScheme()` with System preference, Light, and Dark choices.
+The default appearance is Vaadin Aura as-is, plus Vaadin base-style properties
+(`--vaadin-*`). Use component variants before writing CSS. Color scheme
+selection uses `ColorScheme` and `Page.setColorScheme()` with System
+preference, Light, and Dark choices.
 
 The shell does not override App Layout, Grid, fields, buttons, dialogs,
-overlays, or notifications. Lumo's standard sizing is retained without a VAdmin
-density setting.
+overlays, or notifications. Aura's standard sizing is retained without a
+VAdmin density setting. Do not mix `--lumo-*` properties into shared patterns
+or business CSS.
 
-## Ant Visual Language
-
-`ant` is an explicit alternative visual language. Its selectors are scoped by
-`[data-vadmin-visual-language="ant"]`, and its `--vadmin-ant-*` tokens and
-targeted `::part()` overrides implement Ant Design behavior. No module may
-depend on those selectors or tokens.
-
-Use `AdminIcon` and `AdminIconName` from `vadmin-flow` for standard actions.
-Do not import VAdmin theme icons, assign `data-admin-icon`, or set icon-mask
-variables from a business module. VAdmin owns profile-specific icon assets
-and Vaadin fallbacks.
+Use `AdminIconName` and `AdminIconCatalog` from `vadmin-flow` for standard
+navigation icons. Do not ship a competing icon language from a business module.
 
 ## Business Module CSS
 
@@ -39,7 +30,7 @@ Keep CSS scoped to a module-owned component class:
 
 ```css
 .inventory-summary {
-  background: var(--lumo-base-color);
+  background: var(--vaadin-background-color);
   border: 1px solid var(--vaadin-border-color-secondary);
   border-radius: var(--vaadin-radius-m);
   color: var(--vaadin-text-color);
@@ -54,6 +45,6 @@ shared `vadmin-flow` page patterns and normal Vaadin state APIs.
 ## Full Shell Replacement
 
 Only a consumer deliberately replacing the complete shell owns an alternative
-`AppShellConfigurator`, `@Theme`, and token implementation. It must preserve a
+`AppShellConfigurator`, stylesheet, and token implementation. It must preserve a
 coherent accessible appearance for all assembled modules. Partial replacement
 of default shell pieces or selected system pages is not supported.

@@ -5,7 +5,6 @@ import io.github.huahill.vadmin.flow.navigation.AdminMessageBundle;
 import io.github.huahill.vadmin.springflow.AdminFlowAutoConfiguration;
 import io.github.huahill.vadmin.brand.AdminBrandProperties;
 import io.github.huahill.vadmin.shell.AdminShellProperties;
-import io.github.huahill.vadmin.theme.AdminAppearanceProperties;
 import io.github.huahill.vadmin.views.DefaultMainLayout;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -17,7 +16,7 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 @AutoConfigurationPackage
 @AutoConfigureBefore(AdminFlowAutoConfiguration.class)
-@EnableConfigurationProperties({AdminAppearanceProperties.class, AdminBrandProperties.class, AdminShellProperties.class})
+@EnableConfigurationProperties({AdminBrandProperties.class, AdminShellProperties.class})
 public class DefaultAdminHostLayoutConfiguration {
     @Bean
     @ConditionalOnMissingBean(AdminHostLayout.class)

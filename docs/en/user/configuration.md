@@ -10,15 +10,12 @@ required; everything else has a working default.
 | Property | Default | Purpose |
 | --- | --- | --- |
 | `vadmin.brand.name` | `VAdmin` | Product name shown in the shell brand area. Blank values fall back to the default. |
-| `vadmin.appearance.visual-language` | `vaadin` | Shell visual language: `vaadin` (native Lumo) or `ant` (Ant-Design-inspired). Unknown values fall back to `vaadin`. |
 | `vadmin.shell.workplace-enabled` | `true` | Shows or hides the built-in workplace home entry. |
 
 ```yaml
 vadmin:
   brand:
     name: Inventory Operations
-  appearance:
-    visual-language: ant
   shell:
     workplace-enabled: true
 ```

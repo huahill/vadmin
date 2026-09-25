@@ -5,7 +5,6 @@ import com.vaadin.flow.component.html.DescriptionList;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import java.util.Objects;
 
 /** A compact, semantic entity row for narrow data workspaces. */
@@ -18,9 +17,9 @@ public final class CompactDataItem extends VerticalLayout {
 
     public CompactDataItem(String primaryText) {
         this.primaryText.setText(Objects.requireNonNull(primaryText));
-        this.primaryText.addClassNames(LumoUtility.FontWeight.SEMIBOLD);
-        this.primaryText.getStyle().set("overflow-wrap", "anywhere");
-        status.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.TextColor.SECONDARY);
+        this.primaryText.getStyle().set("font-weight", "600").set("overflow-wrap", "anywhere");
+        status.getStyle().set("font-size", "var(--vaadin-font-size-s)")
+                .set("color", "var(--vaadin-text-color-secondary)");
         status.setVisible(false);
 
         var header = new HorizontalLayout(this.primaryText, status);
@@ -47,7 +46,7 @@ public final class CompactDataItem extends VerticalLayout {
         setWidthFull();
         setPadding(true);
         setSpacing(true);
-        addClassNames(LumoUtility.Border.BOTTOM, LumoUtility.BorderColor.CONTRAST_20);
+        getStyle().set("border-bottom", "1px solid var(--vaadin-border-color-secondary)");
         add(header, metadata, actions);
     }
 
@@ -69,9 +68,12 @@ public final class CompactDataItem extends VerticalLayout {
         var field = new DescriptionList();
         var term = new DescriptionList.Term(Objects.requireNonNull(label));
         var description = new DescriptionList.Description(Objects.requireNonNull(value));
-        field.addClassNames(LumoUtility.Display.INLINE_FLEX, LumoUtility.Gap.XSMALL,
-                LumoUtility.Margin.NONE, LumoUtility.FontSize.SMALL, LumoUtility.TextColor.SECONDARY);
-        description.addClassNames(LumoUtility.Margin.NONE);
+        field.getStyle().set("display", "inline-flex")
+                .set("gap", "var(--vaadin-gap-xs)")
+                .set("margin", "0")
+                .set("font-size", "var(--vaadin-font-size-s)")
+                .set("color", "var(--vaadin-text-color-secondary)");
+        description.getStyle().set("margin", "0");
         description.getStyle().set("overflow-wrap", "anywhere");
         field.add(term, description);
         metadata.add(field);
