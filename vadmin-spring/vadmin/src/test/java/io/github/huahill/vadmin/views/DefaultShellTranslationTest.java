@@ -14,8 +14,10 @@ class DefaultShellTranslationTest {
 
         assertThat(source).contains("return text(page.titleKey());").doesNotContain("legacyLabel");
         assertThat(source).contains("new Avatar(user.username())")
+                .contains("AvatarVariant.SMALL")
+                .contains("AvatarVariant.AURA_FILLED")
                 .contains("new MenuBar()")
-                .contains("MenuBarVariant.LUMO_ICON")
+                .contains("MenuBarVariant.TERTIARY")
                 .contains("option.setCheckable(true)")
                 .contains("option.setChecked(locale.equals(selectedLocale))")
                 .contains("rebuildUserMenu(userMenu)")

@@ -7,6 +7,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.page.ColorScheme;
@@ -165,16 +166,20 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
     }
 
     private MenuBar createLanguageMenu() {
-        var menu = new MenuBar();
-        menu.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE);
+        var menu = createUtilityMenu();
         rebuildLanguageMenu(menu);
         return menu;
     }
 
     private MenuBar createUserMenu() {
-        var menu = new MenuBar();
-        menu.addThemeVariants(MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_TERTIARY_INLINE);
+        var menu = createUtilityMenu();
         rebuildUserMenu(menu);
+        return menu;
+    }
+
+    private static MenuBar createUtilityMenu() {
+        var menu = new MenuBar();
+        menu.addThemeVariants(MenuBarVariant.TERTIARY);
         return menu;
     }
 
@@ -268,7 +273,9 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
 
     private void rebuildUserMenu(MenuBar menu) {
         menu.removeAll();
-        var trigger = menu.addItem(new Avatar(user.username()));
+        var avatar = new Avatar(user.username());
+        avatar.addThemeVariants(AvatarVariant.SMALL, AvatarVariant.AURA_FILLED);
+        var trigger = menu.addItem(avatar);
         trigger.setAriaLabel(text("system.shell.current-user"));
         trigger.setTooltipText(text("system.shell.current-user"));
         var actions = trigger.getSubMenu();
