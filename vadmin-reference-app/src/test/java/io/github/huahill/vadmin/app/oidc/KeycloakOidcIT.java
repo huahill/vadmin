@@ -142,7 +142,7 @@ class KeycloakOidcIT {
     private void startExternalLogin(String username) {
         var externalLogin = page.getByRole(AriaRole.LINK,
                 new Page.GetByRoleOptions().setName("使用单点登录继续"));
-        assertThat(externalLogin).hasAttribute("href", "/oauth2/authorization/oidc");
+        assertThat(externalLogin).hasAttribute("href", "oauth2/authorization/oidc");
         externalLogin.click();
         page.waitForURL(url -> url.startsWith(keycloak.issuerUri() + "/protocol/openid-connect/auth"));
         page.locator("#username").fill(username);

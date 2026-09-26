@@ -12,7 +12,6 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinServletResponse;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -85,13 +84,20 @@ public final class LoginView extends com.vaadin.flow.component.orderedlayout.Ver
             login.setError(true);
             return;
         }
-        getUI().ifPresent(ui -> ui.getPage().setLocation(request.getContextPath() + "/"));
+        getUI().ifPresent(ui -> ui.getPage().setLocation(postLoginBrowserLocation()));
+    }
+
+    /**
+     * Path-relative home. Root-absolute {@code /} is resolved against the
+     * browser origin, so a reverse-proxy prefix stripped before this process
+     * is lost.
+     */
+    static String postLoginBrowserLocation() {
+        return ".";
     }
 
     private static String oidcAuthorizationUrl(String registrationId) {
-        var request = VaadinRequest.getCurrent();
-        var contextPath = request == null ? "" : request.getContextPath();
-        return contextPath + "/oauth2/authorization/" + registrationId;
+        return "oauth2/authorization/" + registrationId;
     }
 
     private void updateBrowserTitle() { getUI().ifPresent(ui -> ui.getPage().setTitle(getPageTitle())); }

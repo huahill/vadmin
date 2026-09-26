@@ -13,7 +13,6 @@ import com.vaadin.flow.function.DeploymentConfiguration;
 import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import io.github.huahill.vadmin.springsecurity.OidcLoginAvailability;
 import io.github.huahill.vadmin.springsecurity.auth.LocalLoginAuthenticator;
@@ -59,7 +58,7 @@ class LoginViewTest {
         var view = new LoginView(new OidcLoginAvailability(true, "oidc"), localLoginAuthenticator);
 
         var externalEntry = oidcEntry(view);
-        assertThat(externalEntry.getAttribute("href")).isEqualTo("/oauth2/authorization/oidc");
+        assertThat(externalEntry.getAttribute("href")).isEqualTo("oauth2/authorization/oidc");
         assertThat(externalEntry.hasAttribute("router-ignore")).isTrue();
         assertThat(externalEntry.getText()).isEqualTo("Continue with single sign-on");
         assertThat(view.getChildren()).anyMatch(LoginOverlay.class::isInstance);
@@ -70,18 +69,19 @@ class LoginViewTest {
     void usesTheConfiguredRegistrationIdForTheExternalEntry() {
         var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
 
-        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("/oauth2/authorization/corp-sso");
+        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("oauth2/authorization/corp-sso");
     }
 
     @Test
-    void prefixesTheExternalEntryWithTheCurrentContextPath() {
-        var request = mock(VaadinRequest.class);
-        when(request.getContextPath()).thenReturn("/admin");
-        service.setCurrentInstances(request, null);
-
+    void usesAPathRelativeExternalEntrySoAStrippedProxyPrefixIsPreserved() {
         var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
 
-        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("/admin/oauth2/authorization/corp-sso");
+        assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("oauth2/authorization/corp-sso");
+    }
+
+    @Test
+    void usesAPathRelativeHomeAfterLocalLogin() {
+        assertThat(LoginView.postLoginBrowserLocation()).isEqualTo(".");
     }
 
     @Test
