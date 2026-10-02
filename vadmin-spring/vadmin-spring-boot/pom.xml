@@ -9,7 +9,7 @@
     <artifactId>vadmin-spring-boot</artifactId>
     <name>VAdmin Spring Boot</name>
     <dependencies>
-        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-contracts</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-contracts</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
