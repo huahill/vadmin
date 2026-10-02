@@ -1,6 +1,6 @@
 # 配置参考
 
-[English](../../en/user/configuration.md) | 简体中文
+简体中文 | [English](../../en/user/configuration.md)
 
 所有配置都是普通的 Spring Boot 属性。只有数据源是必需项，其余配置都有可用默认值。
 

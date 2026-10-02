@@ -2,7 +2,7 @@
 
 VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
-[English](../../en/dev/theme-tokens.md) | 简体中文
+简体中文 | [English](../../en/dev/theme-tokens.md)
 
 `vadmin` 拥有默认的 Vaadin Flow 外壳。其 `DefaultApplicationShell` 通过
 `@StyleSheet(Aura.STYLESHEET)` 加载 Aura。普通使用方和业务模块不得定义竞争性的

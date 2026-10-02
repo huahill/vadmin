@@ -1,6 +1,6 @@
 # 快速开始
 
-[English](../../en/user/getting-started.md) | 简体中文
+简体中文 | [English](../../en/user/getting-started.md)
 
 向已有的 Spring Boot 应用添加一个依赖并启动，即可获得：引导管理员登录、
 按权限过滤的导航、默认外壳与主题、Users/Roles/Permissions/Audit 系统管理模块、
@@ -113,7 +113,6 @@ docker compose --env-file .env up --build
 - 用[模块开发](modules.md)指南添加业务页面。
 - 上线前阅读[安全说明](security.md)。
 - 用[部署与运维](deployment.md)指南完成部署。
-- 用[升级指南](upgrade.md)在版本间迁移。
 - 用[外观配置](appearance.md)调整外观。
 
 只有有意完全替换外壳时，使用方才需要提供 `AdminHostLayout` 和

@@ -1,6 +1,6 @@
 # Appearance
 
-[简体中文](../../zh-CN/user/appearance.md) | English
+English | [简体中文](../../zh-CN/user/appearance.md)
 
 VAdmin uses Vaadin Aura as-is. Users pick system, light, or dark color schemes
 from the shell's user menu through Vaadin's `ColorScheme` API.

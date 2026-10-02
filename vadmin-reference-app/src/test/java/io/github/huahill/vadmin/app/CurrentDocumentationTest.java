@@ -19,7 +19,6 @@ class CurrentDocumentationTest {
             "docs/en/user/appearance.md",
             "docs/en/user/security.md",
             "docs/en/user/deployment.md",
-            "docs/en/user/upgrade.md",
             "docs/en/dev/architecture.md",
             "docs/en/dev/release-guide.md",
             "docs/en/dev/theme-tokens.md",
@@ -29,7 +28,6 @@ class CurrentDocumentationTest {
             "docs/zh-CN/user/appearance.md",
             "docs/zh-CN/user/security.md",
             "docs/zh-CN/user/deployment.md",
-            "docs/zh-CN/user/upgrade.md",
             "docs/zh-CN/dev/architecture.md",
             "docs/zh-CN/dev/release-guide.md",
             "docs/zh-CN/dev/theme-tokens.md");

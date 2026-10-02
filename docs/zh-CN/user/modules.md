@@ -1,6 +1,6 @@
 # 模块开发
 
-[English](../../en/user/modules.md) | 简体中文
+简体中文 | [English](../../en/user/modules.md)
 
 VAdmin 自带完整的管理外壳。你通过声明模块来添加业务页面——一个小型 Spring 配置，
 告诉 VAdmin 路由、权限、翻译和视图 Bean。无需任何外壳、布局或主题工作。

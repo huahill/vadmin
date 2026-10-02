@@ -1,6 +1,6 @@
 # Security
 
-[简体中文](../../zh-CN/user/security.md) | English
+English | [简体中文](../../zh-CN/user/security.md)
 
 ## Sign-In
 

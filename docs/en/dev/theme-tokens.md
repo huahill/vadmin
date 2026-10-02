@@ -2,7 +2,7 @@
 
 VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
-[简体中文](../../zh-CN/dev/theme-tokens.md) | English
+English | [简体中文](../../zh-CN/dev/theme-tokens.md)
 
 `vadmin` owns the default Vaadin Flow shell. Its
 `DefaultApplicationShell` loads Aura with `@StyleSheet(Aura.STYLESHEET)`.

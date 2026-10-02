@@ -9,11 +9,11 @@
     <artifactId>vadmin-spring-jpa</artifactId>
     <name>VAdmin Spring JPA</name>
     <dependencies>
-        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-platform</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-platform</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-flyway</artifactId></dependency>
-        <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-core</artifactId><version>${flyway.version}</version></dependency>
-        <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-database-postgresql</artifactId><version>${flyway.version}</version></dependency>
+        <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-core</artifactId></dependency>
+        <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-database-postgresql</artifactId></dependency>
         <!-- Hibernate needs a JSON FormatMapper for the jsonb audit column; flyway-core no longer leaks jackson-databind transitively. -->
         <dependency><groupId>tools.jackson.core</groupId><artifactId>jackson-databind</artifactId></dependency>
         <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><scope>runtime</scope></dependency>

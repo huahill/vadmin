@@ -1,6 +1,6 @@
 # Configuration Reference
 
-[简体中文](../../zh-CN/user/configuration.md) | English
+English | [简体中文](../../zh-CN/user/configuration.md)
 
 All settings are ordinary Spring Boot properties. Only the datasource is
 required; everything else has a working default.

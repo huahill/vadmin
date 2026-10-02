@@ -2,7 +2,7 @@
 
 简体中文 | [English](README.md)
 
-VAdmin 是一个 Java 优先、面向 Vaadin Flow 的管理基线。它的可复用核心——
+VAdmin 是一个 Java 优先、面向 [Vaadin Flow](https://vaadin.com/docs/latest/flow) 的管理基线。它的可复用核心——
 身份与权限契约、RBAC 用例和共享外壳模式——框架无关，运行时专属行为归入适配层，
 因此 Spring Boot 之外的运行时（如 Quarkus、Helidon、Jakarta EE）仍是未来可能的
 适配方向。Spring Boot 是当前唯一受支持的运行时：添加 `vadmin-spring-boot-starter`
@@ -38,7 +38,6 @@ docker compose --env-file .env up --build
 | 外观配置 | [阅读](docs/zh-CN/user/appearance.md) |
 | 安全说明 | [阅读](docs/zh-CN/user/security.md) |
 | 部署 | [阅读](docs/zh-CN/user/deployment.md) |
-| 升级 | [阅读](docs/zh-CN/user/upgrade.md) |
 
 **开发者指南**
 

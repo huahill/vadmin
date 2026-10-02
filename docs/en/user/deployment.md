@@ -1,6 +1,6 @@
 # Deployment
 
-[简体中文](../../zh-CN/user/deployment.md) | English
+English | [简体中文](../../zh-CN/user/deployment.md)
 
 VAdmin is a regular Spring Boot library — deploy your application the way you
 already do. This guide covers the VAdmin-specific concerns to check before

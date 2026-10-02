@@ -9,12 +9,12 @@
     <artifactId>vadmin-spring-security</artifactId>
     <name>VAdmin Spring Security</name>
     <dependencies>
-        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-contracts</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.huahill</groupId><artifactId>vadmin-contracts</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-security</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-oauth2-client</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>
-        <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-core</artifactId><version>${vaadin.version}</version></dependency>
-        <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-spring</artifactId><version>${vaadin.version}</version></dependency>
+        <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-core</artifactId></dependency>
+        <dependency><groupId>com.vaadin</groupId><artifactId>vaadin-spring</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
     </dependencies>
 </project>
