@@ -1,6 +1,6 @@
 # 部署
 
-[English](../../en/user/deployment.md) | 简体中文
+简体中文 | [English](../../en/user/deployment.md)
 
 VAdmin 是一个普通的 Spring Boot 库——按你已有的方式部署应用即可。本指南涵盖上线前
 需要检查的 VAdmin 相关事项。

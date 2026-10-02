@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-VAdmin is a Java-first administration baseline for Vaadin Flow. Its reusable
+VAdmin is a Java-first administration baseline for [Vaadin Flow](https://vaadin.com/docs/latest/flow). Its reusable
 core — identity and permission contracts, RBAC use cases, and the shared
 shell patterns — is framework-neutral, and runtime-specific behavior lives in
 adapter modules, so runtimes beyond Spring Boot (such as Quarkus, Helidon, or
@@ -18,7 +18,7 @@ React, and TypeScript are not included.
 
 VAdmin owns the baseline experience through its default administration module. Consumers add business capabilities
 as `AdminModule` beans and Flow view beans; they do not create a shell, theme,
-or system-administration module for normal adoption. See the English
+or system-administration module for normal adoption. See the
 [Modules](docs/en/user/modules.md) guide for the module, translation, and
 production-anchor contract.
 
@@ -44,7 +44,6 @@ Open `http://localhost:8080` and sign in with `admin` and the value of
 | Appearance | [Read](docs/en/user/appearance.md) |
 | Security | [Read](docs/en/user/security.md) |
 | Deployment | [Read](docs/en/user/deployment.md) |
-| Upgrade | [Read](docs/en/user/upgrade.md) |
 
 **Developer guides**
 

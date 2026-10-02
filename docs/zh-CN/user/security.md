@@ -1,6 +1,6 @@
 # 安全说明
 
-[English](../../en/user/security.md) | 简体中文
+简体中文 | [English](../../en/user/security.md)
 
 ## 登录
 

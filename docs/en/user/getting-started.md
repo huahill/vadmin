@@ -1,6 +1,6 @@
 # Getting Started
 
-[简体中文](../../zh-CN/user/getting-started.md) | English
+English | [简体中文](../../zh-CN/user/getting-started.md)
 
 Add one dependency to an existing Spring Boot application and start it. You
 get sign-in with a bootstrap administrator, permission-filtered navigation,
@@ -126,7 +126,6 @@ Open `http://localhost:8080` and sign in with `admin` and the value of
 - Add business pages with the [Modules](modules.md) guide.
 - Review the [Security](security.md) model before production.
 - Deploy with the [Deployment](deployment.md) guide.
-- Move between versions with the [Upgrade](upgrade.md) guide.
 - Change the look with the [Appearance](appearance.md) guide.
 
 Only a deliberate full shell replacement needs a consumer `AdminHostLayout`

@@ -1,6 +1,6 @@
 # Modules
 
-[简体中文](../../zh-CN/user/modules.md) | English
+English | [简体中文](../../zh-CN/user/modules.md)
 
 VAdmin ships a complete administration shell out of the box. You add
 business pages by declaring a module — a small Spring configuration that

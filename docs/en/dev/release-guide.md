@@ -2,7 +2,7 @@
 
 VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
-[简体中文](../../zh-CN/dev/release-guide.md) | English
+English | [简体中文](../../zh-CN/dev/release-guide.md)
 
 ## Scope
 

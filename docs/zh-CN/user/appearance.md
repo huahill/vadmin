@@ -1,6 +1,6 @@
 # 外观配置
 
-[English](../../en/user/appearance.md) | 简体中文
+简体中文 | [English](../../en/user/appearance.md)
 
 VAdmin 直接使用 Vaadin Aura。用户可通过外壳用户菜单，用 Vaadin 的
 `ColorScheme` API 在跟随系统、浅色和深色之间切换。
