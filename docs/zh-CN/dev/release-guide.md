@@ -16,7 +16,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 | JDK | Java 25 | 构建和运行使用方均要求 Java 25。 |
 | 构建工具 | Maven Wrapper 4.0.0-rc-7 | 升级到 Maven GA 属于独立工作。 |
 | 运行时 | Spring Boot 4.1.1 | Spring Boot 是唯一受支持的运行时。 |
-| UI | Vaadin Flow 25.3.0 | Flow 是唯一 UI 模型；不包含 Hilla、React、Vue 或 TypeScript。 |
+| UI | Vaadin Flow 25.3.1 | Flow 是唯一 UI 模型；不包含 Hilla、React、Vue 或 TypeScript。 |
 | 数据库与迁移 | PostgreSQL 18 Compose 基线，Flyway 13.7.0 | Testcontainers 覆盖不构成额外部署承诺。 |
 | 外观 | Aura；跟随系统/浅色/深色 | Aura 与配色方案选择共享同一套 Flow、权限、模块和 i18n 契约。 |
 | UI 语言 | `zh-CN`、`en-US` | VAdmin 与使用方模块资源都必须支持这两种语言。 |

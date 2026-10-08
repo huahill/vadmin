@@ -62,7 +62,7 @@ release, not a second Vaadin baseline for the consumer to maintain:
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>flow-maven-plugin</artifactId>
-        <version>25.3.0</version>
+        <version>25.3.1</version>
         <executions>
           <execution>
             <goals>
