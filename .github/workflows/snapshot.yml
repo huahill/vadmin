@@ -36,9 +36,37 @@ jobs:
           cache-dependency-path: |
             **/pom.xml
             .mvn/wrapper/maven-wrapper.properties
-          server-id: central
+          # Maven 4 binds server id "central" to repo.maven.apache.org. Reusing it for the
+          # Central Portal snapshots host drops these credentials and the deploy returns 401.
+          server-id: central-snapshots
           server-username: MAVEN_CENTRAL_USERNAME
           server-password: MAVEN_CENTRAL_PASSWORD
+
+      - name: Declare the Central snapshots repository
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          path = Path.home() / ".m2" / "settings.xml"
+          tree = ET.parse(path)
+          root = tree.getroot()
+          profiles = root.find("profiles")
+          if profiles is None:
+              profiles = ET.SubElement(root, "profiles")
+          profile = ET.SubElement(profiles, "profile")
+          ET.SubElement(profile, "id").text = "central-snapshots"
+          repository = ET.SubElement(ET.SubElement(profile, "repositories"), "repository")
+          ET.SubElement(repository, "id").text = "central-snapshots"
+          ET.SubElement(repository, "url").text = "https://central.sonatype.com/repository/maven-snapshots/"
+          ET.SubElement(ET.SubElement(repository, "releases"), "enabled").text = "false"
+          ET.SubElement(ET.SubElement(repository, "snapshots"), "enabled").text = "true"
+          active = root.find("activeProfiles")
+          if active is None:
+              active = ET.SubElement(root, "activeProfiles")
+          ET.SubElement(active, "activeProfile").text = "central-snapshots"
+          tree.write(path, encoding="utf-8", xml_declaration=True)
+          PY
 
       - name: Resolve version
         id: version
@@ -65,4 +93,4 @@ jobs:
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: >
           ./mvnw -B -ntp -DskipTests deploy
-          -DaltDeploymentRepository=central::https://central.sonatype.com/repository/maven-snapshots/
+          -DaltDeploymentRepository=central-snapshots::https://central.sonatype.com/repository/maven-snapshots/

@@ -148,11 +148,16 @@ workflow.
 
 The workflow reads the root Maven version and deploys only when it ends with
 `-SNAPSHOT`. It uses the standard Maven deploy lifecycle and the Central Portal
-snapshots repository without the release profile or GPG signing:
+snapshots repository without the release profile or GPG signing.
+
+Maven 4 binds the server id `central` to `https://repo.maven.apache.org`. The
+snapshot deploy therefore uses a separate server id, `central-snapshots`, and
+settings must declare a repository with that same id at the snapshots URL.
+Reusing `central` omits the credentials and Central responds with HTTP 401:
 
 ```bash
 ./mvnw -B -ntp -DskipTests deploy \
-  -DaltDeploymentRepository=central::https://central.sonatype.com/repository/maven-snapshots/
+  -DaltDeploymentRepository=central-snapshots::https://central.sonatype.com/repository/maven-snapshots/
 ```
 
 The ordinary `Verify` workflow remains the build and test gate for every

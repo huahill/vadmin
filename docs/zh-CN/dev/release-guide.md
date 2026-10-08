@@ -117,11 +117,15 @@ annotated tag，且准确指向已验证的发布提交。
 `MAVEN_CENTRAL_USERNAME` 和 `MAVEN_CENTRAL_PASSWORD` secrets。
 
 工作流读取根 Maven 版本，只有版本以 `-SNAPSHOT` 结尾时才会部署。它使用标准 Maven deploy
-生命周期和 Central Portal snapshots 仓库，不启用 `release` profile，也不进行 GPG 签名：
+生命周期和 Central Portal snapshots 仓库，不启用 `release` profile，也不进行 GPG 签名。
+
+Maven 4 把 server id `central` 绑定到 `https://repo.maven.apache.org`。快照部署因此使用
+单独的 server id `central-snapshots`，并且 settings 里必须声明同 id、指向快照仓库的
+repository。继续复用 `central` 会丢掉凭据，Central 返回 HTTP 401：
 
 ```bash
 ./mvnw -B -ntp -DskipTests deploy \
-  -DaltDeploymentRepository=central::https://central.sonatype.com/repository/maven-snapshots/
+  -DaltDeploymentRepository=central-snapshots::https://central.sonatype.com/repository/maven-snapshots/
 ```
 
 普通 `Verify` 工作流仍是每次推送到 `main` 时的构建与测试门禁。SNAPSHOT 是可变的开发制品，
