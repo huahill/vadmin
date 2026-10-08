@@ -226,6 +226,7 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
                 </plugin>
+                <!-- Same version as vaadin-bom. Flow publishes later plugin patches; do not follow those. -->
                 <plugin>
                     <groupId>com.vaadin</groupId>
                     <artifactId>flow-maven-plugin</artifactId>
@@ -240,7 +241,43 @@
         </pluginManagement>
     </build>
 
+    <!--
+        Dependabot reads this root POM only. It does not recurse through Maven 4
+        subprojects, and an inferred empty parent hides properties from it.
+        This profile stays inactive, so these internal lines are visible to
+        dependency updates without being exported through vadmin-bom.
+    -->
     <profiles>
+        <profile>
+            <id>dependency-updates</id>
+            <activation>
+                <property>
+                    <name>vadmin.dependencyUpdateScan</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-core</artifactId>
+                        <version>${flyway.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-database-postgresql</artifactId>
+                        <version>${flyway.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers-bom</artifactId>
+                        <version>${testcontainers.version}</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
         <profile>
             <id>production</id>
             <properties>
