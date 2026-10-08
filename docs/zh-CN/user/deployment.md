@@ -35,6 +35,42 @@ spring:
 首次启动后修改 `APP_BOOTSTRAP_PASSWORD` 对已有账户无效。引导账户行为见
 [安全说明](security.md)。
 
+
+## 生产前端
+
+`vadmin-bom` 已经管理 `flow-server-production-mode` 的版本。Maven BOM 不能管理插件，
+所以生产前端插件仍要写版本。这个版本就是本版 VAdmin 验证过的 Vaadin 版本，不是另一条
+需要使用方自己维护的 Vaadin 基线：
+
+```xml
+<profile>
+  <id>production</id>
+  <dependencies>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>flow-server-production-mode</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>flow-maven-plugin</artifactId>
+        <version>25.3.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-frontend</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</profile>
+```
+
 ## 容器
 
 如果你将应用容器化，使用 JRE 基础镜像并以非 root 用户运行。VAdmin 本身不需要任何

@@ -26,6 +26,7 @@ Spring Boot 4.x、Vaadin Flow 25.x、PostgreSQL 和 Flyway SQL 迁移。Spring B
 | `vadmin-spring-flow` | 模块组装、动态路由、组合翻译和语言偏好。 |
 | `vadmin` | 默认外壳和主题、系统管理 UI 与翻译、默认 `AdminModule`。 |
 | `vadmin-spring-boot-starter` | 面向使用方的 Spring Boot 接入依赖聚合。 |
+| `vadmin-bom` | 使用方导入的版本清单，固定已发布的 VAdmin 模块和 Vaadin 版本，不管理 Spring Boot。 |
 | `vadmin-reference-app` | 精简 starter 使用方、启动配置、种子数据和浏览器验收覆盖。 |
 
 `vadmin` 提供完整的默认后台框架、首页，以及 Users、Roles、Permissions、Audit 系统管理模块；
@@ -42,7 +43,7 @@ Spring Boot 4.x、Vaadin Flow 25.x、PostgreSQL 和 Flyway SQL 迁移。Spring B
   -> 使用方 AdminModule Bean 与 Flow View Bean
 ```
 
-普通使用方配置数据源和 Flyway 迁移位置、依赖 `vadmin-spring-boot-starter` 后即可启动。无需定义
+普通使用方导入 `vadmin-bom`，配置数据源和 Flyway 迁移位置，再依赖 `vadmin-spring-boot-starter` 后即可启动。无需定义
 布局、主题或系统页面，即可获得本地登录、按权限过滤的响应式后台外壳、Users、Roles、Permissions、
 Audit、`zh-CN`/`en-US` 翻译、跟随系统/浅色/深色配色方案以及 Aura 外观。
 

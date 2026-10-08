@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.1.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
-    <parent>
-        <groupId>io.github.huahill</groupId>
-        <artifactId>vadmin-parent</artifactId>
-        <version>0.4.1-SNAPSHOT</version>
-    </parent>
+    <parent/>
 
     <artifactId>vadmin-spring</artifactId>
     <name>VAdmin Spring</name>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>vadmin-spring-security</module>
-        <module>vadmin-spring-jpa</module>
-        <module>vadmin-spring-boot</module>
-        <module>vadmin-spring-flow</module>
-        <module>vadmin</module>
-        <module>vadmin-spring-boot-starter</module>
-    </modules>
+    <subprojects>
+        <subproject>vadmin-spring-security</subproject>
+        <subproject>vadmin-spring-jpa</subproject>
+        <subproject>vadmin-spring-boot</subproject>
+        <subproject>vadmin-spring-flow</subproject>
+        <subproject>vadmin</subproject>
+        <subproject>vadmin-spring-boot-starter</subproject>
+    </subprojects>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

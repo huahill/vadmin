@@ -16,7 +16,7 @@ needed by a consumer.
 | Area | `0.2.0` verified baseline | Release boundary |
 | --- | --- | --- |
 | JDK | Java 25 | Java 25 is required to build and run a consumer. |
-| Build tool | Maven Wrapper 4.0.0-rc-6 | A Maven GA upgrade is independent work. |
+| Build tool | Maven Wrapper 4.0.0-rc-7 | A Maven GA upgrade is independent work. |
 | Runtime | Spring Boot 4.1.1 | Spring Boot is the only supported runtime. |
 | UI | Vaadin Flow 25.3.0 | Flow is the only UI model; Hilla, React, Vue, and TypeScript are excluded. |
 | Database and migration | PostgreSQL 18 Compose baseline, Flyway 13.7.0 | Testcontainers coverage is not an additional deployment promise. |
@@ -31,8 +31,10 @@ updated compatibility evidence, and both normal and production verification.
 
 1. Update all `io.github.huahill` dependencies to the same target
    version. Do not mix released artifacts with snapshot siblings.
-2. Run the consumer with Java 25 and align Spring Boot and Vaadin with the
-   verified release table.
+2. Run the consumer with Java 25 and import `vadmin-bom` at the same version.
+   The BOM aligns the VAdmin modules and Vaadin dependencies; do not also define
+   a Vaadin version or import `vaadin-bom`. `flow-maven-plugin` is a plugin, so
+   the BOM cannot manage it. Use the Vaadin version from the table above.
 3. Review Flyway migrations against a production-like database copy. Apply
    each migration once and never rewrite an applied migration.
 4. Keep the documented module contract: `AdminModule` metadata, declared
@@ -91,11 +93,13 @@ docker build -t vadmin:0.4.0 .
 
 The `release` Maven profile requires a non-SNAPSHOT version, attaches source
 and Javadoc archives, signs every publication file with GPG, and uses the Maven
-Central Publisher Portal. VAdmin uses its checked-in Maven 4 wrapper for normal
-development and CI. Maven Central release publication deliberately uses Apache
-Maven 3.9.16 because the Central publishing path is not yet reliable for Maven
-4 project models; the project POMs therefore retain Maven 3-compatible
-`4.0.0` model syntax.
+Central Publisher Portal. Development, CI, and publication all use the checked-in
+Maven 4 wrapper. Reactor build POMs use model `4.1.0`: parent coordinates are
+inferred from `<parent/>`, and subprojects are declared with `<subprojects>`.
+Maven 4 publishes Maven 3-compatible model `4.0.0` consumer POMs with those
+parent coordinates resolved, so a consumer does not depend on reactor inference.
+Apache Maven 3 cannot read the `4.1.0` build model, so publication no longer
+uses Maven 3.9.16.
 
 The supported publication path is the manually triggered `Publish Release`
 GitHub Actions workflow. It must be started from `main`, but checks out the

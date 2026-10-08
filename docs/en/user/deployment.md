@@ -40,6 +40,43 @@ Changing `APP_BOOTSTRAP_PASSWORD` after the initial start has no effect on
 existing accounts. See [Security](security.md) for the bootstrap account
 behavior.
 
+
+## Production Frontend
+
+`vadmin-bom` manages the `flow-server-production-mode` version. A Maven BOM
+cannot manage a plugin, so the production frontend plugin still needs an
+explicit version. That version is the Vaadin line verified with this VAdmin
+release, not a second Vaadin baseline for the consumer to maintain:
+
+```xml
+<profile>
+  <id>production</id>
+  <dependencies>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>flow-server-production-mode</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>flow-maven-plugin</artifactId>
+        <version>25.3.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-frontend</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</profile>
+```
+
 ## Container
 
 If you containerize your application, use a JRE base image and run as a

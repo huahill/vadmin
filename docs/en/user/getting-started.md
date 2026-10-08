@@ -12,7 +12,8 @@ or system pages — VAdmin provides them.
 ## Prerequisites
 
 - A Spring Boot application built with Java 25.
-- Vaadin Flow 25.x on the classpath.
+- No separate Vaadin version. The `vadmin-bom` import below brings the Vaadin
+  Flow line verified with this VAdmin release.
 
 If your application does not yet use Vaadin Flow, the starter brings it in
 transitively. VAdmin does not include Hilla, React, or TypeScript.
@@ -25,12 +26,29 @@ identity and authorization, disable local IAM with
 
 ## 1. Add The Dependency
 
+Import the BOM, then declare the starter. `${vadmin.version}` is the only
+version a consumer writes. Do not also define `vaadin.version` or import
+`vaadin-bom`.
+
 ```xml
-<dependency>
-  <groupId>io.github.huahill</groupId>
-  <artifactId>vadmin-spring-boot-starter</artifactId>
-  <version>${vadmin.version}</version>
-</dependency>
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.huahill</groupId>
+      <artifactId>vadmin-bom</artifactId>
+      <version>${vadmin.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+
+<dependencies>
+  <dependency>
+    <groupId>io.github.huahill</groupId>
+    <artifactId>vadmin-spring-boot-starter</artifactId>
+  </dependency>
+</dependencies>
 ```
 
 If your application declares `@EnableVaadin` explicitly, add the VAdmin root
@@ -52,10 +70,12 @@ production artifact:
 <dependency>
   <groupId>com.vaadin</groupId>
   <artifactId>vaadin-dev</artifactId>
-  <version>${vaadin.version}</version>
   <optional>true</optional>
 </dependency>
 ```
+
+The production frontend plugin cannot be managed by a BOM. See
+[Deployment](deployment.md).
 
 ## 2. Point At Your PostgreSQL
 

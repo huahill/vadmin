@@ -12,7 +12,7 @@ permission-filtered navigation, the default shell and theme, Users, Roles,
 Permissions, Audit, locale selection, and appearance controls. It is not a
 collection of showcase pages or a runtime plugin platform.
 
-The first release uses Java 25, Maven 4.0.0-rc-6, Spring Boot 4.1.1, Vaadin
+The first release uses Java 25, Maven 4.0.0-rc-7, Spring Boot 4.1.1, Vaadin
 Flow 25.3.0, PostgreSQL, and Flyway. Flow is the only UI model in scope; Hilla,
 React, and TypeScript are not included.
 

@@ -9,7 +9,7 @@ VAdmin 是一个 Java 优先、面向 [Vaadin Flow](https://vaadin.com/docs/late
 即可获得本地登录、按权限过滤的导航、默认外壳与主题、Users、Roles、Permissions、
 Audit、语言选择和外观控制。它不是一组展示页面，也不是运行时插件平台。
 
-首发版本使用 Java 25、Maven 4.0.0-rc-6、Spring Boot 4.1.1、Vaadin Flow 25.3.0、
+首发版本使用 Java 25、Maven 4.0.0-rc-7、Spring Boot 4.1.1、Vaadin Flow 25.3.0、
 PostgreSQL 和 Flyway。Flow 是唯一的 UI 模型；不包含 Hilla、React 和 TypeScript。
 
 VAdmin 通过默认管理模块提供完整的基线体验。使用方以 `AdminModule` Bean 和 Flow

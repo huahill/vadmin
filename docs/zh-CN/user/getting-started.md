@@ -10,7 +10,7 @@
 ## 前置条件
 
 - 基于 Java 25 的 Spring Boot 应用。
-- classpath 上的 Vaadin Flow 25.x。
+- 不需要另外声明 Vaadin 版本。下面的 `vadmin-bom` 会带入与这版 VAdmin 一起验证过的 Vaadin Flow。
 
 如果你的应用尚未使用 Vaadin Flow，starter 会传递引入。VAdmin 不包含 Hilla、
 React 或 TypeScript。
@@ -22,12 +22,28 @@ VAdmin 通过 Flyway 管理自己的表结构。如果你的应用已经使用 P
 
 ## 1. 添加依赖
 
+导入 BOM 后再声明 starter。`${vadmin.version}` 是使用方需要写的唯一版本；不要再定义
+`vaadin.version`，也不要自己导入 `vaadin-bom`。
+
 ```xml
-<dependency>
-  <groupId>io.github.huahill</groupId>
-  <artifactId>vadmin-spring-boot-starter</artifactId>
-  <version>${vadmin.version}</version>
-</dependency>
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.huahill</groupId>
+      <artifactId>vadmin-bom</artifactId>
+      <version>${vadmin.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+
+<dependencies>
+  <dependency>
+    <groupId>io.github.huahill</groupId>
+    <artifactId>vadmin-spring-boot-starter</artifactId>
+  </dependency>
+</dependencies>
 ```
 
 如果应用显式声明了 `@EnableVaadin`，请加入 VAdmin 根包，让 Vaadin 发现默认外壳
@@ -47,10 +63,11 @@ public class InventoryApplication {
 <dependency>
   <groupId>com.vaadin</groupId>
   <artifactId>vaadin-dev</artifactId>
-  <version>${vaadin.version}</version>
   <optional>true</optional>
 </dependency>
 ```
+
+生产包里的前端插件不能由 BOM 管理，见[部署与运维](deployment.md)。
 
 ## 2. 指向你的 PostgreSQL
 

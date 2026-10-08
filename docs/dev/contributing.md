@@ -4,7 +4,7 @@ VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 ## 兼容性基线
 
-提交必须在 Java 25 和项目 Maven Wrapper（Maven 4.0.0-rc-6）上构建。当前经过验证的
+提交必须在 Java 25 和项目 Maven Wrapper（Maven 4.0.0-rc-7）上构建。当前经过验证的
 技术基线为 Spring Boot 4.1.1、Vaadin Flow 25.3.0、PostgreSQL 18 和 Flyway 13.7.0。
 Maven 4 仍为 RC 版本；其 GA 升级同样需要独立变更。
 

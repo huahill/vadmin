@@ -29,6 +29,7 @@ business domain and deployment configuration.
 | `vadmin-spring-flow` | Module assembly, dynamic routes, composite translations, and locale preference. |
 | `vadmin` | Default shell and theme, system administration UI and translations, and the default `AdminModule`. |
 | `vadmin-spring-boot-starter` | Consumer-facing dependency composition for Spring Boot adoption. |
+| `vadmin-bom` | Consumer-imported bill of materials for the published VAdmin modules and the Vaadin line. It does not manage Spring Boot. |
 | `vadmin-reference-app` | Thin starter consumer, launch configuration, seed data, and browser acceptance coverage. |
 
 `vadmin` supplies the complete default administration experience, home page,
@@ -48,7 +49,7 @@ Consumer application
   -> consumer AdminModule beans and Flow view beans
 ```
 
-A normal consumer configures its datasource and Flyway migration location,
+A normal consumer imports `vadmin-bom`, configures its datasource and Flyway migration location,
 depends on `vadmin-spring-boot-starter`, and starts the application. It receives
 local login, the permission-filtered shell, Users, Roles, Permissions, Audit,
 `zh-CN`/`en-US` translations, system/light/dark color schemes, and the Aura

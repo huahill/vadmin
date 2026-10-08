@@ -24,9 +24,11 @@ class ReactorCoordinateTest {
                 "vadmin-parent", "vadmin-contracts", "vadmin-platform", "vadmin-flow",
                 "vadmin-spring", "vadmin-spring-security", "vadmin-spring-jpa",
                 "vadmin-spring-boot", "vadmin-spring-flow", "vadmin",
-                "vadmin-spring-boot-starter", "vadmin-reference-app");
+                "vadmin-spring-boot-starter", "vadmin-bom", "vadmin-reference-app");
         assertThat(allPomContent)
                 .doesNotContain("io.github.huahill.vadmin", "<artifactId>admin-");
+        assertThat(pomFiles.stream().map(ReactorCoordinateTest::modelVersion)).containsOnly("4.1.0");
+        assertThat(pomFiles.stream().skip(1)).allSatisfy(ReactorCoordinateTest::assertInferredParent);
         assertThat(pomFiles.stream().skip(1).map(ReactorCoordinateTest::parentGroupId))
                 .containsOnly("io.github.huahill");
         assertThat(pomFiles.stream().map(ReactorCoordinateTest::name))
@@ -38,19 +40,19 @@ class ReactorCoordinateTest {
         List<Path> pomFiles = new ArrayList<>();
         Path rootPom = root.resolve("pom.xml");
         pomFiles.add(rootPom);
-        for (String module : modules(rootPom)) {
+        for (String module : subprojects(rootPom)) {
             Path modulePom = root.resolve(module).resolve("pom.xml");
             pomFiles.add(modulePom);
-            for (String child : modules(modulePom)) {
+            for (String child : subprojects(modulePom)) {
                 pomFiles.add(modulePom.getParent().resolve(child).resolve("pom.xml"));
             }
         }
         return pomFiles;
     }
 
-    private static List<String> modules(Path pom) throws Exception {
+    private static List<String> subprojects(Path pom) throws Exception {
         Element project = document(pom).getDocumentElement();
-        return directChildren(directChildren(project, "modules").stream().findFirst().orElse(null), "module")
+        return directChildren(directChildren(project, "subprojects").stream().findFirst().orElse(null), "subproject")
                 .stream()
                 .map(Element::getTextContent)
                 .map(String::strip)
@@ -65,12 +67,50 @@ class ReactorCoordinateTest {
         }
     }
 
-    private static String parentGroupId(Path pom) {
+    private static void assertInferredParent(Path pom) {
         try {
-            return directText(directChildren(document(pom).getDocumentElement(), "parent").getFirst(), "groupId");
+            Element parent = directChildren(document(pom).getDocumentElement(), "parent").getFirst();
+            assertThat(directChildren(parent, "groupId")).isEmpty();
+            assertThat(directChildren(parent, "artifactId")).isEmpty();
+            assertThat(directChildren(parent, "version")).isEmpty();
+        } catch (RuntimeException exception) {
+            throw exception;
         } catch (Exception exception) {
             throw new IllegalStateException("Cannot read " + pom, exception);
         }
+    }
+
+    private static String parentGroupId(Path pom) {
+        try {
+            return effectiveGroupId(resolveParentPom(pom));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot read " + pom, exception);
+        }
+    }
+
+    private static String modelVersion(Path pom) {
+        try {
+            return directText(document(pom).getDocumentElement(), "modelVersion");
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot read " + pom, exception);
+        }
+    }
+
+    private static Path resolveParentPom(Path pom) throws Exception {
+        Element parent = directChildren(document(pom).getDocumentElement(), "parent").getFirst();
+        String relative = directChildren(parent, "relativePath").isEmpty()
+                ? "../pom.xml"
+                : directText(parent, "relativePath");
+        Path resolved = pom.getParent().resolve(relative).normalize();
+        return Files.isDirectory(resolved) ? resolved.resolve("pom.xml") : resolved;
+    }
+
+    private static String effectiveGroupId(Path pom) throws Exception {
+        Element project = document(pom).getDocumentElement();
+        if (!directChildren(project, "groupId").isEmpty()) {
+            return directText(project, "groupId");
+        }
+        return effectiveGroupId(resolveParentPom(pom));
     }
 
     private static String name(Path pom) {

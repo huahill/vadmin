@@ -18,8 +18,10 @@ class RootPomIdentityTest {
         assertThat(directText(project, "groupId")).isEqualTo("io.github.huahill");
         assertThat(directText(project, "artifactId")).isEqualTo("vadmin-parent");
         assertThat(directChildren(project, "parent")).isEmpty();
-        assertThat(dependency(project, "spring-boot-dependencies").getTextContent())
-                .contains("org.springframework.boot", "pom", "import");
+        assertThat(dependency(project, "vaadin-bom").getTextContent())
+                .contains("com.vaadin", "${vaadin.version}", "pom", "import");
+        assertThat(dependencies(project).stream().map(candidate -> directText(candidate, "artifactId")))
+                .doesNotContain("spring-boot-dependencies", "testcontainers-bom", "flyway-core");
         assertThat(plugin(project, "spring-boot-maven-plugin").getTextContent())
                 .contains("${spring-boot.version}");
     }

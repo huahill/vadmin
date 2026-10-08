@@ -14,7 +14,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 | 领域 | `0.2.0` 已验证基线 | 发布边界 |
 | --- | --- | --- |
 | JDK | Java 25 | 构建和运行使用方均要求 Java 25。 |
-| 构建工具 | Maven Wrapper 4.0.0-rc-6 | 升级到 Maven GA 属于独立工作。 |
+| 构建工具 | Maven Wrapper 4.0.0-rc-7 | 升级到 Maven GA 属于独立工作。 |
 | 运行时 | Spring Boot 4.1.1 | Spring Boot 是唯一受支持的运行时。 |
 | UI | Vaadin Flow 25.3.0 | Flow 是唯一 UI 模型；不包含 Hilla、React、Vue 或 TypeScript。 |
 | 数据库与迁移 | PostgreSQL 18 Compose 基线，Flyway 13.7.0 | Testcontainers 覆盖不构成额外部署承诺。 |
@@ -29,7 +29,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 1. 将所有 `io.github.huahill` 依赖升级到相同目标版本。不得混用已发布制品和
    snapshot 同级制品。
-2. 使用 Java 25 运行使用方，并让 Spring Boot 与 Vaadin 与已验证版本表保持一致。
+2. 使用 Java 25 运行使用方，并导入同一版本的 `vadmin-bom`。由它对齐 VAdmin 模块和 Vaadin 依赖；不要另外定义 Vaadin 版本或导入 `vaadin-bom`。`flow-maven-plugin` 是插件，BOM 不能管理它，版本仍使用上表中的 Vaadin 版本。
 3. 在类生产数据库副本上审查 Flyway 迁移。每个迁移只执行一次，且不得改写已应用的迁移。
 4. 保持文档化模块契约：`AdminModule` 元数据、已声明权限、路由、图标 key、`zh-CN` 与
    `en-US` 资源、没有 `@Route` 的 prototype View Bean，以及每个使用方动态 View 的宿主
@@ -75,9 +75,11 @@ docker build -t vadmin:0.4.0 .
 ## 发布
 
 Maven 的 `release` profile 会要求非 SNAPSHOT 版本、附加源码和 Javadoc 归档、使用 GPG 签名
-全部发布文件，并通过 Maven Central Publisher Portal 发布。VAdmin 的日常开发和 CI 使用仓库内置的
-Maven 4 Wrapper；Maven Central 的发布则有意使用 Apache Maven 3.9.16，因为 Central 发布链路目前
-不能可靠支持 Maven 4 项目模型。因此项目 POM 保持 Maven 3 兼容的 `4.0.0` model 语法。
+全部发布文件，并通过 Maven Central Publisher Portal 发布。日常开发、CI 和发布都使用仓库内置的
+Maven 4 Wrapper。Reactor 构建 POM 使用 model `4.1.0`：父坐标由 `<parent/>` 推断，子项目用
+`<subprojects>` 声明。Maven 4 发布的 consumer POM 仍是 Maven 3 兼容的 model `4.0.0`，并写回已解析的
+父坐标，使用方不依赖 reactor 推断。Apache Maven 3 无法读取 `4.1.0` 构建模型，因此发布不再使用
+Maven 3.9.16。
 
 推荐的发布路径是手动触发 `Publish Release` GitHub Actions 工作流。它必须从 `main` 发起，但会
 检出不可变的 annotated release tag。其发布 job 绑定到 `vadmin` Environment，因此该环境中的
