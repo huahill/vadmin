@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class AdminShellPropertiesTest {
     @Test
     void enablesTheWorkplaceByDefault() {
-        assertThat(new AdminShellProperties().workplaceEnabled()).isTrue();
+        assertThat(new AdminShellProperties().isWorkplaceEnabled()).isTrue();
     }
 
     @Test
@@ -16,6 +16,6 @@ class AdminShellPropertiesTest {
 
         properties.setWorkplaceEnabled(false);
 
-        assertThat(properties.workplaceEnabled()).isFalse();
+        assertThat(properties.isWorkplaceEnabled()).isFalse();
     }
 }

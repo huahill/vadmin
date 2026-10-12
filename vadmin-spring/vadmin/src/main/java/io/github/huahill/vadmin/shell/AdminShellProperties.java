@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public final class AdminShellProperties implements Serializable {
     private boolean workplaceEnabled = true;
 
-    public boolean workplaceEnabled() {
+    public boolean isWorkplaceEnabled() {
         return workplaceEnabled;
     }
 

@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public final class AdminBrandProperties implements Serializable {
     private String name = "VAdmin";
 
-    public String name() {
+    public String getName() {
         if (name == null || name.isBlank()) {
             return "VAdmin";
         }

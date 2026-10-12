@@ -39,7 +39,7 @@ class DefaultAdminHostLayoutConfigurationTest {
     @Test
     void bindsTheWorkplaceNavigationSetting() {
         context.withPropertyValues("vadmin.shell.workplace-enabled=false").run(application ->
-                assertThat(application.getBean(AdminShellProperties.class).workplaceEnabled()).isFalse());
+                assertThat(application.getBean(AdminShellProperties.class).isWorkplaceEnabled()).isFalse());
     }
 
     @Test

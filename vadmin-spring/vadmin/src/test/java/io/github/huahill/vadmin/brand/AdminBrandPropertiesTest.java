@@ -10,7 +10,7 @@ class AdminBrandPropertiesTest {
         var properties = new AdminBrandProperties();
         properties.setName("  RDC OpenAPI OPS  ");
 
-        assertThat(properties.name()).isEqualTo("RDC OpenAPI OPS");
+        assertThat(properties.getName()).isEqualTo("RDC OpenAPI OPS");
     }
 
     @Test
@@ -18,6 +18,6 @@ class AdminBrandPropertiesTest {
         var properties = new AdminBrandProperties();
         properties.setName(" ");
 
-        assertThat(properties.name()).isEqualTo("VAdmin");
+        assertThat(properties.getName()).isEqualTo("VAdmin");
     }
 }

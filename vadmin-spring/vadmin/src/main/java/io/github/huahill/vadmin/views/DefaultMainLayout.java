@@ -86,7 +86,7 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
         user = currentUserValue.orElseThrow();
         var productMark = AdminIcon.of(AdminIconName.CUBE);
         productMark.addClassName("admin-product-mark");
-        var productName = new Span(brandProperties.name());
+        var productName = new Span(brandProperties.getName());
         productName.addClassName("admin-shell-brand");
         var brand = createBrand(productMark, productName);
         setPrimarySection(Section.DRAWER);
@@ -185,7 +185,7 @@ public final class DefaultMainLayout extends AppLayout implements LocaleChangeOb
 
     private void rebuildDrawer() {
         drawer.removeAll();
-        if (shell.workplaceEnabled()) {
+        if (shell.isWorkplaceEnabled()) {
             drawer.add(navigationGroup(text("system.shell.workspace"),
                     new SideNavItem(text("system.shell.home"), "", navigationIcon(AdminIconName.HOME.cssValue()))));
         }
