@@ -25,6 +25,7 @@ vadmin:
 | Property | Default | Purpose |
 | --- | --- | --- |
 | `vadmin.local-iam.enabled` | `true` | Enables the built-in local IAM: username/password login and the Users, Roles, Permissions, and Audit administration module. Disable it only when the host application provides its own identity and authorization beans. |
+| `vadmin.local-iam.table-prefix` | `vadmin` | Prefix for the six local IAM tables. The default produces `vadmin_users` and its siblings. A blank value is rejected and does not fall back to unprefixed names. |
 | `vadmin.oidc.registration-id` | `oidc` | The Spring Security client registration used by the optional OIDC login. The registration itself is standard `spring.security.oauth2.client.*` configuration. |
 
 OIDC login maps an authenticated external identity to an existing, enabled
@@ -63,3 +64,18 @@ spring:
 Keep consumer migrations in a location separate from VAdmin's own migrations
 and never rewrite a migration that has reached any environment. See the
 [Deployment](deployment.md) guide for backup and migration operations.
+
+Local IAM tables use the `vadmin` prefix by default: `vadmin_users`,
+`vadmin_roles`, `vadmin_permissions`, `vadmin_user_roles`,
+`vadmin_role_permissions`, and `vadmin_audit_entries`. Setting
+`vadmin.local-iam.table-prefix: ci` produces the `ci_users` family instead.
+A missing value means `vadmin`. An empty or whitespace-only value is rejected;
+it is neither trimmed nor treated as “no prefix”.
+
+`V1` still creates the original unprefixed tables, and `V2` only renames them
+with `ALTER TABLE ... RENAME TO`. A fresh database that already contains a
+business `users` table therefore still conflicts; that is intentional, so
+VAdmin does not attach to someone else's table. Constraint and index names,
+such as `uk_users_username`, stay unchanged. Once `V2` has reached an
+environment the prefix is frozen: changing it later makes
+`ddl-auto: validate` fail because Hibernate looks for the new names.

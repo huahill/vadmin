@@ -9,6 +9,7 @@ import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.contracts.audit.AuditSink;
 import io.github.huahill.vadmin.contracts.audit.CorrelationIdProvider;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
+import io.github.huahill.vadmin.springjpa.AccessControlTables;
 import io.github.huahill.vadmin.springjpa.access.PermissionCatalogSynchronizer;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
 import jakarta.persistence.EntityManager;
@@ -65,5 +66,6 @@ class ApplicationConfigurationTest {
         @Bean PasswordEncoder passwordEncoder() { return mock(PasswordEncoder.class); }
         @Bean PermissionCatalogSynchronizer permissionCatalogSynchronizer() { return mock(PermissionCatalogSynchronizer.class); }
         @Bean LocalUserAccountLookup localUserAccountLookup() { return mock(LocalUserAccountLookup.class); }
+        @Bean AccessControlTables accessControlTables() { return AccessControlTables.of("vadmin"); }
     }
 }

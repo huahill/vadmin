@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +43,12 @@ class JpaAccessControlRepositoryTest {
     void findsRoleAndPermissionAndGrantsTheRelationship() {
         var roleId = UUID.randomUUID();
         var permissionId = UUID.randomUUID();
-        entityManager.createNativeQuery("insert into roles (id, code) values (:id, :code)")
+        entityManager.createNativeQuery("insert into vadmin_roles (id, code) values (:id, :code)")
                 .setParameter("id", roleId)
                 .setParameter("code", "operator")
                 .executeUpdate();
         entityManager.createNativeQuery("""
-                insert into permissions (id, code, system_managed)
+                insert into vadmin_permissions (id, code, system_managed)
                 values (:id, :code, true)
                 """)
                 .setParameter("id", permissionId)
@@ -61,7 +60,7 @@ class JpaAccessControlRepositoryTest {
         repository.grantPermission(role.orElseThrow().id(), permission.orElseThrow().id());
         entityManager.flush();
 
-        var grants = ((Number) entityManager.createNativeQuery("select count(*) from role_permissions")
+        var grants = ((Number) entityManager.createNativeQuery("select count(*) from vadmin_role_permissions")
                 .getSingleResult()).longValue();
         assertThat(grants).isOne();
     }
@@ -72,22 +71,21 @@ class JpaAccessControlRepositoryTest {
         var userId = UUID.randomUUID();
         var roleId = UUID.randomUUID();
         entityManager.createNativeQuery("""
-                insert into users (id, username, password_hash, enabled, auth_version)
+                insert into vadmin_users (id, username, password_hash, enabled, auth_version)
                 values (:id, 'operator', 'stored-hash', true, 4)
                 """).setParameter("id", userId).executeUpdate();
-        entityManager.createNativeQuery("insert into roles (id, code) values (:id, 'operator')")
+        entityManager.createNativeQuery("insert into vadmin_roles (id, code) values (:id, 'operator')")
                 .setParameter("id", roleId).executeUpdate();
-        entityManager.createNativeQuery("insert into user_roles (user_id, role_id) values (:userId, :roleId)")
+        entityManager.createNativeQuery("insert into vadmin_user_roles (user_id, role_id) values (:userId, :roleId)")
                 .setParameter("userId", userId).setParameter("roleId", roleId).executeUpdate();
 
         repository.incrementAuthVersionForRole(roleId);
 
-        assertThat(entityManager.createNativeQuery("select auth_version from users where id = :id")
+        assertThat(entityManager.createNativeQuery("select auth_version from vadmin_users where id = :id")
                 .setParameter("id", userId).getSingleResult()).isEqualTo(5L);
     }
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @Import(JpaAccessControlConfiguration.class)
     static class TestApplication { }
 }

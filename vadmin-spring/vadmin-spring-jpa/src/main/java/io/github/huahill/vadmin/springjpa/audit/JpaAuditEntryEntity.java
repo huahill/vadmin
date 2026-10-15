@@ -14,7 +14,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
-@Table(name = "audit_entries")
+@Table(name = "vadmin_audit_entries")
 public class JpaAuditEntryEntity {
     @Id
     private UUID id;

@@ -5,6 +5,12 @@
       "type": "java.lang.Boolean",
       "description": "Enables the built-in local IAM, including username/password login and the Users, Roles, Permissions, and Audit administration module. Set to false only when the host application provides its own identity and authorization beans.",
       "defaultValue": true
+    },
+    {
+      "name": "vadmin.local-iam.table-prefix",
+      "type": "java.lang.String",
+      "description": "Prefix for the six local IAM tables. The default vadmin becomes the physical prefix vadmin_. A blank value is rejected and does not fall back to unprefixed names. Flyway V2 renames the original tables once; the prefix is then frozen, while constraint and index names stay unchanged.",
+      "defaultValue": "vadmin"
     }
   ]
 }

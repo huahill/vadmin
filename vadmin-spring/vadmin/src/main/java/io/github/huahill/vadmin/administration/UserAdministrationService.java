@@ -9,6 +9,7 @@ import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.contracts.error.BusinessFailure;
 import io.github.huahill.vadmin.contracts.error.ErrorCode;
 import io.github.huahill.vadmin.localiam.ConditionalOnVadminLocalIam;
+import io.github.huahill.vadmin.springjpa.AccessControlTables;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -28,13 +29,15 @@ public class UserAdministrationService {
     private final AuthorizationService authorization;
     private final AuditSink auditSink;
     private final PasswordEncoder passwordEncoder;
+    private final AccessControlTables tables;
 
     public UserAdministrationService(JdbcTemplate jdbcTemplate, AuthorizationService authorization, AuditSink auditSink,
-                                     PasswordEncoder passwordEncoder) {
+                                     PasswordEncoder passwordEncoder, AccessControlTables tables) {
         this.jdbcTemplate = jdbcTemplate;
         this.authorization = authorization;
         this.auditSink = auditSink;
         this.passwordEncoder = passwordEncoder;
+        this.tables = tables;
     }
 
     @Transactional
@@ -43,9 +46,10 @@ public class UserAdministrationService {
         var userId = UUID.randomUUID();
         try {
             jdbcTemplate.update("""
-                    insert into users (id, username, password_hash, enabled, auth_version)
+                    insert into %s (id, username, password_hash, enabled, auth_version)
                     values (?, ?, ?, true, 0)
-                    """, userId, required("username", username), passwordEncoder.encode(required("password", password)));
+                    """.formatted(tables.users()), userId, required("username", username),
+                    passwordEncoder.encode(required("password", password)));
         } catch (DuplicateKeyException exception) {
             throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
                     Map.of("username", "already-exists"));
@@ -63,7 +67,8 @@ public class UserAdministrationService {
     public void setEnabled(CurrentUser actor, Set<UUID> userIds, boolean enabled) {
         authorization.requirePermission(actor, UPDATE);
         Set.copyOf(userIds).forEach(userId -> {
-            jdbcTemplate.update("update users set enabled = ?, auth_version = auth_version + 1 where id = ?", enabled, userId);
+            jdbcTemplate.update("update %s set enabled = ?, auth_version = auth_version + 1 where id = ?".formatted(tables.users()),
+                    enabled, userId);
             auditSink.append(new AuditEvent(actor.userId(), "system:user:update", "user", userId.toString(),
                     AuditOutcome.SUCCESS, Instant.now(), null, Map.of("enabled", Boolean.toString(enabled))));
         });

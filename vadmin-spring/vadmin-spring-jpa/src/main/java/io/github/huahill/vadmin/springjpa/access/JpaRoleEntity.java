@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "vadmin_roles")
 public class JpaRoleEntity {
     @Id
     private UUID id;

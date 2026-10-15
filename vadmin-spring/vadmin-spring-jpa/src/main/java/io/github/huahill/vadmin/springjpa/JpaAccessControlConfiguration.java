@@ -11,19 +11,41 @@ import io.github.huahill.vadmin.springjpa.access.JpaLocalUserSessionLookup;
 import io.github.huahill.vadmin.springjpa.access.PermissionCatalogSynchronizer;
 import io.github.huahill.vadmin.springjpa.audit.JpaAuditSink;
 import jakarta.persistence.EntityManager;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
+@AutoConfigureBefore({
+        org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration.class,
+        org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration.class
+})
+@EnableConfigurationProperties(LocalIamProperties.class)
 public class JpaAccessControlConfiguration {
     @Bean
-    AccessControlRepository accessControlRepository(EntityManager entityManager) {
-        return new JpaAccessControlRepository(entityManager);
+    AccessControlTables accessControlTables(LocalIamProperties properties) {
+        return properties.tables();
     }
 
     @Bean
-    LocalUserAccountLookup localUserAccountLookup(EntityManager entityManager) {
-        return new JpaLocalUserAccountLookup(entityManager);
+    AccessControlFlywayCustomizer accessControlFlywayCustomizer(LocalIamProperties properties) {
+        return new AccessControlFlywayCustomizer(properties);
+    }
+
+    @Bean
+    AccessControlNamingCustomizer accessControlNamingCustomizer(LocalIamProperties properties) {
+        return new AccessControlNamingCustomizer(properties);
+    }
+
+    @Bean
+    AccessControlRepository accessControlRepository(EntityManager entityManager, AccessControlTables tables) {
+        return new JpaAccessControlRepository(entityManager, tables);
+    }
+
+    @Bean
+    LocalUserAccountLookup localUserAccountLookup(EntityManager entityManager, AccessControlTables tables) {
+        return new JpaLocalUserAccountLookup(entityManager, tables);
     }
 
     @Bean

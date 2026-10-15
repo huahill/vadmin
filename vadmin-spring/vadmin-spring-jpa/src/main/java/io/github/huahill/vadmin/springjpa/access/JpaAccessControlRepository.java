@@ -4,15 +4,18 @@ import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
 import io.github.huahill.vadmin.platform.access.Permission;
 import io.github.huahill.vadmin.platform.access.Role;
+import io.github.huahill.vadmin.springjpa.AccessControlTables;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 
 public final class JpaAccessControlRepository implements AccessControlRepository {
     private final EntityManager entityManager;
+    private final AccessControlTables tables;
 
-    public JpaAccessControlRepository(EntityManager entityManager) {
+    public JpaAccessControlRepository(EntityManager entityManager, AccessControlTables tables) {
         this.entityManager = entityManager;
+        this.tables = tables;
     }
 
     @Override
@@ -38,10 +41,10 @@ public final class JpaAccessControlRepository implements AccessControlRepository
     @Override
     public void grantPermission(UUID roleId, UUID permissionId) {
         entityManager.createNativeQuery("""
-                insert into role_permissions (role_id, permission_id)
+                insert into %s (role_id, permission_id)
                 values (:roleId, :permissionId)
                 on conflict do nothing
-                """)
+                """.formatted(tables.rolePermissions()))
                 .setParameter("roleId", roleId)
                 .setParameter("permissionId", permissionId)
                 .executeUpdate();
@@ -50,10 +53,10 @@ public final class JpaAccessControlRepository implements AccessControlRepository
     @Override
     public void incrementAuthVersionForRole(UUID roleId) {
         entityManager.createNativeQuery("""
-                update users
+                update %s
                 set auth_version = auth_version + 1
-                where id in (select user_id from user_roles where role_id = :roleId)
-                """)
+                where id in (select user_id from %s where role_id = :roleId)
+                """.formatted(tables.users(), tables.userRoles()))
                 .setParameter("roleId", roleId)
                 .executeUpdate();
     }
