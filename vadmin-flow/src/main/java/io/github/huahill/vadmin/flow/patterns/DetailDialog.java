@@ -19,9 +19,8 @@ public final class DetailDialog extends AdminDialog {
         // only shows the close (cancel) button.
         super(translated, invisibleButton(), null);
         this.titleKey = Objects.requireNonNull(titleKey);
-        form.setAutoResponsive(true);
-        form.setColumnWidth("18rem");
-        form.setExpandFields(true);
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("40em", 2));
         add(form);
         updateSharedText();
     }

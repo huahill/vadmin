@@ -8,6 +8,16 @@ import org.junit.jupiter.api.Test;
 
 class DetailDialogTest {
     @Test
+    void keepsResponsiveStepsForStableDetailRows() {
+        var dialog = new DetailDialog("User details");
+
+        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isFalse();
+        assertThat(dialog.getForm().getElement().getPropertyRaw("responsiveSteps").toString())
+                .contains("40em")
+                .contains("\"columns\":2");
+    }
+
+    @Test
     void composesSemanticDescriptionsInAResponsiveDetailSurface() {
         var dialog = new DetailDialog("User details");
 
