@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,8 +59,8 @@ class JpaGrantPermissionIntegrationTest {
         service(true).grant(actor, new GrantPermissionCommand("operator", USER_READ));
         entityManager.flush();
 
-        assertThat(count("role_permissions")).isOne();
-        assertThat(entityManager.createNativeQuery("select outcome from audit_entries").getSingleResult())
+        assertThat(count("vadmin_role_permissions")).isOne();
+        assertThat(entityManager.createNativeQuery("select outcome from vadmin_audit_entries").getSingleResult())
                 .isEqualTo("SUCCESS");
     }
 
@@ -75,26 +74,26 @@ class JpaGrantPermissionIntegrationTest {
                 .hasMessage("denied");
         entityManager.flush();
 
-        assertThat(count("role_permissions")).isZero();
-        assertThat(entityManager.createNativeQuery("select outcome from audit_entries").getSingleResult())
+        assertThat(count("vadmin_role_permissions")).isZero();
+        assertThat(entityManager.createNativeQuery("select outcome from vadmin_audit_entries").getSingleResult())
                 .isEqualTo("DENIED");
     }
 
     private CurrentUser seedAccessControlData() {
         var actorId = UUID.randomUUID();
         entityManager.createNativeQuery("""
-                insert into users (id, username, password_hash, enabled, auth_version)
+                insert into vadmin_users (id, username, password_hash, enabled, auth_version)
                 values (:id, :username, :passwordHash, true, 0)
                 """)
                 .setParameter("id", actorId)
                 .setParameter("username", "administrator")
                 .setParameter("passwordHash", "not-a-real-password")
                 .executeUpdate();
-        entityManager.createNativeQuery("insert into roles (id, code) values (:id, 'operator')")
+        entityManager.createNativeQuery("insert into vadmin_roles (id, code) values (:id, 'operator')")
                 .setParameter("id", UUID.randomUUID())
                 .executeUpdate();
         entityManager.createNativeQuery("""
-                insert into permissions (id, code, system_managed)
+                insert into vadmin_permissions (id, code, system_managed)
                 values (:id, :code, true)
                 """)
                 .setParameter("id", UUID.randomUUID())
@@ -128,6 +127,5 @@ class JpaGrantPermissionIntegrationTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @Import(JpaAccessControlConfiguration.class)
     static class TestApplication { }
 }

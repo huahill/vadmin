@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +46,7 @@ class JpaAuditSinkTest {
     void redactsSensitiveMetadataBeforePersistingAnAuditEntry() {
         var actorId = UUID.randomUUID();
         entityManager.createNativeQuery("""
-                insert into users (id, username, password_hash, enabled, auth_version)
+                insert into vadmin_users (id, username, password_hash, enabled, auth_version)
                 values (:id, :username, :passwordHash, true, 0)
                 """)
                 .setParameter("id", actorId)
@@ -60,7 +59,7 @@ class JpaAuditSinkTest {
                 Map.of("requestId", "safe", "accessToken", "must-not-persist")));
         entityManager.flush();
 
-        var metadata = entityManager.createNativeQuery("select metadata::text from audit_entries")
+        var metadata = entityManager.createNativeQuery("select metadata::text from vadmin_audit_entries")
                 .getSingleResult()
                 .toString();
         assertThat(metadata).contains("requestId").doesNotContain("accessToken", "must-not-persist");
@@ -68,6 +67,5 @@ class JpaAuditSinkTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @Import(JpaAccessControlConfiguration.class)
     static class TestApplication { }
 }

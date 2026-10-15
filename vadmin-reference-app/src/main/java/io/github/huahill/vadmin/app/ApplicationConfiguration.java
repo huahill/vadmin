@@ -13,6 +13,7 @@ import io.github.huahill.vadmin.app.auth.OidcIdentityLinkProperties;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
 import io.github.huahill.vadmin.platform.access.GrantPermissionService;
 import io.github.huahill.vadmin.platform.access.GrantPermissionUseCase;
+import io.github.huahill.vadmin.springjpa.AccessControlTables;
 import io.github.huahill.vadmin.springjpa.access.PermissionCatalogSynchronizer;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
@@ -61,9 +62,10 @@ public class ApplicationConfiguration {
     CommandLineRunner bootstrapAdministrator(EntityManager entityManager, PermissionCatalog catalog,
                                               PasswordEncoder passwordEncoder, AuditSink auditSink,
                                               CorrelationIdProvider correlationIdProvider, Environment environment,
-                                              PlatformTransactionManager transactionManager) {
+                                             PlatformTransactionManager transactionManager, AccessControlTables tables) {
         return args -> new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
-            var count = ((Number) entityManager.createNativeQuery("select count(*) from users").getSingleResult()).longValue();
+            var count = ((Number) entityManager.createNativeQuery("select count(*) from " + tables.users())
+                    .getSingleResult()).longValue();
             if (count != 0) {
                 return;
             }
@@ -71,24 +73,25 @@ public class ApplicationConfiguration {
             var administratorId = UUID.randomUUID();
             var administratorRoleId = UUID.randomUUID();
             entityManager.createNativeQuery("""
-                    insert into users (id, username, password_hash, enabled, auth_version)
+                    insert into %s (id, username, password_hash, enabled, auth_version)
                     values (:id, 'admin', :passwordHash, true, 0)
-                    """)
+                    """.formatted(tables.users()))
                     .setParameter("id", administratorId)
                     .setParameter("passwordHash", passwordEncoder.encode(password))
                     .executeUpdate();
-            entityManager.createNativeQuery("insert into roles (id, code) values (:id, 'administrator')")
+            entityManager.createNativeQuery("insert into " + tables.roles() + " (id, code) values (:id, 'administrator')")
                     .setParameter("id", administratorRoleId)
                     .executeUpdate();
-            entityManager.createNativeQuery("insert into user_roles (user_id, role_id) values (:userId, :roleId)")
+            entityManager.createNativeQuery("insert into " + tables.userRoles() + " (user_id, role_id) values (:userId, :roleId)")
                     .setParameter("userId", administratorId)
                     .setParameter("roleId", administratorRoleId)
                     .executeUpdate();
             for (var permission : catalog.all()) {
-                var permissionId = entityManager.createNativeQuery("select id from permissions where code = :code")
+                var permissionId = entityManager.createNativeQuery("select id from " + tables.permissions() + " where code = :code")
                         .setParameter("code", permission.value())
                         .getSingleResult();
-                entityManager.createNativeQuery("insert into role_permissions (role_id, permission_id) values (:roleId, :permissionId)")
+                entityManager.createNativeQuery(
+                        "insert into " + tables.rolePermissions() + " (role_id, permission_id) values (:roleId, :permissionId)")
                         .setParameter("roleId", administratorRoleId)
                         .setParameter("permissionId", permissionId)
                         .executeUpdate();

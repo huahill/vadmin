@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "vadmin_permissions")
 public class JpaPermissionEntity {
     @Id
     private UUID id;

@@ -24,6 +24,7 @@ vadmin:
 | 属性 | 默认值 | 用途 |
 | --- | --- | --- |
 | `vadmin.local-iam.enabled` | `true` | 启用内置本地 IAM：用户名/密码登录以及 Users、Roles、Permissions、Audit 系统管理模块。仅当宿主应用自行提供身份与授权 Bean 时才应关闭。 |
+| `vadmin.local-iam.table-prefix` | `vadmin` | 本地 IAM 六张表的前缀。默认写成 `vadmin_users` 这一组；空字符串会被拒绝，不会退回没有前缀的表名。 |
 | `vadmin.oidc.registration-id` | `oidc` | 可选 OIDC 登录使用的 Spring Security 客户端注册 ID。注册本身是标准的 `spring.security.oauth2.client.*` 配置。 |
 
 OIDC 登录只会将已认证的外部身份映射到已有且启用的本地账户，不会创建账户或同步角色；
@@ -57,3 +58,13 @@ spring:
 
 使用方迁移应与 VAdmin 自身迁移放在不同位置，且不得改写已进入任何环境的迁移。
 备份与迁移操作见[部署与运维](deployment.md)。
+
+本地 IAM 默认使用 `vadmin` 前缀，物理表名是 `vadmin_users`、`vadmin_roles`、
+`vadmin_permissions`、`vadmin_user_roles`、`vadmin_role_permissions`、
+`vadmin_audit_entries`。`vadmin.local-iam.table-prefix: ci` 会改成 `ci_users` 这一组。
+未配置时按 `vadmin` 处理；空字符串和纯空白直接拒绝，不会裁剪，也不会退回没有前缀的名字。
+
+`V1` 仍先创建没有前缀的 `users` 等表，`V2` 只执行 `ALTER TABLE ... RENAME TO`。
+全新库如果已经有业务表 `users`，迁移仍会冲突；这是故意的，避免接到别人的表上。
+约束名和索引名保持不变，例如 `uk_users_username`。迁移进入任何环境后前缀即冻结：
+之后再改这项配置，Hibernate 会按新表名做 `ddl-auto: validate` 并失败。

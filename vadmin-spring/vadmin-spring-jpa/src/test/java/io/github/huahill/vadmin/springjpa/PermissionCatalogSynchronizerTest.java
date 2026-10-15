@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +46,7 @@ class PermissionCatalogSynchronizerTest {
         synchronizer.synchronize(new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))));
         entityManager.flush();
 
-        var row = (Object[]) entityManager.createNativeQuery("select code, system_managed from permissions")
+        var row = (Object[]) entityManager.createNativeQuery("select code, system_managed from vadmin_permissions")
                 .getSingleResult();
         assertThat(row[0]).isEqualTo("system:user:read");
         assertThat(row[1]).isEqualTo(true);
@@ -66,6 +65,5 @@ class PermissionCatalogSynchronizerTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @Import(JpaAccessControlConfiguration.class)
     static class TestApplication { }
 }

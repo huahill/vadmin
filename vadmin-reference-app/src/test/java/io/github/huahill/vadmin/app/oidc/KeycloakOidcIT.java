@@ -131,7 +131,7 @@ class KeycloakOidcIT {
         page.navigate(baseUrl() + "/users");
         startExternalLogin("oidc-admin");
         waitForUsersRoute();
-        jdbcTemplate.update("update users set auth_version = auth_version + 1 where username = 'admin'");
+        jdbcTemplate.update("update vadmin_users set auth_version = auth_version + 1 where username = 'admin'");
 
         page.navigate(baseUrl() + "/users");
 

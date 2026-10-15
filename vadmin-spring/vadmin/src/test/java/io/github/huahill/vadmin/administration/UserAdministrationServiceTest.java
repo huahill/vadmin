@@ -3,6 +3,7 @@ package io.github.huahill.vadmin.administration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUser;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.contracts.error.BusinessFailure;
+import io.github.huahill.vadmin.springjpa.AccessControlTables;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,8 @@ class UserAdministrationServiceTest {
         var authorization = mock(AuthorizationService.class);
         var auditSink = mock(AuditSink.class);
         var passwordEncoder = mock(PasswordEncoder.class);
-        var service = new UserAdministrationService(jdbcTemplate, authorization, auditSink, passwordEncoder);
+        var service = new UserAdministrationService(jdbcTemplate, authorization, auditSink, passwordEncoder,
+                AccessControlTables.of("vadmin"));
         var actor = new CurrentUser(UUID.randomUUID(), "administrator",
                 Set.of(PermissionCode.of("system:user:create")), 0);
 
@@ -34,7 +37,7 @@ class UserAdministrationServiceTest {
         service.create(actor, "operator", "initial-password");
 
         verify(authorization).requirePermission(actor, PermissionCode.of("system:user:create"));
-        verify(jdbcTemplate).update(any(String.class), any(UUID.class), eq("operator"), eq("encoded-password"));
+        verify(jdbcTemplate).update(contains("vadmin_users"), any(UUID.class), eq("operator"), eq("encoded-password"));
         verify(auditSink).append(any());
     }
 
@@ -42,11 +45,11 @@ class UserAdministrationServiceTest {
     void reportsDuplicateUsernameAsFieldValidation() {
         var jdbcTemplate = mock(JdbcTemplate.class);
         var service = new UserAdministrationService(jdbcTemplate, mock(AuthorizationService.class), mock(AuditSink.class),
-                mock(PasswordEncoder.class));
+                mock(PasswordEncoder.class), AccessControlTables.of("vadmin"));
         var actor = new CurrentUser(UUID.randomUUID(), "administrator",
                 Set.of(PermissionCode.of("system:user:create")), 0);
 
-        org.mockito.Mockito.when(jdbcTemplate.update(any(String.class), any(Object[].class)))
+        org.mockito.Mockito.when(jdbcTemplate.update(contains("vadmin_users"), any(Object[].class)))
                 .thenThrow(new DuplicateKeyException("users_username_key"));
 
         assertThatThrownBy(() -> service.create(actor, "operator", "initial-password"))

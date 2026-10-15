@@ -298,7 +298,7 @@ class BrowserE2EIT {
         var permissionsWorkspace = page.getByTestId("permissions-workspace");
         var permissionsList = permissionsWorkspace.locator("vaadin-virtual-list");
         var permissionsGrid = permissionsWorkspace.locator("vaadin-grid");
-        var permissionCount = jdbcTemplate.queryForObject("select count(*) from permissions", Long.class);
+        var permissionCount = jdbcTemplate.queryForObject("select count(*) from vadmin_permissions", Long.class);
         assertThat(permissionsList).isVisible();
         assertThat(permissionsGrid).not().isVisible();
         assertThat(permissionsList.getByText("system:audit:read", new Locator.GetByTextOptions().setExact(true))).isVisible();
@@ -351,40 +351,40 @@ class BrowserE2EIT {
 
     private void createUser(String username, String password, UUID roleId) {
         var userId = UUID.randomUUID();
-        jdbcTemplate.update("insert into users (id, username, password_hash, enabled, auth_version) values (?, ?, ?, true, 0)",
+        jdbcTemplate.update("insert into vadmin_users (id, username, password_hash, enabled, auth_version) values (?, ?, ?, true, 0)",
                 userId, username, passwordEncoder.encode(password));
-        if (roleId != null) jdbcTemplate.update("insert into user_roles (user_id, role_id) values (?, ?)", userId, roleId);
+        if (roleId != null) jdbcTemplate.update("insert into vadmin_user_roles (user_id, role_id) values (?, ?)", userId, roleId);
     }
 
     private void createCustomPermissions(int count) {
         for (var index = 0; index < count; index++) {
-            jdbcTemplate.update("insert into permissions (id, code, system_managed) values (?, ?, false)",
+            jdbcTemplate.update("insert into vadmin_permissions (id, code, system_managed) values (?, ?, false)",
                     UUID.randomUUID(), "zz:test:permission:" + String.format("%03d", index));
         }
     }
 
     private void createAuditEntries() {
         jdbcTemplate.update("""
-                insert into audit_entries
+                insert into vadmin_audit_entries
                     (id, actor_user_id, action_code, target_type, target_id, outcome, occurred_at, correlation_id)
-                values (?, (select id from users where username = 'admin'),
+                values (?, (select id from vadmin_users where username = 'admin'),
                     'user.disable', 'user', 'admin', 'SUCCESS', current_timestamp, 'compact-audit-1')
                 """, UUID.randomUUID());
         jdbcTemplate.update("""
-                insert into audit_entries
+                insert into vadmin_audit_entries
                     (id, actor_user_id, action_code, target_type, target_id, outcome, occurred_at, correlation_id)
-                values (?, (select id from users where username = 'admin'),
+                values (?, (select id from vadmin_users where username = 'admin'),
                     'user.enable', 'user', 'admin', 'SUCCESS', current_timestamp - interval '1 minute', 'compact-audit-2')
                 """, UUID.randomUUID());
     }
 
     private void resetData() {
-        jdbcTemplate.update("delete from audit_entries");
-        jdbcTemplate.update("delete from user_roles where user_id <> (select id from users where username = 'admin')");
-        jdbcTemplate.update("delete from role_permissions where role_id not in (select id from roles where code = 'administrator')");
-        jdbcTemplate.update("delete from roles where code <> 'administrator'");
-        jdbcTemplate.update("delete from users where username <> 'admin'");
-        jdbcTemplate.update("delete from permissions where system_managed = false");
+        jdbcTemplate.update("delete from vadmin_audit_entries");
+        jdbcTemplate.update("delete from vadmin_user_roles where user_id <> (select id from vadmin_users where username = 'admin')");
+        jdbcTemplate.update("delete from vadmin_role_permissions where role_id not in (select id from vadmin_roles where code = 'administrator')");
+        jdbcTemplate.update("delete from vadmin_roles where code <> 'administrator'");
+        jdbcTemplate.update("delete from vadmin_users where username <> 'admin'");
+        jdbcTemplate.update("delete from vadmin_permissions where system_managed = false");
     }
 
     private void assertDocumentDoesNotOverflowHorizontally() {
