@@ -23,9 +23,10 @@ public final class EditorDialog extends AdminDialog {
         super(translated, new Button(), onPrimaryAction);
         this.titleKey = Objects.requireNonNull(titleKey);
         this.primaryActionKey = Objects.requireNonNull(primaryActionKey);
-        form.setAutoResponsive(true);
-        form.setColumnWidth("18rem");
-        form.setExpandFields(true);
+        // Explicit steps preserve addFormRow boundaries. Auto-responsive mode
+        // sizes columns dynamically and can leave one side of a row empty.
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("40em", 2));
         validation.getElement().setAttribute("role", "alert");
         validation.setVisible(false);
         primaryAction().addThemeVariants(ButtonVariant.LUMO_PRIMARY);

@@ -9,6 +9,16 @@ import org.junit.jupiter.api.Test;
 
 class EditorDialogTest {
     @Test
+    void keepsResponsiveStepsForStableFormRows() {
+        var dialog = new EditorDialog("Create user", "Save", () -> { });
+
+        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isFalse();
+        assertThat(dialog.getForm().getElement().getPropertyRaw("responsiveSteps").toString())
+                .contains("40em")
+                .contains("\"columns\":2");
+    }
+
+    @Test
     void invokesPrimaryActionAndProvidesTheNativeResponsiveForm() {
         var saves = new AtomicInteger();
         var dialog = new EditorDialog("Create user", "Save", saves::incrementAndGet);
