@@ -30,6 +30,8 @@ abstract class AdminDialog extends Dialog implements LocaleChangeObserver {
     AdminDialog(boolean translated, Button primaryAction, Runnable onPrimaryAction) {
         this.translated = translated;
         this.primaryAction = Objects.requireNonNull(primaryAction);
+        setWidth("52rem");
+        setMaxWidth("calc(100vw - 2rem)");
         if (onPrimaryAction != null) {
             this.primaryAction.addClickListener(event -> onPrimaryAction.run());
         }

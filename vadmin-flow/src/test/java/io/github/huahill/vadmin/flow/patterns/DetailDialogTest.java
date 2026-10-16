@@ -2,11 +2,42 @@ package io.github.huahill.vadmin.flow.patterns;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.vaadin.flow.component.html.DescriptionList;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.junit.jupiter.api.Test;
 
 class DetailDialogTest {
+    @Test
+    void usesFormItemsForLabeledDetailValues() {
+        var dialog = new DetailDialog("User details");
+
+        var username = dialog.addField("Username", "ada");
+
+        assertThat(username).isInstanceOf(FormLayout.FormItem.class);
+        assertThat(username.getElement().getTag()).isEqualTo("vaadin-form-item");
+        assertThat(username.getLabel()).isEqualTo("Username");
+        assertThat(username.getValue()).isEqualTo("ada");
+    }
+
+    @Test
+    void boundsDialogWidthForLongDetailValues() {
+        var dialog = new DetailDialog("User details");
+
+        assertThat(dialog.getWidth()).isEqualTo("52rem");
+        assertThat(dialog.getMaxWidth()).isEqualTo("calc(100vw - 2rem)");
+    }
+
+    @Test
+    void canPlaceLongDetailValueAcrossTheForm() {
+        var dialog = new DetailDialog("User details");
+
+        var config = dialog.addFullWidthField("Config", "{}");
+
+        var row = dialog.getForm().getChildren().findFirst().orElseThrow();
+        assertThat(row.getChildren()).containsExactly(config);
+        assertThat(dialog.getForm().getColspan(config)).isEqualTo(2);
+    }
+
     @Test
     void keepsResponsiveStepsForStableDetailRows() {
         var dialog = new DetailDialog("User details");
@@ -25,10 +56,6 @@ class DetailDialogTest {
         var status = dialog.addField("Status", "Enabled");
 
         assertThat(dialog.getForm().getChildren()).containsExactly(username, status);
-        assertThat(username).isInstanceOf(DescriptionList.class);
-        assertThat(username.getElement().getTag()).isEqualTo("dl");
-        assertThat(username.getElement().getChildren().map(element -> element.getTag()))
-                .containsExactly("dt", "dd");
         assertThat(username.getLabel()).isEqualTo("Username");
         assertThat(username.getValue()).isEqualTo("ada");
         assertThat(status.getLabel()).isEqualTo("Status");
