@@ -5,8 +5,12 @@ import com.vaadin.flow.server.ErrorHandler;
 import io.github.huahill.vadmin.contracts.error.BusinessFailure;
 import io.github.huahill.vadmin.contracts.error.ErrorCode;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class FlowErrorHandler implements ErrorHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowErrorHandler.class);
+
     private final FlowErrorMapper mapper;
     private final FlowErrorPresenter presenter;
 
@@ -25,7 +29,12 @@ public final class FlowErrorHandler implements ErrorHandler {
 
     @Override
     public void error(ErrorEvent event) {
-        presenter.present(mapper.map(findBusinessFailure(event.getThrowable())));
+        var throwable = event.getThrowable();
+        var businessFailure = findBusinessFailure(throwable);
+        if (businessFailure.errorCode() == ErrorCode.INTERNAL_ERROR) {
+            LOGGER.error("Unhandled Vaadin Flow exception", throwable);
+        }
+        presenter.present(mapper.map(businessFailure));
     }
 
     private BusinessFailure findBusinessFailure(Throwable throwable) {
