@@ -56,7 +56,7 @@ spring:
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>flow-maven-plugin</artifactId>
-        <version>25.3.1</version>
+        <version>25.3.2</version>
         <executions>
           <execution>
             <goals>
