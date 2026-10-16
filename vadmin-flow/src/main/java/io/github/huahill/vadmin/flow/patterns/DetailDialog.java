@@ -1,9 +1,9 @@
 package io.github.huahill.vadmin.flow.patterns;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.DescriptionList;
+import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.html.Span;
 import java.util.Objects;
 
 /** A read-only, responsive dialog for presenting an entity's already-authorized details. */
@@ -36,26 +36,35 @@ public final class DetailDialog extends AdminDialog {
     public FormLayout getForm() { return form; }
 
     /** One semantic term-description pair in the responsive detail surface. */
-    public static final class DetailField extends DescriptionList {
-        private final Term term;
-        private final Description description;
+    public static final class DetailField extends FormLayout.FormItem {
+        private final NativeLabel label;
+        private final Span value;
 
         private DetailField(String label, String value) {
-            term = new Term(Objects.requireNonNull(label));
-            description = new Description(Objects.requireNonNull(value));
-            getStyle().set("margin", "0");
-            description.getStyle().set("margin-inline-start", "0");
-            description.getStyle().set("overflow-wrap", "anywhere");
-            add(term, description);
+            this.label = new NativeLabel(Objects.requireNonNull(label));
+            this.value = new Span(Objects.requireNonNull(value));
+            this.value.setWidthFull();
+            this.value.getStyle().set("overflow-wrap", "anywhere");
+            this.value.getStyle().set("white-space", "pre-wrap");
+            add(this.value);
+            addToLabel(this.label);
         }
 
-        public String getLabel() { return term.getText(); }
-        public String getValue() { return description.getText(); }
+        public String getLabel() { return label.getText(); }
+        public String getValue() { return value.getText(); }
     }
 
     public DetailField addField(String label, String value) {
         var field = new DetailField(label, value);
         form.add(field);
+        return field;
+    }
+
+    /** Adds a long value on its own row across all detail columns. */
+    public DetailField addFullWidthField(String label, String value) {
+        var field = new DetailField(label, value);
+        var row = form.addFormRow(field);
+        row.setColspan(field, 2);
         return field;
     }
 
