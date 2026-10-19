@@ -12,6 +12,7 @@
 
     <subprojects>
         <subproject>vadmin-spring-security</subproject>
+        <subproject>vadmin-spring-jdbc</subproject>
         <subproject>vadmin-spring-jpa</subproject>
         <subproject>vadmin-spring-boot</subproject>
         <subproject>vadmin-spring-flow</subproject>

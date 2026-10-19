@@ -22,7 +22,7 @@ class ReactorCoordinateTest {
 
         assertThat(artifactIds).containsExactly(
                 "vadmin-parent", "vadmin-contracts", "vadmin-platform", "vadmin-flow",
-                "vadmin-spring", "vadmin-spring-security", "vadmin-spring-jpa",
+                "vadmin-spring", "vadmin-spring-security", "vadmin-spring-jdbc", "vadmin-spring-jpa",
                 "vadmin-spring-boot", "vadmin-spring-flow", "vadmin",
                 "vadmin-spring-boot-starter", "vadmin-bom", "vadmin-reference-app");
         assertThat(allPomContent)

@@ -8,49 +8,46 @@ import io.github.huahill.vadmin.contracts.auth.CurrentUser;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.contracts.error.BusinessFailure;
 import io.github.huahill.vadmin.contracts.error.ErrorCode;
-import io.github.huahill.vadmin.localiam.ConditionalOnVadminLocalIam;
-import io.github.huahill.vadmin.springjpa.AccessControlTables;
+import io.github.huahill.vadmin.localiam.ConditionalOnSystemAdministration;
+import io.github.huahill.vadmin.platform.administration.AdministrationStore;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@ConditionalOnVadminLocalIam
+@ConditionalOnSystemAdministration
 public class UserAdministrationService {
     private static final PermissionCode CREATE = PermissionCode.of("system:user:create");
     private static final PermissionCode UPDATE = PermissionCode.of("system:user:update");
-    private final JdbcTemplate jdbcTemplate;
+    private final AdministrationStore store;
     private final AuthorizationService authorization;
     private final AuditSink auditSink;
     private final PasswordEncoder passwordEncoder;
-    private final AccessControlTables tables;
 
-    public UserAdministrationService(JdbcTemplate jdbcTemplate, AuthorizationService authorization, AuditSink auditSink,
-                                     PasswordEncoder passwordEncoder, AccessControlTables tables) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UserAdministrationService(AdministrationStore store, AuthorizationService authorization, AuditSink auditSink,
+                                     PasswordEncoder passwordEncoder) {
+        this.store = store;
         this.authorization = authorization;
         this.auditSink = auditSink;
         this.passwordEncoder = passwordEncoder;
-        this.tables = tables;
     }
 
     @Transactional
     public void create(CurrentUser actor, String username, String password) {
         authorization.requirePermission(actor, CREATE);
         var userId = UUID.randomUUID();
-        try {
-            jdbcTemplate.update("""
-                    insert into %s (id, username, password_hash, enabled, auth_version)
-                    values (?, ?, ?, true, 0)
-                    """.formatted(tables.users()), userId, required("username", username),
-                    passwordEncoder.encode(required("password", password)));
-        } catch (DuplicateKeyException exception) {
+        String name = required("username", username);
+        if (name.length() > 120) {
+            throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("username", "too-long"));
+        }
+        if (password == null || password.isBlank()) {
+            throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("password", "required"));
+        }
+        if (!store.insertUser(userId, name, passwordEncoder.encode(password))) {
             throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
                     Map.of("username", "already-exists"));
         }
@@ -66,9 +63,15 @@ public class UserAdministrationService {
     @Transactional
     public void setEnabled(CurrentUser actor, Set<UUID> userIds, boolean enabled) {
         authorization.requirePermission(actor, UPDATE);
+        store.lockAdministratorRole();
         Set.copyOf(userIds).forEach(userId -> {
-            jdbcTemplate.update("update %s set enabled = ?, auth_version = auth_version + 1 where id = ?".formatted(tables.users()),
-                    enabled, userId);
+            if (!store.userExists(userId)) {
+                throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("user", "not-found"));
+            }
+            if (!enabled && store.isLastEnabledAdministrator(userId)) {
+                throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("user", "last-administrator"));
+            }
+            store.setEnabled(userId, enabled);
             auditSink.append(new AuditEvent(actor.userId(), "system:user:update", "user", userId.toString(),
                     AuditOutcome.SUCCESS, Instant.now(), null, Map.of("enabled", Boolean.toString(enabled))));
         });

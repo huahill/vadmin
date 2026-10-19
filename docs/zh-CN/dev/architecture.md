@@ -22,6 +22,7 @@ Spring Boot 4.x、Vaadin Flow 25.x、PostgreSQL 和 Flyway SQL 迁移。Spring B
 | `vadmin-flow` | 无 Spring 依赖的 Flow 模式、路由守卫和模块元数据。 |
 | `vadmin-spring-security` | 本地认证及可选的标准 OIDC 适配器。 |
 | `vadmin-spring-jpa` | JPA/Flyway RBAC 与审计适配器。 |
+| `vadmin-spring-jdbc` | 在宿主迁移的 MySQL/PostgreSQL 表上按需启用完整 JDBC IAM：账号/会话、审计、管理存储及首个管理员初始化。 |
 | `vadmin-spring-boot` | 关联 ID 与 Problem Details 配置。 |
 | `vadmin-spring-flow` | 模块组装、动态路由、组合翻译和语言偏好。 |
 | `vadmin` | 默认外壳和主题、系统管理 UI 与翻译、默认 `AdminModule`。 |

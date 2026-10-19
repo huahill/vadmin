@@ -37,6 +37,43 @@ VAdmin checks each permission in two layers:
 The permission catalog is defined in code at startup; administrators cannot
 invent new permission codes through the UI.
 
+## Shared User And Role Management
+
+The Users page creates accounts, enables/disables them, and assigns roles. The Roles page
+creates roles and grants registered permissions. `system:role:create` controls role creation;
+`system:user:roles` controls membership changes and is a privileged delegation capability.
+Membership and permission changes increment the affected accounts' authentication version,
+requiring existing sessions to sign in again. The last enabled administrator cannot be
+disabled or lose the `administrator` role.
+
+For a host-owned database, set `vadmin.local-iam.enabled=false` and
+`vadmin.system-admin.enabled=true`. Supply `AdministrationStore` and
+`AccessControlRepository` alongside the existing identity, authorization, and audit contracts.
+VAdmin assembles the management services and transactional permission-grant use case; hosts
+do not recreate system pages. An existing `GrantPermissionUseCase` bean takes precedence.
+
+For a standard VAdmin schema on a host-owned database, add
+`io.github.huahill:vadmin-spring-jdbc` and enable `vadmin.jdbc.enabled=true`.
+It supplies account lookup, session validation, redacted audit persistence,
+administration storage, permission grants, and first-account initialization;
+the host does not implement those contracts or its own initializer.
+Keep `vadmin.system-admin.enabled=true` to use the shared pages and
+enable the VAdmin Spring Security integration in the host.
+
+All six tables share `vadmin.jdbc.table-prefix` (default `vadmin`).
+`vadmin.jdbc.uuid-storage=string` uses MySQL `CHAR(36)` identifiers;
+`native` uses PostgreSQL UUIDs and JSONB audit metadata. Existing contract beans
+take precedence over the JDBC defaults. Exclude the starter's `vadmin-spring-jpa`
+and PostgreSQL driver when replacing the default persistence setup.
+Management writes, audit, and initialization must share one transaction manager
+and DataSource. The host owns Flyway schema migrations; this module never creates tables.
+
+Set `vadmin.bootstrap.password` or inject `APP_BOOTSTRAP_PASSWORD` on the first start.
+An empty schema receives `admin`, the `administrator` role, and the declared permissions
+in one transaction. Missing credentials fail initialization outside the `dev` profile;
+`dev` alone falls back to `change-me`. Existing accounts are never reset. Later starts
+grant newly declared permissions to the administrator role and invalidate affected sessions.
+
 ## OIDC (Optional)
 
 VAdmin supports optional standard OIDC authorization-code login through

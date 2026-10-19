@@ -25,6 +25,7 @@ business domain and deployment configuration.
 | `vadmin-flow` | Spring-free Flow patterns, route guards, and module metadata. |
 | `vadmin-spring-security` | Local authentication and optional standards-based OIDC adapter. |
 | `vadmin-spring-jpa` | JPA/Flyway RBAC and audit adapters. |
+| `vadmin-spring-jdbc` | Opt-in JDBC IAM account/session lookup, audit, management storage and first-admin initialization for host-migrated MySQL or PostgreSQL schemas. |
 | `vadmin-spring-boot` | Correlation and Problem Details configuration. |
 | `vadmin-spring-flow` | Module assembly, dynamic routes, composite translations, and locale preference. |
 | `vadmin` | Default shell and theme, system administration UI and translations, and the default `AdminModule`. |

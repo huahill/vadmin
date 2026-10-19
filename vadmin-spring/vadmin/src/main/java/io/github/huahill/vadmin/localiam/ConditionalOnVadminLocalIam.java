@@ -11,7 +11,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
  *
  * <p>Hosts with an existing authentication and authorization system set
  * {@code vadmin.local-iam.enabled=false}. In that mode they provide VAdmin's user and authorization
- * contracts themselves; VAdmin does not create local IAM services or system-administration pages.</p>
+ * contracts themselves. System pages default to disabled, but hosts may enable
+ * {@code vadmin.system-admin.enabled} with their own administration store.</p>
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

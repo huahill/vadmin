@@ -24,7 +24,12 @@ vadmin:
 | 属性 | 默认值 | 用途 |
 | --- | --- | --- |
 | `vadmin.local-iam.enabled` | `true` | 启用内置本地 IAM：用户名/密码登录以及 Users、Roles、Permissions、Audit 系统管理模块。仅当宿主应用自行提供身份与授权 Bean 时才应关闭。 |
+| `vadmin.system-admin.enabled` | 跟随 `vadmin.local-iam.enabled` | 独立启用用户、角色、权限、审计页面。自有身份模式提供 `AdministrationStore` 和 `AccessControlRepository` 后可复用默认服务及页面。 |
 | `vadmin.local-iam.table-prefix` | `vadmin` | 本地 IAM 六张表的前缀。默认写成 `vadmin_users` 这一组；空字符串会被拒绝，不会退回没有前缀的表名。 |
+| `vadmin.jdbc.enabled` | `false` | 在已有表结构上启用完整 JDBC IAM 存储和初始管理员引导，宿主不再提供身份或审计存储 Bean。 |
+| `vadmin.jdbc.table-prefix` | `vadmin` | JDBC IAM 六张表统一前缀，按 SQL 标识符校验。 |
+| `vadmin.jdbc.uuid-storage` | `string` | MySQL CHAR(36) 使用 `string`；PostgreSQL UUID 和 JSONB 使用 `native`。 |
+| `vadmin.bootstrap.password` | 未配置 | JDBC IAM 首个管理员密码，回退到 APP_BOOTSTRAP_PASSWORD；仅 dev 使用默认 change-me，已有密码不会重置。 |
 | `vadmin.oidc.registration-id` | `oidc` | 可选 OIDC 登录使用的 Spring Security 客户端注册 ID。注册本身是标准的 `spring.security.oauth2.client.*` 配置。 |
 
 OIDC 登录只会将已认证的外部身份映射到已有且启用的本地账户，不会创建账户或同步角色；

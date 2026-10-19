@@ -3,6 +3,7 @@ package io.github.huahill.vadmin.views;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -12,6 +13,7 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import io.github.huahill.vadmin.administration.AdministrationQueryService;
 import io.github.huahill.vadmin.administration.UserAdministrationService;
+import io.github.huahill.vadmin.administration.RoleAdministrationService;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUserProvider;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
@@ -29,7 +31,7 @@ import io.github.huahill.vadmin.flow.patterns.PageToolbar;
 import io.github.huahill.vadmin.flow.navigation.PermissionProtectedView;
 import io.github.huahill.vadmin.flow.navigation.AdminIcon;
 import io.github.huahill.vadmin.flow.navigation.AdminIconName;
-import io.github.huahill.vadmin.localiam.ConditionalOnVadminLocalIam;
+import io.github.huahill.vadmin.localiam.ConditionalOnSystemAdministration;
 import jakarta.annotation.security.PermitAll;
 import java.util.Map;
 import java.util.Set;
@@ -38,13 +40,16 @@ import java.util.stream.Collectors;
 @PermitAll
 @org.springframework.stereotype.Component
 @org.springframework.context.annotation.Scope(org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@ConditionalOnVadminLocalIam
+@ConditionalOnSystemAdministration
 public final class UsersView extends PermissionProtectedView implements LocaleChangeObserver, HasDynamicTitle {
     public static final PermissionCode REQUIRED_PERMISSION = PermissionCode.of("system:user:read");
     private static final PermissionCode CREATE = PermissionCode.of("system:user:create");
     private static final PermissionCode UPDATE = PermissionCode.of("system:user:update");
+    private static final PermissionCode ASSIGN_ROLES = PermissionCode.of("system:user:roles");
 
     private final UserAdministrationService commands;
+    private final AdministrationQueryService queries;
+    private final RoleAdministrationService roles;
     private final Grid<AdministrationQueryService.UserRow> grid = new Grid<>();
     private final TextField filter = new TextField();
     private final PagedGrid<AdministrationQueryService.UserRow> pages;
@@ -58,9 +63,12 @@ public final class UsersView extends PermissionProtectedView implements LocaleCh
     private final Button disableSelectedAction;
 
     public UsersView(CurrentUserProvider currentUser, AuthorizationService authorization,
-                     AdministrationQueryService queries, UserAdministrationService commands) {
+                     AdministrationQueryService queries, UserAdministrationService commands,
+                     RoleAdministrationService roles) {
         super(currentUser, authorization);
         this.commands = commands;
+        this.queries = queries;
+        this.roles = roles;
         filter.setLabel(getTranslation("system.users.filter"));
         filter.setClearButtonVisible(true);
         filter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -113,7 +121,7 @@ public final class UsersView extends PermissionProtectedView implements LocaleCh
         enabled.setTooltipText(actionLabel);
         enabled.setAriaLabel(getTranslation(user.enabled() ? "system.users.disable-aria" : "system.users.enable-aria", user.username()));
         enabled.setVisible(authorization.hasPermission(requireCurrentUser(), UPDATE));
-        var actions = new HorizontalLayout(details, enabled);
+        var actions = new HorizontalLayout(details, enabled, roleAssignmentAction(user, authorization));
         actions.setPadding(false);
         actions.setSpacing(true);
         return actions;
@@ -134,7 +142,7 @@ public final class UsersView extends PermissionProtectedView implements LocaleCh
                 event -> confirmStatusChange(Set.of(user.id()), user.enabled()));
         statusChange.addThemeVariants(ButtonVariant.TERTIARY);
         statusChange.setVisible(authorization.hasPermission(requireCurrentUser(), UPDATE));
-        item.addActions(details, statusChange);
+        item.addActions(details, statusChange, roleAssignmentAction(user, authorization));
         return item;
     }
 
@@ -151,6 +159,44 @@ public final class UsersView extends PermissionProtectedView implements LocaleCh
         dialog.addField(getTranslation("system.users.username"), user.username());
         dialog.addField(getTranslation("system.users.status"), getTranslation(user.enabled() ? "system.users.enabled" : "system.users.disabled"));
         dialog.addField(getTranslation("system.users.auth-version"), Long.toString(user.authVersion()));
+        var selected = queries.userRoleIds(user.id());
+        dialog.addField(getTranslation("system.users.roles"), queries.roles().stream()
+                .filter(role -> selected.contains(role.id())).map(AdministrationQueryService.RoleRow::code)
+                .collect(Collectors.joining(", ")));
+        dialog.open();
+    }
+
+    private Button roleAssignmentAction(AdministrationQueryService.UserRow user, AuthorizationService authorization) {
+        var action = new Button(getTranslation("system.users.assign-roles"), event -> assignRoles(user));
+        action.getElement().setAttribute("data-testid", "user-assign-roles");
+        action.setAriaLabel(getTranslation("system.users.assign-roles-aria", user.username()));
+        action.addThemeVariants(ButtonVariant.TERTIARY);
+        action.setVisible(authorization.hasPermission(requireCurrentUser(), ASSIGN_ROLES));
+        return action;
+    }
+
+    private void assignRoles(AdministrationQueryService.UserRow user) {
+        var choices = new MultiSelectComboBox<AdministrationQueryService.RoleRow>(getTranslation("system.users.roles"));
+        var available = queries.roles();
+        choices.setItems(available);
+        choices.setItemLabelGenerator(AdministrationQueryService.RoleRow::code);
+        var selected = queries.userRoleIds(user.id());
+        choices.setValue(available.stream().filter(role -> selected.contains(role.id())).collect(Collectors.toSet()));
+        var dialog = EditorDialog.translated("system.users.assign-roles", "system.users.save", () -> { });
+        dialog.getPrimaryAction().addClickListener(event -> {
+            try {
+                roles.assignRoles(requireCurrentUser(), user.id(), choices.getValue().stream()
+                        .map(AdministrationQueryService.RoleRow::id).collect(Collectors.toSet()));
+                dialog.close();
+                pages.refresh();
+                feedback.success(getTranslation("system.users.roles-saved"));
+            } catch (BusinessFailure failure) {
+                ViewBusinessFailureHandler.handle(failure, validation -> dialog.showValidationMessage(
+                        getTranslation(validation.fieldErrors().containsValue("last-administrator")
+                                ? "system.users.last-administrator" : "system.users.roles-invalid")));
+            }
+        });
+        dialog.addField(choices);
         dialog.open();
     }
 
@@ -159,7 +205,14 @@ public final class UsersView extends PermissionProtectedView implements LocaleCh
         var confirmation = ConfirmationDialog.translated(enabling ? "system.users.enable-title" : "system.users.disable-title",
                 enabling ? "system.users.enable-consequence" : "system.users.disable-consequence",
                 enabling ? "system.users.enabled" : "system.users.disabled", () -> {
-            commands.setEnabled(requireCurrentUser(), userIds, enabling);
+            try {
+                commands.setEnabled(requireCurrentUser(), userIds, enabling);
+            } catch (BusinessFailure failure) {
+                ViewBusinessFailureHandler.handle(failure, validation -> feedback.error(
+                        getTranslation(validation.fieldErrors().containsValue("last-administrator")
+                                ? "system.users.last-administrator" : "system.users.roles-invalid")));
+                return;
+            }
             grid.deselectAll();
             pages.refresh();
             feedback.success(getTranslation(enabling ? "system.users.enabled-success" : "system.users.disabled-success"));

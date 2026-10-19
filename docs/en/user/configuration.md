@@ -25,7 +25,12 @@ vadmin:
 | Property | Default | Purpose |
 | --- | --- | --- |
 | `vadmin.local-iam.enabled` | `true` | Enables the built-in local IAM: username/password login and the Users, Roles, Permissions, and Audit administration module. Disable it only when the host application provides its own identity and authorization beans. |
+| `vadmin.system-admin.enabled` | Follows `vadmin.local-iam.enabled` | Independently enables Users, Roles, Permissions, and Audit. With host-provided identity, supply `AdministrationStore` and `AccessControlRepository`; the default services and pages are reused. |
 | `vadmin.local-iam.table-prefix` | `vadmin` | Prefix for the six local IAM tables. The default produces `vadmin_users` and its siblings. A blank value is rejected and does not fall back to unprefixed names. |
+| `vadmin.jdbc.enabled` | `false` | Opt into complete JDBC IAM persistence and initial admin bootstrap on an existing schema. Replaces host identity/audit storage beans. |
+| `vadmin.jdbc.table-prefix` | `vadmin` | Prefix for all six JDBC IAM tables; validated as a SQL identifier. |
+| `vadmin.jdbc.uuid-storage` | `string` | `string` for MySQL CHAR(36); `native` for PostgreSQL UUID and JSONB metadata. |
+| `vadmin.bootstrap.password` | Unset | First admin password for JDBC IAM; falls back to APP_BOOTSTRAP_PASSWORD, or `change-me` only in dev. Existing passwords are never reset. |
 | `vadmin.oidc.registration-id` | `oidc` | The Spring Security client registration used by the optional OIDC login. The registration itself is standard `spring.security.oauth2.client.*` configuration. |
 
 OIDC login maps an authenticated external identity to an existing, enabled

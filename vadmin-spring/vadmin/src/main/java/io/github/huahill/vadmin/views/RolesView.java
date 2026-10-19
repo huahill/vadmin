@@ -4,10 +4,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import io.github.huahill.vadmin.administration.AdministrationQueryService;
+import io.github.huahill.vadmin.administration.RoleAdministrationService;
+import io.github.huahill.vadmin.contracts.error.BusinessFailure;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUserProvider;
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
@@ -26,26 +29,29 @@ import io.github.huahill.vadmin.platform.access.GrantPermissionUseCase;
 import io.github.huahill.vadmin.flow.navigation.PermissionProtectedView;
 import io.github.huahill.vadmin.flow.navigation.AdminIcon;
 import io.github.huahill.vadmin.flow.navigation.AdminIconName;
-import io.github.huahill.vadmin.localiam.ConditionalOnVadminLocalIam;
+import io.github.huahill.vadmin.localiam.ConditionalOnSystemAdministration;
 import jakarta.annotation.security.PermitAll;
 import java.util.Comparator;
 
 @PermitAll
 @org.springframework.stereotype.Component
 @org.springframework.context.annotation.Scope(org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@ConditionalOnVadminLocalIam
+@ConditionalOnSystemAdministration
 public final class RolesView extends PermissionProtectedView implements LocaleChangeObserver, HasDynamicTitle {
     public static final PermissionCode REQUIRED_PERMISSION = PermissionCode.of("system:role:read");
     private static final PermissionCode GRANT = PermissionCode.of("system:role:grant");
+    private static final PermissionCode CREATE = PermissionCode.of("system:role:create");
     private final Grid<AdministrationQueryService.RoleRow> grid = new Grid<>(AdministrationQueryService.RoleRow.class, false);
     private final Grid.Column<AdministrationQueryService.RoleRow> codeColumn;
     private final Grid.Column<AdministrationQueryService.RoleRow> permissionCountColumn;
     private final Grid.Column<AdministrationQueryService.RoleRow> actionsColumn;
     private final PagedGrid<AdministrationQueryService.RoleRow> pages;
     private final Button grantAction;
+    private final Button createAction;
 
     public RolesView(CurrentUserProvider currentUser, AuthorizationService authorization,
-                     AdministrationQueryService queries, PermissionCatalog catalog, GrantPermissionUseCase grants) {
+                     AdministrationQueryService queries, PermissionCatalog catalog, GrantPermissionUseCase grants,
+                     RoleAdministrationService commands) {
         super(currentUser, authorization);
         codeColumn = grid.addColumn(AdministrationQueryService.RoleRow::code).setAutoWidth(true);
         permissionCountColumn = grid.addColumn(AdministrationQueryService.RoleRow::permissionCount);
@@ -64,7 +70,10 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         grantAction.setVisible(authorization.hasPermission(requireCurrentUser(), GRANT));
         var toolbar = new PageToolbar();
         toolbar.getElement().setAttribute("data-testid", "roles-toolbar");
-        toolbar.setPrimaryAction(grantAction);
+        toolbar.addAction(grantAction);
+        createAction = new Button(AdminIcon.of(AdminIconName.ADD), event -> createRole(commands));
+        createAction.setVisible(authorization.hasPermission(requireCurrentUser(), CREATE));
+        toolbar.setPrimaryAction(createAction);
 
         var frame = new AdminPageFrame(header, toolbar, workspace);
         add(frame);
@@ -100,6 +109,26 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
     @Override
     protected PermissionCode requiredPermission() {
         return REQUIRED_PERMISSION;
+    }
+
+    private void createRole(RoleAdministrationService commands) {
+        var code = new TextField(getTranslation("system.roles.code"));
+        code.setRequired(true);
+        code.setMaxLength(120);
+        var dialog = EditorDialog.translated("system.roles.create", "system.users.save", () -> { });
+        dialog.addField(code);
+        dialog.getPrimaryAction().addClickListener(event -> {
+            try {
+                commands.create(requireCurrentUser(), code.getValue());
+                dialog.close();
+                pages.refresh();
+            } catch (BusinessFailure failure) {
+                ViewBusinessFailureHandler.handle(failure, validation -> dialog.showValidationMessage(getTranslation(
+                        "already-exists".equals(validation.fieldErrors().get("code"))
+                                ? "system.roles.already-exists" : "system.roles.required")));
+            }
+        });
+        dialog.open();
     }
 
     private EditorDialog grantDialog(AdministrationQueryService queries, PermissionCatalog catalog,
@@ -138,6 +167,7 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         permissionCountColumn.setHeader(getTranslation("system.roles.permission-count"));
         actionsColumn.setHeader(getTranslation("system.roles.actions"));
         grantAction.setText(getTranslation("system.roles.grant"));
+        createAction.setText(getTranslation("system.roles.create"));
     }
 
     private void updateBrowserTitle() { getUI().ifPresent(ui -> ui.getPage().setTitle(getPageTitle())); }

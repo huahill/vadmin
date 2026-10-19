@@ -5,6 +5,9 @@ import io.github.huahill.vadmin.contracts.audit.AuditSink;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.contracts.auth.LocalUserSessionLookup;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
+import io.github.huahill.vadmin.platform.administration.AdministrationStore;
+import io.github.huahill.vadmin.springjdbc.JdbcAdministrationStore;
+import io.github.huahill.vadmin.springjdbc.UuidStorage;
 import io.github.huahill.vadmin.springjpa.access.JpaAccessControlRepository;
 import io.github.huahill.vadmin.springjpa.access.JpaLocalUserAccountLookup;
 import io.github.huahill.vadmin.springjpa.access.JpaLocalUserSessionLookup;
@@ -15,6 +18,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @AutoConfiguration
 @AutoConfigureBefore({
@@ -23,6 +27,11 @@ import org.springframework.context.annotation.Bean;
 })
 @EnableConfigurationProperties(LocalIamProperties.class)
 public class JpaAccessControlConfiguration {
+    @Bean
+    AdministrationStore administrationStore(JdbcTemplate jdbcTemplate, LocalIamProperties properties) {
+        return new JdbcAdministrationStore(jdbcTemplate, properties.getTablePrefix(), UuidStorage.NATIVE);
+    }
+
     @Bean
     AccessControlTables accessControlTables(LocalIamProperties properties) {
         return properties.tables();

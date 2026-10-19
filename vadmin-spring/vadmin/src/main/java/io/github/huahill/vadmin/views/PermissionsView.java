@@ -14,13 +14,13 @@ import io.github.huahill.vadmin.flow.patterns.DataWorkspace;
 import io.github.huahill.vadmin.flow.patterns.PagedGrid;
 import io.github.huahill.vadmin.flow.patterns.PageHeader;
 import io.github.huahill.vadmin.flow.navigation.PermissionProtectedView;
-import io.github.huahill.vadmin.localiam.ConditionalOnVadminLocalIam;
+import io.github.huahill.vadmin.localiam.ConditionalOnSystemAdministration;
 import jakarta.annotation.security.PermitAll;
 
 @PermitAll
 @org.springframework.stereotype.Component
 @org.springframework.context.annotation.Scope(org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@ConditionalOnVadminLocalIam
+@ConditionalOnSystemAdministration
 public final class PermissionsView extends PermissionProtectedView implements LocaleChangeObserver, HasDynamicTitle {
     public static final PermissionCode REQUIRED_PERMISSION = PermissionCode.of("system:permission:read");
     private final Grid<AdministrationQueryService.PermissionRow> grid = new Grid<>(AdministrationQueryService.PermissionRow.class, false);

@@ -1,0 +1,12 @@
+{
+  "properties": [
+    {"name": "vadmin.jdbc.enabled", "type": "java.lang.Boolean", "defaultValue": false,
+     "description": "Enable JDBC IAM identity, audit, administration storage and initial administrator bootstrap on a host-migrated schema."},
+    {"name": "vadmin.jdbc.table-prefix", "type": "java.lang.String", "defaultValue": "vadmin",
+     "description": "SQL identifier prefix shared by all six JDBC IAM tables."},
+    {"name": "vadmin.jdbc.uuid-storage", "type": "io.github.huahill.vadmin.springjdbc.UuidStorage", "defaultValue": "STRING",
+     "description": "STRING binds MySQL CHAR(36) identifiers; NATIVE binds PostgreSQL UUIDs and JSONB audit metadata."},
+    {"name": "vadmin.bootstrap.password", "type": "java.lang.String",
+     "description": "Initial admin password on an empty JDBC IAM schema. Falls back to APP_BOOTSTRAP_PASSWORD; never resets an existing account."}
+  ]
+}

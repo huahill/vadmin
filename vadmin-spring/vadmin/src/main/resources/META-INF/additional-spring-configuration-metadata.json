@@ -3,8 +3,13 @@
     {
       "name": "vadmin.local-iam.enabled",
       "type": "java.lang.Boolean",
-      "description": "Enables the built-in local IAM, including username/password login and the Users, Roles, Permissions, and Audit administration module. Set to false only when the host application provides its own identity and authorization beans.",
+      "description": "Enables the built-in local IAM. System administration follows this value unless vadmin.system-admin.enabled is set explicitly. Set to false when the host provides identity and authorization beans.",
       "defaultValue": true
+    },
+    {
+      "name": "vadmin.system-admin.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables the shared Users, Roles, Permissions and Audit pages. Defaults to vadmin.local-iam.enabled. Hosts may enable this with their own AdministrationStore and AccessControlRepository."
     },
     {
       "name": "vadmin.local-iam.table-prefix",
