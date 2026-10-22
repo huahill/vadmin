@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -17,6 +18,9 @@ import com.vaadin.flow.router.RouterLayout;
 
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
+import io.github.huahill.vadmin.flow.error.FlowError;
+import io.github.huahill.vadmin.flow.error.FlowErrorPresenter;
+import io.github.huahill.vadmin.flow.error.FlowErrorPresenters;
 import io.github.huahill.vadmin.flow.navigation.AdminHostLayout;
 import io.github.huahill.vadmin.flow.navigation.AdminMessageBundle;
 import io.github.huahill.vadmin.flow.navigation.AdminModule;
@@ -27,6 +31,11 @@ class AdminFlowAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(AdminFlowAutoConfiguration.class))
             .withUserConfiguration(ModuleConfiguration.class);
+
+    @AfterEach
+    void restoreDefaultPresenter() {
+        FlowErrorPresenters.install(FlowErrorPresenters.vaadin());
+    }
 
     @Test
     void rejectsAHostPermissionCatalogInsteadOfIgnoringModulePermissions() {
@@ -51,6 +60,36 @@ class AdminFlowAutoConfigurationTest {
                         .hasMessageContaining("module 'incomplete'")
                         .hasMessageContaining("key 'incomplete.list.title'")
                         .hasMessageContaining("base name 'i18n.incomplete'"));
+    }
+
+    @Test
+    void installsTheDefaultFlowErrorPresenterBeforeSessionsStart() {
+        contextRunner.run(context -> {
+            assertThat(context).hasSingleBean(FlowErrorPresenter.class);
+            assertThat(context.getBean(FlowErrorPresenter.class).getClass())
+                    .isEqualTo(FlowErrorPresenters.vaadin().getClass());
+            try {
+                context.getBean(FlowErrorPresenterInstallation.class).install();
+                assertThat(FlowErrorPresenters.resolve())
+                        .isSameAs(context.getBean(FlowErrorPresenter.class));
+            } finally {
+                restoreDefaultPresenter();
+            }
+        });
+    }
+
+    @Test
+    void letsTheHostReplaceTheFlowErrorPresenter() {
+        contextRunner.withUserConfiguration(HostPresenterConfiguration.class).run(context -> {
+            assertThat(context).hasSingleBean(FlowErrorPresenter.class);
+            assertThat(context.getBean(FlowErrorPresenter.class)).isInstanceOf(HostPresenter.class);
+            try {
+                context.getBean(FlowErrorPresenterInstallation.class).install();
+                assertThat(FlowErrorPresenters.resolve()).isInstanceOf(HostPresenter.class);
+            } finally {
+                restoreDefaultPresenter();
+            }
+        });
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -108,5 +147,19 @@ class AdminFlowAutoConfigurationTest {
     }
 
     static final class TestView extends Div {
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class HostPresenterConfiguration {
+        @Bean
+        FlowErrorPresenter hostFlowErrorPresenter() {
+            return new HostPresenter();
+        }
+    }
+
+    static final class HostPresenter implements FlowErrorPresenter {
+        @Override
+        public void present(FlowError error) {
+        }
     }
 }

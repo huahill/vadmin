@@ -25,6 +25,8 @@ import com.vaadin.flow.spring.SpringSecurityAutoConfiguration;
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUserProvider;
+import io.github.huahill.vadmin.flow.error.FlowErrorPresenter;
+import io.github.huahill.vadmin.flow.error.FlowErrorPresenters;
 import io.github.huahill.vadmin.flow.navigation.AdminHostLayout;
 import io.github.huahill.vadmin.flow.navigation.AdminMessageBundle;
 import io.github.huahill.vadmin.flow.navigation.AdminModule;
@@ -133,6 +135,21 @@ public class AdminFlowAutoConfiguration {
                 ui.setLocale(localePreference.selectInitialLocale(browserLocales(ui.getLocale())));
             });
         };
+    }
+
+    /**
+     * Hosts replace this bean to change how uncaught administration failures are shown.
+     * The service-loader session handler reads the installed instance when a session starts.
+     */
+    @Bean
+    @ConditionalOnMissingBean(FlowErrorPresenter.class)
+    FlowErrorPresenter flowErrorPresenter() {
+        return FlowErrorPresenters.vaadin();
+    }
+
+    @Bean
+    FlowErrorPresenterInstallation flowErrorPresenterInstallation(FlowErrorPresenter presenter) {
+        return new FlowErrorPresenterInstallation(presenter);
     }
 
     private static List<Locale> browserLocales(Locale uiLocale) {

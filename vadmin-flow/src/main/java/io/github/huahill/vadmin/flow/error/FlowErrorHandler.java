@@ -15,7 +15,7 @@ public final class FlowErrorHandler implements ErrorHandler {
     private final FlowErrorPresenter presenter;
 
     public FlowErrorHandler() {
-        this(new VaadinFlowErrorPresenter());
+        this(FlowErrorPresenters.resolve());
     }
 
     FlowErrorHandler(FlowErrorPresenter presenter) {
