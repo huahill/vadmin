@@ -34,7 +34,11 @@ updated compatibility evidence, and both normal and production verification.
 2. Run the consumer with Java 25 and import `vadmin-bom` at the same version.
    The BOM aligns the VAdmin modules and Vaadin dependencies; do not also define
    a Vaadin version or import `vaadin-bom`. `flow-maven-plugin` is a plugin, so
-   the BOM cannot manage it. Use the Vaadin version from the table above.
+   the BOM cannot manage it. Its version must equal the Flow version managed by
+   the Vaadin platform BOM imported by that `vadmin-bom` release. That Flow
+   version can be a newer patch than the platform number. Do not use the
+   platform number or the historical baseline in the table above as the plugin
+   version.
 3. Review Flyway migrations against a production-like database copy. Apply
    each migration once and never rewrite an applied migration.
 4. Keep the documented module contract: `AdminModule` metadata, declared

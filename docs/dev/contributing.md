@@ -4,9 +4,10 @@ VAdmin publication coordinate: `io.github.huahill:vadmin-spring-boot-starter`.
 
 ## 兼容性基线
 
-提交必须在 Java 25 和项目 Maven Wrapper（Maven 4.0.0-rc-7）上构建。当前经过验证的
-技术基线为 Spring Boot 4.1.1、Vaadin Flow 25.3.1、PostgreSQL 18 和 Flyway 13.7.0。
-Maven 4 仍为 RC 版本；其 GA 升级同样需要独立变更。
+提交必须在 Java 25 和项目 Maven Wrapper（Maven 4.0.0-rc-7）上构建。当前支持线为
+Java 25、Spring Boot 4.1.x、Vaadin Flow 25.x 和 PostgreSQL 18。精确补丁版本以根 POM
+属性为准，文档不另记一份。`flow-maven-plugin` 使用平台 BOM 管理的 Flow 版本，不是
+`vaadin.version` 这个平台号。Maven 4 仍为 RC 版本；其 GA 升级同样需要独立变更。
 
 Java、Maven、Spring Boot 或 Vaadin 的主版本升级必须通过独立 PR 完成，说明兼容性
 影响，并通过全部 CI 验证。依赖的小版本或补丁升级也应先在完整测试矩阵中验证。

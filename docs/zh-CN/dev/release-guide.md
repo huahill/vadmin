@@ -29,7 +29,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 
 1. 将所有 `io.github.huahill` 依赖升级到相同目标版本。不得混用已发布制品和
    snapshot 同级制品。
-2. 使用 Java 25 运行使用方，并导入同一版本的 `vadmin-bom`。由它对齐 VAdmin 模块和 Vaadin 依赖；不要另外定义 Vaadin 版本或导入 `vaadin-bom`。`flow-maven-plugin` 是插件，BOM 不能管理它，版本仍使用上表中的 Vaadin 版本。
+2. 使用 Java 25 运行使用方，并导入同一版本的 `vadmin-bom`。由它对齐 VAdmin 模块和 Vaadin 依赖；不要另外定义 Vaadin 版本或导入 `vaadin-bom`。`flow-maven-plugin` 是插件，BOM 不能管理它。插件版本必须等于该次 `vadmin-bom` 所导入的 Vaadin 平台 BOM 管理的 Flow 版本；它可能比平台版本号新一个补丁。不要把平台版本号或上表中的历史基线当作插件版本。
 3. 在类生产数据库副本上审查 Flyway 迁移。每个迁移只执行一次，且不得改写已应用的迁移。
 4. 保持文档化模块契约：`AdminModule` 元数据、已声明权限、路由、图标 key、`zh-CN` 与
    `en-US` 资源、没有 `@Route` 的 prototype View Bean，以及每个使用方动态 View 的宿主

@@ -56,6 +56,20 @@ class ConsumerBomContractTest {
                     .contains("<artifactId>flow-server-production-mode</artifactId>")
                     .doesNotContain("${vaadin.version}");
         }
+        for (var guide : List.of(
+                "docs/en/dev/release-guide.md",
+                "docs/zh-CN/dev/release-guide.md",
+                "docs/dev/contributing.md")) {
+            var content = Files.readString(repositoryRoot.resolve(guide));
+            assertThat(content)
+                    .as(guide)
+                    .doesNotContain("Use the Vaadin version from the table above")
+                    .doesNotContain("版本仍使用上表中的 Vaadin 版本");
+        }
+        assertThat(Files.readString(repositoryRoot.resolve("docs/dev/contributing.md")))
+                .contains("Spring Boot 4.1.x")
+                .contains("Vaadin Flow 25.x")
+                .doesNotContain("Spring Boot 4.1.1、Vaadin Flow 25.3.1");
     }
 
     private static String property(Path pom, Pattern pattern) throws Exception {
