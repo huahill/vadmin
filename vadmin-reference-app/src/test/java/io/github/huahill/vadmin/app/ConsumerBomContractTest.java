@@ -13,7 +13,8 @@ import org.w3c.dom.Element;
 
 class ConsumerBomContractTest {
     private static final String MAVEN_NS = "http://maven.apache.org/POM/4.1.0";
-    private static final Pattern VAADIN_VERSION = Pattern.compile("<vaadin.version>([^<]+)</vaadin.version>");
+    private static final Pattern FLOW_PLUGIN_VERSION =
+            Pattern.compile("<flow-maven-plugin.version>([^<]+)</flow-maven-plugin.version>");
 
     @Test
     void consumerBomMatchesTheParentContractAndDoesNotExportInternalLines() throws Exception {
@@ -36,7 +37,6 @@ class ConsumerBomContractTest {
     @Test
     void adoptionGuidesImportTheBomInsteadOfAConsumerVaadinVersion() throws Exception {
         var repositoryRoot = Path.of("").toAbsolutePath().getParent();
-        var vaadinVersion = vaadinVersion(repositoryRoot.resolve("pom.xml"));
         for (var guide : List.of("docs/en/user/getting-started.md", "docs/zh-CN/user/getting-started.md")) {
             var content = Files.readString(repositoryRoot.resolve(guide));
             assertThat(content)
@@ -46,19 +46,20 @@ class ConsumerBomContractTest {
                     .doesNotContain("${vaadin.version}")
                     .doesNotContain("<artifactId>vaadin-bom</artifactId>");
         }
+        var flowPluginVersion = property(repositoryRoot.resolve("pom.xml"), FLOW_PLUGIN_VERSION);
         for (var guide : List.of("docs/en/user/deployment.md", "docs/zh-CN/user/deployment.md")) {
             var content = Files.readString(repositoryRoot.resolve(guide));
             assertThat(content)
                     .as(guide)
                     .contains("<artifactId>flow-maven-plugin</artifactId>")
-                    .contains("<version>" + vaadinVersion + "</version>")
+                    .contains("<version>" + flowPluginVersion + "</version>")
                     .contains("<artifactId>flow-server-production-mode</artifactId>")
                     .doesNotContain("${vaadin.version}");
         }
     }
 
-    private static String vaadinVersion(Path pom) throws Exception {
-        var matcher = VAADIN_VERSION.matcher(Files.readString(pom));
+    private static String property(Path pom, Pattern pattern) throws Exception {
+        var matcher = pattern.matcher(Files.readString(pom));
         assertThat(matcher.find()).isTrue();
         return matcher.group(1);
     }
