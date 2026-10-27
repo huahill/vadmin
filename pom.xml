@@ -38,7 +38,9 @@
     <properties>
         <java.version>25</java.version>
         <spring-boot.version>4.1.2</spring-boot.version>
-        <vaadin.version>25.3.2</vaadin.version>
+        <vaadin.version>25.3.3</vaadin.version>
+        <!-- Platform 25.3.3 manages Flow 25.3.4. The plugin must match Flow, not the platform number. -->
+        <flow-maven-plugin.version>25.3.4</flow-maven-plugin.version>
         <flyway.version>13.11.1</flyway.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <archunit.version>1.5.1</archunit.version>
@@ -231,11 +233,10 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
                 </plugin>
-                <!-- Same version as vaadin-bom. Flow publishes later plugin patches; do not follow those. -->
                 <plugin>
                     <groupId>com.vaadin</groupId>
                     <artifactId>flow-maven-plugin</artifactId>
-                    <version>${vaadin.version}</version>
+                    <version>${flow-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
