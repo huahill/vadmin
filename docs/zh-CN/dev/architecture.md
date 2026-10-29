@@ -72,9 +72,7 @@ Flow View 类型和两套消息资源包。启动时，`vadmin-spring-flow` 校�
 模块使用共享 Flow 模式，不注册全局主题、不修改全局主题属性。系统、浅色和深色模式仅通过
 `ColorScheme` 与 `Page.setColorScheme()` 处理。
 
-动态路由需要静态生产前端锚点。使用方新增动态业务 View 时，在自己拥有的应用配置类型上
-为该 View 声明一次 `@Uses(该View.class)`。View 本身不声明 `@Route`；模块元数据才是路由
-注册的唯一来源。
+动态路由需要静态生产前端锚点。Flow 的生产扫描不会访问 Spring Boot 应用类。使用方继承 `AdminModuleViewAnchor`，并在该子类上为每个动态业务 View 声明一次 `@Uses(该View.class)`。这个子类不是 Spring Bean，也不通过 SPI 注册。View 本身不声明 `@Route`；模块元数据才是路由注册的唯一来源。
 
 ## 有意的完全替换
 

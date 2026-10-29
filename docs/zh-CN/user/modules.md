@@ -94,17 +94,15 @@ VAdmin 将你的翻译与自身的翻译合并，外壳和模块都会按用户�
 
 ## 生产构建锚点
 
-Vaadin 的生产前端 bundle 需要对每个视图的静态引用。在你的应用类上为每个动态视图
-添加一个 `@Uses`：
+Vaadin 的生产前端 bundle 只会从 Flow 入口点继续跟踪 `@Uses`。Spring Boot 应用类不是入口点。继承 `AdminModuleViewAnchor`，并为每个动态视图添加一个 `@Uses`：
 
 ```java
 @Uses(InventoryView.class)
-@SpringBootApplication
-public final class InventoryApplication {
+public final class InventoryFrontendAnchor extends AdminModuleViewAnchor {
 }
 ```
 
-不要给视图加 `@Route`，也不要为 VAdmin 的系统视图加 `@Uses`——VAdmin 自己处理。
+不要把这些注解放到应用类上，也不要把子类注册成 Spring Bean 或写入 `META-INF/services`。Flow 会按子类型扫描发现它。不要给视图加 `@Route`，也不要为 VAdmin 的系统视图加 `@Uses`——VAdmin 自己处理。
 
 ## 授权
 

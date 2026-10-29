@@ -100,17 +100,16 @@ module render in the user's selected locale. In your view, resolve text with
 ## Production Build Anchor
 
 Vaadin's production frontend bundle needs a static reference to each view.
-Add `@Uses` on your application class — one per dynamic view:
+Flow follows `@Uses` only from an entry point, and a Spring Boot application class is not one.
+Subclass `AdminModuleViewAnchor` and add one `@Uses` per dynamic view:
 
 ```java
 @Uses(InventoryView.class)
-@SpringBootApplication
-public final class InventoryApplication {
+public final class InventoryFrontendAnchor extends AdminModuleViewAnchor {
 }
 ```
 
-Do not add `@Route` to your view, and do not add `@Uses` for VAdmin's
-built-in system views — VAdmin handles those.
+Do not put those annotations on the application class, and do not register the subclass as a Spring bean or through `META-INF/services`. Flow discovers it by subtype scan. Do not add `@Route` to your view, and do not add `@Uses` for VAdmin's built-in system views — VAdmin handles those.
 
 ## Authorization
 

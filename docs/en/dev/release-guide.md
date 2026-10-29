@@ -43,8 +43,7 @@ updated compatibility evidence, and both normal and production verification.
    each migration once and never rewrite an applied migration.
 4. Keep the documented module contract: `AdminModule` metadata, declared
    permissions, routes, icon keys, `zh-CN` and `en-US` resources, prototype
-   view beans without `@Route`, and a host `@Uses` anchor for each consumer
-   dynamic view.
+   view beans without `@Route`, and one `AdminModuleViewAnchor` subclass with a `@Uses` anchor for each consumer dynamic view. Do not put those anchors on the Spring Boot application class.
 5. Keep the VAdmin default shell, theme, and system administration unless the
    consumer intentionally replaces the complete shell with its own
    `AdminHostLayout`, `AppShellConfigurator`, and stylesheets.

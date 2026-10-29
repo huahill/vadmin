@@ -92,10 +92,7 @@ Modules consume the shared Flow patterns; they do not register a global theme
 or mutate global theme properties. System, light, and dark modes use only
 `ColorScheme` and `Page.setColorScheme()`.
 
-Dynamic routes need a static production frontend anchor. A consumer that adds
-a dynamic business view declares `@Uses(ThatView.class)` once on a host-owned
-application configuration type. The view itself has no `@Route`: the assembled
-module metadata is the source of route registration.
+Dynamic routes need a static production frontend anchor. Flow's production scanner does not visit a Spring Boot application class. A consumer subclasses `AdminModuleViewAnchor` and declares `@Uses(ThatView.class)` once on that subclass for each dynamic business view. The subclass is not a Spring bean and is not registered through SPI. The view itself has no `@Route`: the assembled module metadata is the source of route registration.
 
 ## Intentional Full Replacement
 
