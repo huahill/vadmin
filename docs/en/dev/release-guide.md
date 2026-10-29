@@ -124,8 +124,8 @@ annotated, clean, reachable from `main`, and matches the root Maven version.
 It signs and verifies the full reactor, requires the Central Publisher to
 report a deployment ID, waits until the starter POM is publicly downloadable,
 and resolves that artifact from a clean Maven consumer repository. Only then
-does it create or update the GitHub Release and upload Central deployment
-evidence.
+does it create or update the GitHub Release, using the annotated tag `vX.Y.Z`
+as the release title, and upload Central deployment evidence.
 
 Do not move a tag after Central has accepted its version. Before a version is
 published, replacing a mistaken tag is acceptable, but the final tag must be

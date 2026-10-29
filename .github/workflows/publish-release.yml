@@ -222,7 +222,6 @@ jobs:
         id: release_notes
         env:
           RELEASE_TAG: ${{ inputs.release_tag }}
-          RELEASE_VERSION: ${{ steps.release_source.outputs.version }}
         run: |
           set -euo pipefail
 
@@ -235,7 +234,7 @@ jobs:
           done)"
 
           {
-            printf '# VAdmin %s\n\n' "${RELEASE_VERSION}"
+            printf '# %s\n\n' "${RELEASE_TAG}"
             echo '## Changes'
             if [[ -n "${previous_tag}" ]]; then
               git log --no-merges \
@@ -262,17 +261,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
-          RELEASE_VERSION: ${{ steps.release_source.outputs.version }}
         run: |
           set -euo pipefail
 
           if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             gh release edit "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" \
-              --title "VAdmin ${RELEASE_VERSION}" --draft=false --prerelease=false \
+              --title "${RELEASE_TAG}" --draft=false --prerelease=false \
               --notes-file "${{ steps.release_notes.outputs.path }}"
             exit 0
           fi
 
           gh release create "${RELEASE_TAG}" --verify-tag \
-            --repo "${GITHUB_REPOSITORY}" --title "VAdmin ${RELEASE_VERSION}" \
+            --repo "${GITHUB_REPOSITORY}" --title "${RELEASE_TAG}" \
             --notes-file "${{ steps.release_notes.outputs.path }}"

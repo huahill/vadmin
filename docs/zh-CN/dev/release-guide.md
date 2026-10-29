@@ -94,7 +94,8 @@ secrets 和仓库级 secrets 均可用。首次使用前，配置以下受保护
 页面使用该精确标签运行 `Publish Release`。工作流会校验标签为 annotated、工作树干净、提交可从
 `main` 到达，且与根 Maven 版本一致；随后签名并验证完整 reactor，要求 Central Publisher 报告
 deployment ID，等待 starter POM 可被公开下载，再通过干净 Maven 使用方仓库解析该制品。只有这些
-检查全部成功后，才会创建或更新 GitHub Release 并上传 Central 发布证据。
+检查全部成功后，才会创建或更新 GitHub Release，并以 annotated 标签 `vX.Y.Z`
+作为发布标题，然后上传 Central 发布证据。
 
 Central 接受某个版本后不得移动其标签。在版本尚未发布前，可以替换错误标签；最终标签必须为
 annotated tag，且准确指向已验证的发布提交。
