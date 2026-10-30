@@ -1,5 +1,6 @@
 package io.github.huahill.vadmin.flow.patterns;
 
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import java.util.Objects;
@@ -20,21 +21,32 @@ public final class AdminNotifications {
 
     /** Shows a successful operation at the shared top-centre location for the requested duration. */
     public static void success(String message, int durationMs) {
-        show(message, durationMs, NotificationVariant.LUMO_SUCCESS);
+        showSuccess(message, durationMs);
     }
 
     /** Shows a warning at the shared top-centre location. */
     public static void warning(String message) {
-        show(message, WARNING_DURATION_MS, NotificationVariant.LUMO_WARNING);
+        showWarning(message);
     }
 
     /** Shows an error at the shared top-centre location. */
     public static void error(String message) {
-        show(message, ERROR_DURATION_MS, NotificationVariant.LUMO_ERROR);
+        showError(message);
     }
 
-    private static void show(String message, int durationMs, NotificationVariant variant) {
-        var notification = Notification.show(Objects.requireNonNull(message), durationMs, Notification.Position.TOP_CENTER);
-        notification.addThemeVariants(variant);
+    static Notification showSuccess(String message, int durationMs) {
+        return show(message, durationMs, NotificationVariant.SUCCESS, VaadinIcon.CHECK_CIRCLE);
+    }
+
+    static Notification showWarning(String message) {
+        return show(message, WARNING_DURATION_MS, NotificationVariant.WARNING, VaadinIcon.EXCLAMATION_CIRCLE);
+    }
+
+    static Notification showError(String message) {
+        return show(message, ERROR_DURATION_MS, NotificationVariant.ERROR, VaadinIcon.WARNING);
+    }
+
+    private static Notification show(String message, int durationMs, NotificationVariant variant, VaadinIcon icon) {
+        return StatusNotification.show(Objects.requireNonNull(message), durationMs, variant, icon);
     }
 }

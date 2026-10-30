@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maintain VAdmin"
+  short_description: "Guide maintenance of the VAdmin product"
+  default_prompt: "Use $maintain-vadmin to change the VAdmin product without breaking its module and shell boundaries."
