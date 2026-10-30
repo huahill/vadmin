@@ -45,11 +45,21 @@ behavior.
 
 `vadmin-bom` manages the `flow-server-production-mode` version. A Maven BOM
 cannot manage a plugin, so the production frontend plugin still needs an
-explicit version. Use the Flow version managed by this Vaadin platform
-release. It can be a newer Flow patch than the platform number, and it is
-not a second Vaadin baseline for the consumer to maintain:
+explicit version. Set `flow.version` to the `com.vaadin:flow-server` version
+managed by that BOM. It can be a newer Flow patch than the Vaadin platform
+number, and it is not a second Vaadin baseline for the consumer to maintain.
+
+Resolve the managed version from a module that imports `vadmin-bom`:
+
+```bash
+./mvnw dependency:tree -Dincludes=com.vaadin:flow-server
+```
 
 ```xml
+<properties>
+  <!-- The com.vaadin:flow-server version managed by vadmin-bom. -->
+  <flow.version><!-- resolved Flow version --></flow.version>
+</properties>
 <profile>
   <id>production</id>
   <dependencies>
@@ -63,7 +73,7 @@ not a second Vaadin baseline for the consumer to maintain:
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>flow-maven-plugin</artifactId>
-        <version>25.3.4</version>
+        <version>${flow.version}</version>
         <executions>
           <execution>
             <goals>

@@ -39,10 +39,21 @@ spring:
 ## 生产前端
 
 `vadmin-bom` 已经管理 `flow-server-production-mode` 的版本。Maven BOM 不能管理插件，
-所以生产前端插件仍要写版本。版本要和该 Vaadin 平台发行版所管理的 Flow 版本一致；
-它可能比平台版本号更新一个补丁，但不是另一条需要使用方自己维护的 Vaadin 基线：
+所以生产前端插件仍要写版本。把 `flow.version` 设为该 BOM 所管理的
+`com.vaadin:flow-server` 版本。它可能比 Vaadin 平台版本号新一个补丁，
+但不是另一条需要使用方自己维护的 Vaadin 基线。
+
+在导入了 `vadmin-bom` 的模块中解析这个版本：
+
+```bash
+./mvnw dependency:tree -Dincludes=com.vaadin:flow-server
+```
 
 ```xml
+<properties>
+  <!-- vadmin-bom 所管理的 com.vaadin:flow-server 版本。 -->
+  <flow.version><!-- 解析到的 Flow 版本 --></flow.version>
+</properties>
 <profile>
   <id>production</id>
   <dependencies>
@@ -56,7 +67,7 @@ spring:
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>flow-maven-plugin</artifactId>
-        <version>25.3.4</version>
+        <version>${flow.version}</version>
         <executions>
           <execution>
             <goals>
