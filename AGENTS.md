@@ -47,3 +47,10 @@
   a customization mechanism for isolated header, navigation, page, or styling
   fragments. VAdmin configuration must expose coherent product choices, not
   arbitrary layout or component-level visual controls.
+
+## Project Skills
+
+- This repository owns a local product-maintenance skill at `skills/maintain-vadmin`. When modifying VAdmin internals, use `$maintain-vadmin` if the agent runtime exposes it. If it is not auto-loaded, read `skills/maintain-vadmin/SKILL.md` and the relevant file under `skills/maintain-vadmin/references/` before editing.
+- Use it for module boundaries, Flow patterns, the default shell, Spring adapters, the BOM, the starter, production frontend anchors, and product documentation.
+- Keep this skill separate from host-application guidance. Do not apply it to an application that only consumes VAdmin, and do not use consumer guidance as authority for changing this repository.
+- This file remains the contract for commit messages, theme governance, and product composition. The skill routes placement and verification; it does not replace those rules.
