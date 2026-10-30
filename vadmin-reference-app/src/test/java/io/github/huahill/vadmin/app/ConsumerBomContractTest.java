@@ -2,6 +2,7 @@ package io.github.huahill.vadmin.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.vaadin.flow.server.Version;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ class ConsumerBomContractTest {
     private static final String MAVEN_NS = "http://maven.apache.org/POM/4.1.0";
     private static final Pattern FLOW_PLUGIN_VERSION =
             Pattern.compile("<flow-maven-plugin.version>([^<]+)</flow-maven-plugin.version>");
+    private static final Pattern HARDCODED_MAVEN_VERSION = Pattern.compile("<version>\\d");
 
     @Test
     void consumerBomMatchesTheParentContractAndDoesNotExportInternalLines() throws Exception {
@@ -46,15 +48,17 @@ class ConsumerBomContractTest {
                     .doesNotContain("${vaadin.version}")
                     .doesNotContain("<artifactId>vaadin-bom</artifactId>");
         }
-        var flowPluginVersion = property(repositoryRoot.resolve("pom.xml"), FLOW_PLUGIN_VERSION);
         for (var guide : List.of("docs/en/user/deployment.md", "docs/zh-CN/user/deployment.md")) {
             var content = Files.readString(repositoryRoot.resolve(guide));
             assertThat(content)
                     .as(guide)
                     .contains("<artifactId>flow-maven-plugin</artifactId>")
-                    .contains("<version>" + flowPluginVersion + "</version>")
+                    .contains("<version>${flow.version}</version>")
+                    .contains("com.vaadin:flow-server")
+                    .contains("dependency:tree")
                     .contains("<artifactId>flow-server-production-mode</artifactId>")
-                    .doesNotContain("${vaadin.version}");
+                    .doesNotContain("${vaadin.version}")
+                    .doesNotContainPattern(HARDCODED_MAVEN_VERSION);
         }
         for (var guide : List.of(
                 "docs/en/dev/release-guide.md",
@@ -70,6 +74,13 @@ class ConsumerBomContractTest {
                 .contains("Spring Boot 4.1.x")
                 .contains("Vaadin Flow 25.x")
                 .doesNotContain("Spring Boot 4.1.1、Vaadin Flow 25.3.1");
+    }
+
+    @Test
+    void flowMavenPluginMatchesTheFlowServerManagedByTheBom() throws Exception {
+        var repositoryRoot = Path.of("").toAbsolutePath().getParent();
+        assertThat(property(repositoryRoot.resolve("pom.xml"), FLOW_PLUGIN_VERSION))
+                .isEqualTo(Version.getFullVersion());
     }
 
     private static String property(Path pom, Pattern pattern) throws Exception {

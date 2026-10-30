@@ -12,7 +12,7 @@ Do not add main Java, auto-configuration, the reference app, an example module, 
 
 Its managed dependency list must match `dependencyManagement` in the root `pom.xml`. `ConsumerBomContractTest` rejects drift, rejects managing `vadmin-bom` or `vadmin-reference-app`, and rejects exporting internal lines such as `spring-boot-dependencies`, the Testcontainers BOM, and Flyway. Do not add an internal-only line to the parent section merely because the BOM imports the parent.
 
-Adoption guides import `vadmin-bom`. They do not tell a consumer to import `vaadin-bom` or pin `${vaadin.version}`. The `flow-maven-plugin` version is the root POM's `flow-maven-plugin.version` property, not `vaadin.version`. Deployment guides in both languages must track the plugin property; `ConsumerBomContractTest` checks that wording.
+Adoption guides import `vadmin-bom`. They do not tell a consumer to import `vaadin-bom` or pin `${vaadin.version}`. The `flow-maven-plugin` version is the root POM's `flow-maven-plugin.version` property. It must equal the `com.vaadin:flow-server` version managed by `vaadin-bom`, not `vaadin.version`. Deployment guides tell consumers to resolve that Flow version; they do not copy the current patch number. `ConsumerBomContractTest` checks both.
 
 ## Production Frontend
 
