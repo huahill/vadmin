@@ -1,5 +1,6 @@
 package io.github.huahill.vadmin.flow.patterns;
 
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import io.github.huahill.vadmin.contracts.error.BusinessFailure;
@@ -39,24 +40,27 @@ public final class OperationFeedback implements Serializable {
 
     /** Presents a non-blocking warning using the shared operation-feedback placement. */
     public void warning(String message) {
-        show(Objects.requireNonNull(message), NotificationVariant.LUMO_WARNING);
+        showWarning(Objects.requireNonNull(message));
     }
 
-    private static void showSuccess(String message) {
-        show(message, NotificationVariant.LUMO_SUCCESS);
+    static Notification showSuccess(String message) {
+        return show(message, NotificationVariant.SUCCESS, VaadinIcon.CHECK_CIRCLE);
     }
 
     public void error(String message) {
         errorPresenter.accept(Objects.requireNonNull(message));
     }
 
-    private static void showError(String message) {
-        show(message, NotificationVariant.LUMO_ERROR);
+    static Notification showError(String message) {
+        return show(message, NotificationVariant.ERROR, VaadinIcon.WARNING);
     }
 
-    private static void show(String message, NotificationVariant variant) {
-        var notification = Notification.show(message, 5_000, Notification.Position.TOP_CENTER);
-        notification.addThemeVariants(variant);
+    static Notification showWarning(String message) {
+        return show(message, NotificationVariant.WARNING, VaadinIcon.EXCLAMATION_CIRCLE);
+    }
+
+    private static Notification show(String message, NotificationVariant variant, VaadinIcon icon) {
+        return StatusNotification.show(message, 5_000, variant, icon);
     }
 
     @Serial

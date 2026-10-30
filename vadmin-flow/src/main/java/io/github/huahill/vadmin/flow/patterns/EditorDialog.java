@@ -29,7 +29,7 @@ public final class EditorDialog extends AdminDialog {
                 new FormLayout.ResponsiveStep("40em", 2));
         validation.getElement().setAttribute("role", "alert");
         validation.setVisible(false);
-        primaryAction().addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        primaryAction().addThemeVariants(ButtonVariant.PRIMARY);
         add(form, validation);
         updateSharedText();
     }
