@@ -74,11 +74,12 @@ docker build -t vadmin:0.5.0 .
 ## 发布
 
 Maven 的 `release` profile 会要求非 SNAPSHOT 版本、附加源码和 Javadoc 归档、使用 GPG 签名
-全部发布文件，并通过 Maven Central Publisher Portal 发布。日常开发、CI 和发布都使用仓库内置的
-Maven 4 Wrapper。Reactor 构建 POM 使用 model `4.1.0`：父坐标由 `<parent/>` 推断，子项目用
-`<subprojects>` 声明。Maven 4 发布的 consumer POM 仍是 Maven 3 兼容的 model `4.0.0`，并写回已解析的
-父坐标，使用方不依赖 reactor 推断。Apache Maven 3 无法读取 `4.1.0` 构建模型，因此发布不再使用
-Maven 3.9.16。
+全部发布文件，并通过 Maven Central Publisher Portal 发布。日常开发和 CI 继续使用仓库内置的
+Maven 4 Wrapper。Reactor 源码 POM 保持 model `4.1.0`：父坐标由 `<parent/>` 推断，子项目用
+`<subprojects>` 声明。Maven Central 不接受这种构建模型。发布不会改写源码模型，只部署一棵
+一次性的发布树：把它改写为 model `4.0.0`，把 `<subprojects>` 改为 `<modules>`，并根据
+`relativePath` 为每个空的 `<parent/>` 补上父坐标。Apache Maven 3.9.16 只在这棵树上执行
+Central `deploy`。生成的发布树不会提交，也不会打标签。
 
 推荐的发布路径是手动触发 `Publish Release` GitHub Actions 工作流。它必须从 `main` 发起，但会
 检出不可变的 annotated release tag。其发布 job 绑定到 `vadmin` Environment，因此该环境中的
@@ -91,19 +92,24 @@ secrets 和仓库级 secrets 均可用。首次使用前，配置以下受保护
 
 在 `Verify` 工作流成功后，从已验证的发布提交创建并推送 annotated `vX.Y.Z` 标签，再在 Actions
 页面使用该精确标签运行 `Publish Release`。工作流会校验标签为 annotated、工作树干净、提交可从
-`main` 到达，且与根 Maven 版本一致；随后签名并验证完整 reactor，要求 Central Publisher 报告
-deployment ID，等待 starter POM 可被公开下载，再通过干净 Maven 使用方仓库解析该制品。只有这些
-检查全部成功后，才会创建或更新 GitHub Release，并以 annotated 标签 `vX.Y.Z`
-作为发布标题，然后上传 Central 发布证据。
+`main` 到达，且与根 Maven 版本一致。它先用 Maven 4 Wrapper 签名并验证完整 reactor。如果
+Central 上还没有该 starter，就下载 Apache Maven 3.9.16，从标签源码生成一次性发布树并部署。
+工作流要求 Central Publisher 报告 deployment ID，等待 starter POM 可被公开下载，再通过干净的
+Maven 使用方仓库解析该制品。只有这些检查全部成功后，才会创建或更新 GitHub Release，并以
+annotated 标签 `vX.Y.Z` 作为发布标题，然后上传 Central 发布证据。
 
 Central 接受某个版本后不得移动其标签。在版本尚未发布前，可以替换错误标签；最终标签必须为
 annotated tag，且准确指向已验证的发布提交。
 
 如确有必要在本地发布，凭据应只存在于本机 Maven `settings.xml` 中名为 `central` 的 server
-条目，绝不可提交：
+条目，绝不可提交。请单独安装 Apache Maven 3.9.16，并用它的 `mvn` 部署一次性发布树。
+`./mvnw -Pproduction,release deploy` 不会发布到 Central：Wrapper 可以为 reactor 签名，但
+Central 会拒绝 model `4.1.0` 构建 POM。
 
 ```bash
-./mvnw -B -ntp -Pproduction,release deploy
+scripts/generate-maven3-publication-tree.sh /tmp/vadmin-maven3-publication
+cd /tmp/vadmin-maven3-publication
+mvn -B -T 1 -Pproduction,release -DskipTests -DskipITs deploy
 ```
 
 该 profile 会等待 Central Portal 发布完成。然后在干净的使用方项目中确认

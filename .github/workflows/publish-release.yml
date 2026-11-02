@@ -120,6 +120,65 @@ jobs:
               ;;
           esac
 
+      - name: Install Apache Maven 3 for Central publication
+        id: maven_3
+        if: steps.central_publication.outputs.already_published != 'true'
+        env:
+          MAVEN_3_VERSION: 3.9.16
+          MAVEN_3_SHA512: 831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6
+        run: |
+          set -euo pipefail
+
+          archive="${RUNNER_TEMP}/apache-maven-${MAVEN_3_VERSION}-bin.tar.gz"
+          curl --fail --location --retry 3 --retry-all-errors --output "${archive}" \
+            "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_3_VERSION}/apache-maven-${MAVEN_3_VERSION}-bin.tar.gz"
+          printf '%s  %s\n' "${MAVEN_3_SHA512}" "${archive}" | sha512sum --check --status
+          tar -xzf "${archive}" -C "${RUNNER_TEMP}"
+
+          executable="${RUNNER_TEMP}/apache-maven-${MAVEN_3_VERSION}/bin/mvn"
+          "${executable}" --version
+          echo "executable=${executable}" >> "${GITHUB_OUTPUT}"
+
+      - name: Generate Maven 3 publication tree
+        id: maven_3_tree
+        if: steps.central_publication.outputs.already_published != 'true'
+        run: |
+          set -euo pipefail
+
+          generator="${RUNNER_TEMP}/generate-maven3-publication-tree.sh"
+          git show origin/main:scripts/generate-maven3-publication-tree.sh > "${generator}"
+          chmod +x "${generator}"
+          publication_tree="${RUNNER_TEMP}/vadmin-maven3-publication-tree"
+          bash "${generator}" "${publication_tree}" "${GITHUB_WORKSPACE}"
+          python3 -c 'import textwrap; exec(textwrap.dedent("""
+          import sys
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          namespace = {"m": "http://maven.apache.org/POM/4.0.0"}
+          problems = []
+          for pom in sorted(root.glob("**/pom.xml")):
+              document = ET.parse(pom)
+              project = document.getroot()
+              model = project.find("m:modelVersion", namespace)
+              if model is None or model.text != "4.0.0":
+                  problems.append(f"{pom}: modelVersion is not 4.0.0")
+              serialized = ET.tostring(project, encoding="unicode")
+              if "4.1.0" in serialized or "subproject" in serialized:
+                  problems.append(f"{pom}: still contains Maven 4.1 publication syntax")
+              parent = project.find("m:parent", namespace)
+              if parent is not None:
+                  for name in ("groupId", "artifactId", "version"):
+                      child = parent.find(f"m:{name}", namespace)
+                      if child is None or not (child.text or "").strip():
+                          problems.append(f"{pom}: parent.{name} is missing")
+          if problems:
+              print(*problems, sep=chr(10), file=sys.stderr)
+              raise SystemExit(1)
+          """))' "${publication_tree}"
+          echo "path=${publication_tree}" >> "${GITHUB_OUTPUT}"
+
       - name: Publish Maven Central deployment
         id: publish_central
         if: steps.central_publication.outputs.already_published != 'true'
@@ -129,18 +188,11 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           set -euo pipefail
-
-          # The central-publishing lifecycle participant injects its deploy
-          # execution too late for Maven 4, so the reactor can succeed without
-          # uploading anything. Invoke publish in this same session, where the
-          # signed artifacts are already attached.
-          ./mvnw -B -ntp -T 1 -Pproduction,release -DskipTests -DskipITs deploy \
-            org.sonatype.central:central-publishing-maven-plugin:publish \
+          cd "${{ steps.maven_3_tree.outputs.path }}"
+          "${{ steps.maven_3.outputs.executable }}" -B -T 1 -Pproduction,release -DskipTests -DskipITs deploy \
             "-DaltDeploymentRepository=central::file:${RUNNER_TEMP}/vadmin-release-deployment" \
-            -DautoPublish=true \
-            -DwaitUntil=PUBLISHED \
-            -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" 2>&1 | tee central-deploy.log
-          deployment_id="$(sed -nE 's/.*deploymentId: ([[:alnum:]-]+).*/\1/p' central-deploy.log | tail -n 1)"
+            -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" 2>&1 | tee "${GITHUB_WORKSPACE}/central-deploy.log"
+          deployment_id="$(sed -nE 's/.*deploymentId: ([[:alnum:]-]+).*/\1/p' "${GITHUB_WORKSPACE}/central-deploy.log" | tail -n 1)"
           if [[ -z "${deployment_id}" ]]; then
             echo "Central Publishing did not report a deploymentId." >&2
             exit 1

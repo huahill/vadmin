@@ -96,13 +96,15 @@ docker build -t vadmin:0.5.0 .
 
 The `release` Maven profile requires a non-SNAPSHOT version, attaches source
 and Javadoc archives, signs every publication file with GPG, and uses the Maven
-Central Publisher Portal. Development, CI, and publication all use the checked-in
-Maven 4 wrapper. Reactor build POMs use model `4.1.0`: parent coordinates are
+Central Publisher Portal. Development and CI stay on the checked-in Maven 4
+wrapper. Reactor source POMs stay on model `4.1.0`: parent coordinates are
 inferred from `<parent/>`, and subprojects are declared with `<subprojects>`.
-Maven 4 publishes Maven 3-compatible model `4.0.0` consumer POMs with those
-parent coordinates resolved, so a consumer does not depend on reactor inference.
-Apache Maven 3 cannot read the `4.1.0` build model, so publication no longer
-uses Maven 3.9.16.
+Maven Central does not accept that build model. Publication leaves the source
+model unchanged and deploys only a disposable tree. The tree is rewritten to
+model `4.0.0`, `<subprojects>` becomes `<modules>`, and each empty `<parent/>`
+receives the coordinates of the POM at its `relativePath`. Apache Maven 3.9.16
+runs the Central `deploy` from that tree. The generated tree is never committed
+or tagged.
 
 The supported publication path is the manually triggered `Publish Release`
 GitHub Actions workflow. It must be started from `main`, but checks out the
@@ -120,21 +122,29 @@ After a successful `Verify` workflow, create and push an annotated `vX.Y.Z`
 tag from the verified release commit, then run `Publish Release` from the
 Actions page with that exact tag. The workflow verifies that the tag is
 annotated, clean, reachable from `main`, and matches the root Maven version.
-It signs and verifies the full reactor, requires the Central Publisher to
-report a deployment ID, waits until the starter POM is publicly downloadable,
-and resolves that artifact from a clean Maven consumer repository. Only then
-does it create or update the GitHub Release, using the annotated tag `vX.Y.Z`
-as the release title, and upload Central deployment evidence.
+It signs and verifies the full reactor with the Maven 4 wrapper. When Central
+does not already contain the starter, it downloads Apache Maven 3.9.16, builds
+the disposable publication tree from the tagged source, and deploys that tree.
+It requires the Central Publisher to report a deployment ID, waits until the
+starter POM is publicly downloadable, and resolves that artifact from a clean
+Maven consumer repository. Only then does it create or update the GitHub
+Release, using the annotated tag `vX.Y.Z` as the release title, and upload
+Central deployment evidence.
 
 Do not move a tag after Central has accepted its version. Before a version is
 published, replacing a mistaken tag is acceptable, but the final tag must be
 annotated and point at the exact verified release commit.
 
 For an exceptional local publication, credentials belong in the local Maven
-`settings.xml` server entry named `central`; never commit them:
+`settings.xml` server entry named `central`; never commit them. Install Apache
+Maven 3.9.16 separately and deploy the disposable tree with that `mvn`.
+`./mvnw -Pproduction,release deploy` does not publish to Central: the wrapper
+can sign the reactor, but Central rejects the model `4.1.0` build POM.
 
 ```bash
-./mvnw -B -ntp -Pproduction,release deploy
+scripts/generate-maven3-publication-tree.sh /tmp/vadmin-maven3-publication
+cd /tmp/vadmin-maven3-publication
+mvn -B -T 1 -Pproduction,release -DskipTests -DskipITs deploy
 ```
 
 The profile waits for Central Portal publication to complete. Then verify a
