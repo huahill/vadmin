@@ -130,8 +130,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          ./mvnw -B -ntp -T 1 -Pproduction,release -DskipTests deploy \
+          # The central-publishing lifecycle participant injects its deploy
+          # execution too late for Maven 4, so the reactor can succeed without
+          # uploading anything. Invoke publish in this same session, where the
+          # signed artifacts are already attached.
+          ./mvnw -B -ntp -T 1 -Pproduction,release -DskipTests -DskipITs deploy \
+            org.sonatype.central:central-publishing-maven-plugin:publish \
             "-DaltDeploymentRepository=central::file:${RUNNER_TEMP}/vadmin-release-deployment" \
+            -DautoPublish=true \
+            -DwaitUntil=PUBLISHED \
             -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" 2>&1 | tee central-deploy.log
           deployment_id="$(sed -nE 's/.*deploymentId: ([[:alnum:]-]+).*/\1/p' central-deploy.log | tail -n 1)"
           if [[ -z "${deployment_id}" ]]; then
