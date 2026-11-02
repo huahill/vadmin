@@ -17,6 +17,9 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v7.0.1
 
+      - name: Verify release workflows
+        run: bash scripts/verify-release-workflows-test.sh
+
       - name: Set up Java 25
         uses: actions/setup-java@v6
         with:

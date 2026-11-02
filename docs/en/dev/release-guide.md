@@ -106,11 +106,23 @@ receives the coordinates of the POM at its `relativePath`. Apache Maven 3.9.16
 runs the Central `deploy` from that tree. The generated tree is never committed
 or tagged.
 
-The supported publication path is the manually triggered `Publish Release`
-GitHub Actions workflow. It must be started from `main`, but checks out the
-immutable annotated release tag. Its release job is bound to the `vadmin`
-environment, so that environment's secrets are available in addition to
-repository secrets. Before its first use, configure these protected, never
+The supported publication path starts by pushing an annotated stable tag,
+`vX.Y.Z`, with no prerelease suffix. That push runs `Dispatch stable release`,
+which has no Central or signing secrets. The dispatcher checks that the tag is
+annotated and reachable from `main`, then starts the trusted `Publish Release`
+workflow on `main` with that exact `release_tag`. The release job is bound to
+the `vadmin` environment, so that environment's secrets are available in
+addition to repository secrets, and a maintainer approves the environment
+before Maven Central publication. `Publish Release` rejects a run whose
+workflow ref is not `refs/heads/main`: it always uses the reviewed workflow
+definition, then checks out the immutable tag as its source.
+
+A prerelease tag such as `v0.5.0-RC1` does not start the dispatcher. For a
+prerelease, or to retry a publication, run `Publish Release` manually from the
+Actions page on `main` and pass the exact `release_tag`. Approve the `vadmin`
+environment again for that run.
+
+Before the first publication, configure these protected, never
 source-controlled values:
 
 - `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD`: Maven Central Portal
@@ -119,8 +131,8 @@ source-controlled values:
 - `GPG_PASSPHRASE`: signing key passphrase.
 
 After a successful `Verify` workflow, create and push an annotated `vX.Y.Z`
-tag from the verified release commit, then run `Publish Release` from the
-Actions page with that exact tag. The workflow verifies that the tag is
+tag from the verified release commit. A stable tag starts publication
+automatically, as described above. The workflow verifies that the tag is
 annotated, clean, reachable from `main`, and matches the root Maven version.
 It signs and verifies the full reactor with the Maven 4 wrapper. When Central
 does not already contain the starter, it downloads Apache Maven 3.9.16, builds
@@ -130,6 +142,17 @@ starter POM is publicly downloadable, and resolves that artifact from a clean
 Maven consumer repository. Only then does it create or update the GitHub
 Release, using the annotated tag `vX.Y.Z` as the release title, and upload
 Central deployment evidence.
+
+After a successful stable release, `Prepare next SNAPSHOT` opens a pull
+request that increments only the root POM patch version, for example from
+`0.5.0` to `0.5.1-SNAPSHOT`. Review and merge that pull request before
+continuing development. The workflow does not push to `main`, does not publish
+artifacts, and skips prerelease tags. A release started by the tag dispatcher
+also starts this preparation from the trusted publish workflow, because GitHub
+does not deliver `workflow_run` for a run that `GITHUB_TOKEN` started. A
+release started manually from the Actions page still uses the `workflow_run`
+trigger. The repository must allow GitHub Actions to create pull requests;
+these workflows do not approve or merge their own pull requests.
 
 Do not move a tag after Central has accepted its version. Before a version is
 published, replacing a mistaken tag is acceptable, but the final tag must be

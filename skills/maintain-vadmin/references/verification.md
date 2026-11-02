@@ -23,6 +23,7 @@ Start with the narrowest useful test:
 | Starter contents | `./mvnw -pl vadmin-spring/vadmin-spring-boot-starter -am test` |
 | Reference app, BOM contract, or architecture rules | `./mvnw -pl vadmin-reference-app -am test` |
 | Browser or OIDC integration | `./mvnw -pl vadmin-reference-app -am verify` |
+| Release workflow contract | `bash scripts/verify-release-workflows-test.sh` |
 
 `BrowserE2EIT` and `KeycloakOidcIT` are Failsafe integration tests. `test` does not run them; `verify` does.
 
