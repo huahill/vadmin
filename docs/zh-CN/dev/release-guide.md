@@ -81,22 +81,39 @@ Maven 4 Wrapper。Reactor 源码 POM 保持 model `4.1.0`：父坐标由 `<paren
 `relativePath` 为每个空的 `<parent/>` 补上父坐标。Apache Maven 3.9.16 只在这棵树上执行
 Central `deploy`。生成的发布树不会提交，也不会打标签。
 
-推荐的发布路径是手动触发 `Publish Release` GitHub Actions 工作流。它必须从 `main` 发起，但会
-检出不可变的 annotated release tag。其发布 job 绑定到 `vadmin` Environment，因此该环境中的
-secrets 和仓库级 secrets 均可用。首次使用前，配置以下受保护的值，绝不可提交它们：
+推荐的发布路径是推送不带预发布后缀的 annotated 稳定标签 `vX.Y.Z`。该推送会运行
+`Dispatch stable release`。这个分发工作流没有 Central 凭据或签名密钥。它确认标签为
+annotated，且提交可从 `main` 到达后，在 `main` 上启动受信任的 `Publish Release`，并传入
+这个精确的 `release_tag`。发布 job 绑定到 `vadmin` Environment，因此该环境中的 secrets
+和仓库级 secrets 均可用；上传 Maven Central 之前，由维护者批准该环境。`Publish Release`
+拒绝工作流引用不是 `refs/heads/main` 的运行：它始终使用已审查的工作流定义，再检出不可变
+标签作为源码。
+
+像 `v0.5.0-RC1` 这样的预发布标签不会启动分发工作流。预发布和失败重试仍从 Actions 页面、
+以 `main` 为工作流引用手动运行 `Publish Release`，并填写精确的 `release_tag`。该次运行
+同样需要批准 `vadmin` Environment。
+
+首次发布前，配置以下受保护的值，绝不可提交它们：
 
 - `MAVEN_CENTRAL_USERNAME` 和 `MAVEN_CENTRAL_PASSWORD`：Maven Central Portal 发布凭据，
   SNAPSHOT 发布也使用这两个凭据。
 - `GPG_PRIVATE_KEY`：ASCII-armored 格式的私有签名密钥。
 - `GPG_PASSPHRASE`：私钥口令。
 
-在 `Verify` 工作流成功后，从已验证的发布提交创建并推送 annotated `vX.Y.Z` 标签，再在 Actions
-页面使用该精确标签运行 `Publish Release`。工作流会校验标签为 annotated、工作树干净、提交可从
+在 `Verify` 工作流成功后，从已验证的发布提交创建并推送 annotated `vX.Y.Z` 标签。稳定标签会按
+上文自动开始发布。工作流会校验标签为 annotated、工作树干净、提交可从
 `main` 到达，且与根 Maven 版本一致。它先用 Maven 4 Wrapper 签名并验证完整 reactor。如果
 Central 上还没有该 starter，就下载 Apache Maven 3.9.16，从标签源码生成一次性发布树并部署。
 工作流要求 Central Publisher 报告 deployment ID，等待 starter POM 可被公开下载，再通过干净的
 Maven 使用方仓库解析该制品。只有这些检查全部成功后，才会创建或更新 GitHub Release，并以
 annotated 标签 `vX.Y.Z` 作为发布标题，然后上传 Central 发布证据。
+
+稳定发布成功后，`Prepare next SNAPSHOT` 会打开一个拉取请求，只把根 POM 的补丁版本加一，
+例如从 `0.5.0` 到 `0.5.1-SNAPSHOT`。请审查并合并该请求后再继续开发。该工作流不推送到
+`main`，不发布制品，也会跳过预发布标签。由标签分发启动的发布，会从受信任的发布工作流再次
+启动这次准备，因为 GitHub 不会为 `GITHUB_TOKEN` 启动的运行投递 `workflow_run`。从 Actions
+页面手动启动的发布仍使用 `workflow_run` 触发。仓库需要允许 GitHub Actions 创建拉取请求；
+这些工作流不会批准或合并自己创建的拉取请求。
 
 Central 接受某个版本后不得移动其标签。在版本尚未发布前，可以替换错误标签；最终标签必须为
 annotated tag，且准确指向已验证的发布提交。
