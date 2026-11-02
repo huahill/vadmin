@@ -242,8 +242,13 @@ jobs:
           RELEASE_VERSION: ${{ steps.release_source.outputs.version }}
         run: |
           set -euo pipefail
-          consumer_repository="${RUNNER_TEMP}/vadmin-central-consumer-repository"
-          mvn -B -ntp -Dmaven.repo.local="${consumer_repository}" \
+          # Resolve outside the Maven 4.1 checkout. A Maven 3 executable in
+          # this directory tries to parse the reactor before downloading the
+          # published artifact.
+          consumer_dir="${RUNNER_TEMP}/vadmin-central-consumer"
+          mkdir -p "${consumer_dir}"
+          cd "${consumer_dir}"
+          "${GITHUB_WORKSPACE}/mvnw" -B -ntp -Dmaven.repo.local="${consumer_dir}/repository" \
             org.apache.maven.plugins:maven-dependency-plugin:3.8.1:get \
             -Dartifact="io.github.huahill:vadmin-spring-boot-starter:${RELEASE_VERSION}"
 
