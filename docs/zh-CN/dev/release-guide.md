@@ -59,7 +59,7 @@ VAdmin 的发布坐标为 `io.github.huahill:vadmin-spring-boot-starter`。
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.4.0 .
+docker build -t vadmin:0.5.0 .
 ```
 
 - [ ] 两条 Maven 命令均以 `BUILD SUCCESS` 结束。

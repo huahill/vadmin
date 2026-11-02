@@ -77,7 +77,7 @@ output, tool versions, image digest, release commit, and tag.
 ./mvnw -B -ntp verify
 ./mvnw -B -ntp -Pproduction verify
 docker compose --env-file .env.example config
-docker build -t vadmin:0.4.0 .
+docker build -t vadmin:0.5.0 .
 ```
 
 - [ ] Both Maven commands complete with `BUILD SUCCESS`.
