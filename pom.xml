@@ -41,7 +41,7 @@
         <vaadin.version>25.3.4</vaadin.version>
         <!-- Match the com.vaadin:flow-server version managed by vaadin-bom, not the platform number. -->
         <flow-maven-plugin.version>25.3.5</flow-maven-plugin.version>
-        <flyway.version>13.11.1</flyway.version>
+        <flyway.version>13.12.0</flyway.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <archunit.version>1.5.1</archunit.version>
         <playwright.version>1.64.0</playwright.version>
