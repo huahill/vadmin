@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: daily
     open-pull-requests-limit: 5
+    # vaadin-bom and flow-maven-plugin move independently, but the Flow plugin
+    # version must equal the flow-server version managed by that BOM.
+    groups:
+      vaadin-flow:
+        patterns:
+          - "com.vaadin:vaadin-bom"
+          - "com.vaadin:flow-maven-plugin"
 
   - package-ecosystem: github-actions
     directory: "/"

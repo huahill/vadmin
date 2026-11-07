@@ -59,6 +59,17 @@ class DependencyUpdateVisibilityTest {
                         "flyway-database-postgresql");
     }
 
+    @Test
+    void vaadinBomAndFlowPluginShareOneDependabotGroup() throws Exception {
+        String dependabot = Files.readString(rootPom().getParent().resolve(".github/dependabot.yml"));
+        int group = dependabot.indexOf("vaadin-flow:");
+        assertThat(group).isNotNegative();
+        int nextEcosystem = dependabot.indexOf("package-ecosystem:", group);
+        String block = nextEcosystem < 0 ? dependabot.substring(group) : dependabot.substring(group, nextEcosystem);
+
+        assertThat(block).contains("com.vaadin:vaadin-bom", "com.vaadin:flow-maven-plugin");
+    }
+
     private static List<String> versionProperties(Path pom) throws Exception {
         List<String> properties = new ArrayList<>();
         Element project = document(pom).getDocumentElement();
