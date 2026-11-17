@@ -15,8 +15,12 @@ import io.github.huahill.vadmin.springjpa.audit.JpaAuditSink;
 import jakarta.persistence.EntityManager;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+
+import javax.sql.DataSource;
+
 @AutoConfiguration
 @AutoConfigureBefore({
         org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration.class,
@@ -25,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(LocalIamProperties.class)
 public class JpaAccessControlConfiguration {
     @Bean
+    @ConditionalOnBean(DataSource.class)
     AdministrationStore administrationStore(EntityManager entityManager, LocalIamProperties properties) {
         return new JpaAdministrationStore(entityManager, properties.tables());
     }
@@ -45,16 +50,19 @@ public class JpaAccessControlConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(DataSource.class)
     AccessControlRepository accessControlRepository(EntityManager entityManager, AccessControlTables tables) {
         return new JpaAccessControlRepository(entityManager, tables);
     }
 
     @Bean
+    @ConditionalOnBean(DataSource.class)
     LocalUserAccountLookup localUserAccountLookup(EntityManager entityManager, AccessControlTables tables) {
         return new JpaLocalUserAccountLookup(entityManager, tables);
     }
 
     @Bean
+    @ConditionalOnBean(DataSource.class)
     LocalUserSessionLookup localUserSessionLookup(EntityManager entityManager) {
         return new JpaLocalUserSessionLookup(entityManager);
     }
@@ -65,11 +73,13 @@ public class JpaAccessControlConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(DataSource.class)
     AuditSink auditSink(EntityManager entityManager, AuditMetadataRedactor redactor) {
         return new JpaAuditSink(entityManager, redactor);
     }
 
     @Bean
+    @ConditionalOnBean(DataSource.class)
     PermissionCatalogSynchronizer permissionCatalogSynchronizer(EntityManager entityManager) {
         return new PermissionCatalogSynchronizer(entityManager);
     }
