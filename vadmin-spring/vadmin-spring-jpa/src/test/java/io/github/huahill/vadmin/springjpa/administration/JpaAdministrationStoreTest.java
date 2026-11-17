@@ -38,7 +38,6 @@ class JpaAdministrationStoreTest {
         registry.add("spring.flyway.enabled", () -> "false");
         registry.add("spring.sql.init.mode", () -> "always");
         registry.add("spring.sql.init.schema-locations", () -> "classpath:mysql-iam/schema.sql");
-        registry.add("spring.jpa.properties.hibernate.type.preferred_uuid_jdbc_type", () -> "CHAR");
     }
 
     @Test

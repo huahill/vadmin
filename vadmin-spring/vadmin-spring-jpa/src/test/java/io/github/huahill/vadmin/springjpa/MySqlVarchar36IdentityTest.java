@@ -25,8 +25,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(classes = MySqlChar36IdentityTest.TestApplication.class)
-class MySqlChar36IdentityTest {
+@SpringBootTest(classes = MySqlVarchar36IdentityTest.TestApplication.class)
+class MySqlVarchar36IdentityTest {
     private static final UUID USER_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
     @Autowired
@@ -35,7 +35,7 @@ class MySqlChar36IdentityTest {
     @DynamicPropertySource
     static void database(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", () ->
-                "jdbc:h2:mem:vadmin-char36;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE");
+                "jdbc:h2:mem:vadmin-varchar36;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE");
         registry.add("spring.datasource.username", () -> "sa");
         registry.add("spring.datasource.password", () -> "");
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");

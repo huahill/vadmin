@@ -1,6 +1,7 @@
 package io.github.huahill.vadmin.springjpa.audit;
 
 import io.github.huahill.vadmin.contracts.audit.AuditOutcome;
+import io.github.huahill.vadmin.springjpa.IdentityUuid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,11 +18,11 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "vadmin_audit_entries")
 public class JpaAuditEntryEntity {
     @Id
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @IdentityUuid
     @Column(length = 36)
     private UUID id;
 
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @IdentityUuid
     @Column(name = "actor_user_id", nullable = false, length = 36)
     private UUID actorUserId;
 

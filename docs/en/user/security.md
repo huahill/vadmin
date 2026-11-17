@@ -61,7 +61,7 @@ Keep `vadmin.system-admin.enabled=true` to use the shared pages and
 enable the VAdmin Spring Security integration in the host.
 
 All six tables share `vadmin.jdbc.table-prefix` (default `vadmin`).
-`vadmin.jdbc.uuid-storage=string` uses MySQL `CHAR(36)` identifiers;
+`vadmin.jdbc.uuid-storage=string` uses MySQL `VARCHAR(36)` identifiers;
 `native` uses PostgreSQL UUIDs and JSONB audit metadata. Existing contract beans
 take precedence over the JDBC defaults. Exclude the starter's `vadmin-spring-jpa`
 and PostgreSQL driver when replacing the default persistence setup.
