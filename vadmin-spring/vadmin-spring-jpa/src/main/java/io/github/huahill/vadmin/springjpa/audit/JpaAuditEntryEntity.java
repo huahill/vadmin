@@ -17,9 +17,12 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "vadmin_audit_entries")
 public class JpaAuditEntryEntity {
     @Id
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(length = 36)
     private UUID id;
 
-    @Column(name = "actor_user_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(name = "actor_user_id", nullable = false, length = 36)
     private UUID actorUserId;
 
     @Column(name = "action_code", nullable = false)
