@@ -1,5 +1,6 @@
 package io.github.huahill.vadmin.springjpa.access;
 
+import io.github.huahill.vadmin.springjpa.IdentityUuid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,6 +11,8 @@ import java.util.UUID;
 @Table(name = "vadmin_permissions")
 public class JpaPermissionEntity {
     @Id
+    @IdentityUuid
+    @Column(length = 36)
     private UUID id;
 
     @Column(nullable = false, unique = true)

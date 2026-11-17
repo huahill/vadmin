@@ -2,7 +2,7 @@ package io.github.huahill.vadmin.springjdbc;
 
 import java.util.UUID;
 
-/** Bind UUIDs as native PostgreSQL UUIDs or MySQL CHAR(36) strings. */
+/** Bind UUIDs as native PostgreSQL UUIDs or MySQL VARCHAR(36) strings. */
 public enum UuidStorage {
     NATIVE, STRING;
 

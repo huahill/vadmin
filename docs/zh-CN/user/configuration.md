@@ -28,7 +28,7 @@ vadmin:
 | `vadmin.local-iam.table-prefix` | `vadmin` | 本地 IAM 六张表的前缀。默认写成 `vadmin_users` 这一组；空字符串会被拒绝，不会退回没有前缀的表名。 |
 | `vadmin.jdbc.enabled` | `false` | 在已有表结构上启用完整 JDBC IAM 存储和初始管理员引导，宿主不再提供身份或审计存储 Bean。 |
 | `vadmin.jdbc.table-prefix` | `vadmin` | JDBC IAM 六张表统一前缀，按 SQL 标识符校验。 |
-| `vadmin.jdbc.uuid-storage` | `string` | MySQL CHAR(36) 使用 `string`；PostgreSQL UUID 和 JSONB 使用 `native`。 |
+| `vadmin.jdbc.uuid-storage` | `string` | MySQL VARCHAR(36) 使用 `string`；PostgreSQL UUID 和 JSONB 使用 `native`。 |
 | `vadmin.bootstrap.password` | 未配置 | JDBC IAM 首个管理员密码，回退到 APP_BOOTSTRAP_PASSWORD；仅 dev 使用默认 change-me，已有密码不会重置。 |
 | `vadmin.oidc.registration-id` | `oidc` | 可选 OIDC 登录使用的 Spring Security 客户端注册 ID。注册本身是标准的 `spring.security.oauth2.client.*` 配置。 |
 

@@ -47,7 +47,7 @@ VAdmin 在两层检查权限：
 保留 `vadmin.system-admin.enabled=true` 以启用共享页面，并接入 VAdmin Spring Security。
 
 六张表统一使用 `vadmin.jdbc.table-prefix`（默认 `vadmin`）。
-`vadmin.jdbc.uuid-storage=string` 对应 MySQL `CHAR(36)`；`native` 对应 PostgreSQL UUID
+`vadmin.jdbc.uuid-storage=string` 对应 MySQL `VARCHAR(36)`；`native` 对应 PostgreSQL UUID
 和 JSONB 审计字段。已有契约 Bean 优先于 JDBC 默认实现。替换默认持久化时，排除 starter
 的 `vadmin-spring-jpa` 和 PostgreSQL 驱动。管理写操作、审计和初始化必须共享 DataSource
 及事务管理器；宿主仍负责 Flyway 表结构迁移，本模块不会创建表。

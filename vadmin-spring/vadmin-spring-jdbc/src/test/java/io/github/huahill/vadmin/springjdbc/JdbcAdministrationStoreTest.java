@@ -96,7 +96,7 @@ class JdbcAdministrationStoreTest {
         dataSource.setURL("jdbc:h2:mem:" + UUID.randomUUID() + ";MODE="
                 + (format == UuidStorage.STRING ? "MySQL" : "PostgreSQL") + ";DB_CLOSE_DELAY=-1");
         var jdbc = new JdbcTemplate(dataSource);
-        String id = format == UuidStorage.STRING ? "CHAR(36)" : "UUID";
+        String id = format == UuidStorage.STRING ? "VARCHAR(36)" : "UUID";
         jdbc.execute("CREATE TABLE ci_users (id " + id + " PRIMARY KEY, username VARCHAR(120) UNIQUE, "
                 + "password_hash VARCHAR(255), enabled BOOLEAN, auth_version BIGINT)");
         jdbc.execute("CREATE TABLE ci_roles (id " + id + " PRIMARY KEY, code VARCHAR(120) UNIQUE)");
