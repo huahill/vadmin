@@ -37,7 +37,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <spring-boot.version>4.1.2</spring-boot.version>
+        <spring-boot.version>4.2.0</spring-boot.version>
         <vaadin.version>25.3.5</vaadin.version>
         <!-- Match the com.vaadin:flow-server version managed by vaadin-bom, not the platform number. -->
         <flow-maven-plugin.version>25.3.7</flow-maven-plugin.version>
