@@ -31,7 +31,7 @@ public final class AuthenticationVersionFilter extends OncePerRequestFilter {
     }
 
     private boolean isInvalid(LocalUserPrincipal principal) {
-        return sessionLookup.findSessionByUserId(principal.currentUser().userId())
+        return sessionLookup.findSession(principal.currentUser().subject())
                 .map(session -> !session.enabled()
                         || session.authVersion() != principal.currentUser().authVersion())
                 .orElse(true);

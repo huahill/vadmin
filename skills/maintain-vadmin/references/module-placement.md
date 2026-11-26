@@ -15,7 +15,8 @@ Read this before adding or moving a class, module, adapter, or document. If it d
 | Opt-in JDBC IAM for a host-migrated MySQL or PostgreSQL schema | `vadmin-spring/vadmin-spring-jdbc` |
 | Correlation ID and Problem Details configuration | `vadmin-spring/vadmin-spring-boot` |
 | Module assembly, dynamic routes, composite translations, or locale preference | `vadmin-spring/vadmin-spring-flow` |
-| Default shell, system administration, default `AdminModule`, branding, or product translations | `vadmin-spring/vadmin` |
+| Default shell, system administration, default `AdminModule`, shell brand rendering, or product translations | `vadmin-spring/vadmin` |
+| Product name property `vadmin.brand.name`, shared by login and the shell | `vadmin-spring/vadmin-spring-security` |
 | Consumer dependency aggregation | `vadmin-spring/vadmin-spring-boot-starter` |
 | Consumer version alignment for VAdmin modules and the Vaadin line | `vadmin-bom` |
 | Proof that an ordinary application can adopt the starter | `vadmin-reference-app` |
@@ -23,6 +24,7 @@ Read this before adding or moving a class, module, adapter, or document. If it d
 ## Dependency Direction
 
 - `vadmin-contracts`, `vadmin-platform`, and `vadmin-flow` do not depend on Spring, Jakarta Persistence, or Flyway. `vadmin-reference-app` `ArchitectureTest` enforces this.
+- `vadmin.brand.name` is bound in `vadmin-spring-security` so the login route and the default shell share one product name. The shell module renders it and does not redefine the property.
 - Classes in `io.github.huahill.vadmin.administration` consume the platform storage contract. They do not depend on `springjpa`, `springjdbc`, Spring JDBC, or Jakarta Persistence. `AdministrationArchitectureTest` enforces this.
 - Only the default administration packages, `vadmin-spring-flow`, and the reference app depend on `vadmin-spring-flow`.
 - The reference app does not acquire classes whose names claim ownership of the default shell, theme, appearance, system administration, or module configuration.

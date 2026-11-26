@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.di.Instantiator;
@@ -14,6 +15,8 @@ import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.server.VaadinService;
+import io.github.huahill.vadmin.brand.AdminBrandProperties;
+import io.github.huahill.vadmin.springsecurity.LocalLoginAvailability;
 import io.github.huahill.vadmin.springsecurity.OidcLoginAvailability;
 import io.github.huahill.vadmin.springsecurity.auth.LocalLoginAuthenticator;
 import java.util.List;
@@ -32,7 +35,6 @@ class LoginViewTest {
         var translations = mock(I18NProvider.class);
         when(translations.getDefaultLocale()).thenReturn(Locale.US);
         when(translations.getProvidedLocales()).thenReturn(List.of(Locale.US));
-        when(translations.getTranslation("flow.login.heading", Locale.US)).thenReturn("VAdmin");
         when(translations.getTranslation("flow.login.title", Locale.US)).thenReturn("Sign in");
         when(translations.getTranslation("flow.login.sso", Locale.US)).thenReturn("Continue with single sign-on");
         when(translations.getTranslation("flow.login.denied", Locale.US)).thenReturn("Sign-in was not permitted");
@@ -55,7 +57,7 @@ class LoginViewTest {
 
     @Test
     void rendersOneProviderNeutralExternalEntryWhenOidcIsAvailable() {
-        var view = new LoginView(new OidcLoginAvailability(true, "oidc"), localLoginAuthenticator);
+        var view = loginView(new OidcLoginAvailability(true, "oidc"), true);
 
         var externalEntry = oidcEntry(view);
         assertThat(externalEntry.getAttribute("href")).isEqualTo("oauth2/authorization/oidc");
@@ -67,14 +69,14 @@ class LoginViewTest {
 
     @Test
     void usesTheConfiguredRegistrationIdForTheExternalEntry() {
-        var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
+        var view = loginView(new OidcLoginAvailability(true, "corp-sso"), true);
 
         assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("oauth2/authorization/corp-sso");
     }
 
     @Test
     void usesAPathRelativeExternalEntrySoAStrippedProxyPrefixIsPreserved() {
-        var view = new LoginView(new OidcLoginAvailability(true, "corp-sso"), localLoginAuthenticator);
+        var view = loginView(new OidcLoginAvailability(true, "corp-sso"), true);
 
         assertThat(oidcEntry(view).getAttribute("href")).isEqualTo("oauth2/authorization/corp-sso");
     }
@@ -86,7 +88,7 @@ class LoginViewTest {
 
     @Test
     void keepsTheExistingLocalLoginWithoutAnExternalEntryWhenOidcIsUnavailable() {
-        var view = new LoginView(new OidcLoginAvailability(false, "oidc"), localLoginAuthenticator);
+        var view = loginView(new OidcLoginAvailability(false, "oidc"), true);
 
         assertThat(loginOverlay(view).getElement().getChildren()).noneMatch(element -> "a".equals(element.getTag()));
         assertThat(loginOverlay(view).getAction()).isEmpty();
@@ -94,13 +96,59 @@ class LoginViewTest {
 
     @Test
     void showsTheGenericLoginFormErrorAfterLocalCredentialsAreRejected() {
-        var view = new LoginView(new OidcLoginAvailability(false, "oidc"), localLoginAuthenticator);
+        var view = loginView(new OidcLoginAvailability(false, "oidc"), true);
         var event = mock(com.vaadin.flow.router.BeforeEnterEvent.class);
         when(event.getLocation()).thenReturn(new Location("login", QueryParameters.of("error", "")));
 
         view.beforeEnter(event);
 
         assertThat(loginOverlay(view).isError()).isTrue();
+    }
+
+    @Test
+    void usesTheProductNameAsTheLocalLoginHeading() {
+        var view = loginView(new OidcLoginAvailability(false, "oidc"), true, brand("  RDC CI  "));
+
+        assertThat(view.getPageTitle()).isEqualTo("Sign in");
+        assertThat(loginI18n(view)).contains("RDC CI").doesNotContain("  RDC CI  ");
+        assertThat(view.getChildren()).noneMatch(H1.class::isInstance);
+    }
+
+    @Test
+    void fallsBackToVadminWhenTheProductNameIsBlank() {
+        var view = loginView(new OidcLoginAvailability(false, "oidc"), true, brand(" "));
+
+        assertThat(loginI18n(view)).contains("VAdmin");
+    }
+
+    @Test
+    void showsTheProductNameWhenOnlyExternalLoginIsAvailable() {
+        var view = loginView(new OidcLoginAvailability(true, "identity"), false, brand("RDC CI"));
+
+        assertThat(view.getChildren()).noneMatch(LoginOverlay.class::isInstance);
+        assertThat(view.getChildren().filter(H1.class::isInstance).map(H1.class::cast).findFirst().orElseThrow().getText())
+                .isEqualTo("RDC CI");
+        var externalEntry = view.getChildren().filter(Anchor.class::isInstance).map(Anchor.class::cast).findFirst().orElseThrow();
+        assertThat(externalEntry.getHref()).isEqualTo("oauth2/authorization/identity");
+        assertThat(externalEntry.getElement().hasAttribute("router-ignore")).isTrue();
+    }
+
+    private LoginView loginView(OidcLoginAvailability oidc, boolean localLogin) {
+        return loginView(oidc, localLogin, new AdminBrandProperties());
+    }
+
+    private LoginView loginView(OidcLoginAvailability oidc, boolean localLogin, AdminBrandProperties brand) {
+        return new LoginView(oidc, localLoginAuthenticator, new LocalLoginAvailability(localLogin), brand);
+    }
+
+    private static AdminBrandProperties brand(String name) {
+        var brand = new AdminBrandProperties();
+        brand.setName(name);
+        return brand;
+    }
+
+    private static String loginI18n(LoginView view) {
+        return String.valueOf(loginOverlay(view).getElement().getPropertyRaw("i18n"));
     }
 
     private static LoginOverlay loginOverlay(LoginView view) {

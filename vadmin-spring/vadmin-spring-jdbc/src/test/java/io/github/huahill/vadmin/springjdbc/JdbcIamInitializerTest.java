@@ -33,7 +33,7 @@ class JdbcIamInitializerTest {
                 new PermissionCatalog(Set.of(
                         PermissionCode.of("environment:catalog:read"),
                         PermissionCode.of("environment:catalog:write"))),
-                mock(Environment.class), transactions);
+                mock(Environment.class), transactions, null);
     }
 
     @Test
@@ -72,7 +72,7 @@ class JdbcIamInitializerTest {
         var runner = new JdbcIamInitializer(store, mock(PasswordEncoder.class),
                 new PermissionCatalog(java.util.stream.IntStream.range(0, 20)
                         .mapToObj(i -> PermissionCode.of("system:permission:read" + i))
-                        .collect(java.util.stream.Collectors.toSet())), mock(Environment.class), transactions);
+                        .collect(java.util.stream.Collectors.toSet())), mock(Environment.class), transactions, null);
 
         runner.run();
 
@@ -84,7 +84,7 @@ class JdbcIamInitializerTest {
     void should_rollbackAllBootstrapWritesWhenInitialPasswordIsMissing() {
         var environment = new MockEnvironment();
         initializer = new JdbcIamInitializer(new JdbcIamStore(jdbc, "vadmin", UuidStorage.STRING), mock(PasswordEncoder.class),
-                new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))), environment, transactions);
+                new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))), environment, transactions, null);
 
         assertThatThrownBy(initializer::run).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("APP_BOOTSTRAP_PASSWORD");
@@ -97,7 +97,7 @@ class JdbcIamInitializerTest {
         var passwords = org.springframework.security.crypto.factory.PasswordEncoderFactories.createDelegatingPasswordEncoder();
         var environment = new MockEnvironment().withProperty("APP_BOOTSTRAP_PASSWORD", "first-secret");
         initializer = new JdbcIamInitializer(new JdbcIamStore(jdbc, "vadmin", UuidStorage.STRING), passwords,
-                new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))), environment, transactions);
+                new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))), environment, transactions, null);
 
         initializer.run();
         String hash = jdbc.queryForObject("SELECT password_hash FROM vadmin_users WHERE username = 'admin'", String.class);
@@ -119,7 +119,7 @@ class JdbcIamInitializerTest {
         org.mockito.Mockito.when(encoder.encode("secret")).thenReturn("hash");
         var runner = new JdbcIamInitializer(new JdbcIamStore(jdbc, "vadmin", UuidStorage.STRING), encoder,
                 new PermissionCatalog(Set.of()), new MockEnvironment().withProperty("APP_BOOTSTRAP_PASSWORD", "secret"),
-                transactions);
+                transactions, null);
 
         assertThatThrownBy(runner::run).isInstanceOf(org.springframework.dao.DuplicateKeyException.class);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_users", Long.class)).isZero();
@@ -141,7 +141,7 @@ class JdbcIamInitializerTest {
         var encoder = mock(PasswordEncoder.class);
         org.mockito.Mockito.when(encoder.encode("secret")).thenReturn("hash");
         var runner = new JdbcIamInitializer(store, encoder, new PermissionCatalog(Set.of()),
-                new MockEnvironment().withProperty("APP_BOOTSTRAP_PASSWORD", "secret"), transactions);
+                new MockEnvironment().withProperty("APP_BOOTSTRAP_PASSWORD", "secret"), transactions, null);
 
         try (var executor = java.util.concurrent.Executors.newFixedThreadPool(2)) {
             var first = executor.submit(() -> runner.run());

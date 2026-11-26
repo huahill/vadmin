@@ -50,6 +50,26 @@ final class JdbcIamStore {
         return granted;
     }
 
+    public void ensureAdministratorRole(Collection<String> permissionCodes) {
+        List<String> roleIds = jdbcTemplate.queryForList(
+                "SELECT id FROM " + tables.roles() + " WHERE code = 'administrator' FOR UPDATE", String.class);
+        String roleId;
+        if (roleIds.isEmpty()) {
+            UUID created = UUID.randomUUID();
+            jdbcTemplate.update("INSERT INTO " + tables.roles() + " (id, code) VALUES (?, 'administrator')",
+                    uuidStorage.parameter(created));
+            roleId = created.toString();
+        } else {
+            roleId = roleIds.getFirst();
+        }
+        int added = grantMissingPermissions(roleId, permissionCodes);
+        if (added > 0) {
+            jdbcTemplate.update("UPDATE " + tables.externalSubjects() + " SET auth_version = auth_version + 1 "
+                    + "WHERE subject IN (SELECT g.subject FROM " + tables.externalGrants() + " g JOIN " + tables.roles()
+                    + " r ON r.id = g.role_id WHERE r.code = 'administrator')");
+        }
+    }
+
     public int bootstrapAdministrator(String passwordHash, Collection<String> permissionCodes) {
         Object administratorUserId = uuidStorage.parameter(UUID.randomUUID());
         UUID administratorRoleId = UUID.randomUUID();

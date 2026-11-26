@@ -78,7 +78,7 @@ public final class OidcLocalUserAuthenticationSuccessHandler implements Authenti
         }
         try {
             return identityMapper.map(identityFactory.from(oidcUser))
-                    .flatMap(currentUser -> accountLookup.findByUserId(currentUser.userId()))
+                    .flatMap(currentUser -> accountLookup.findByUserId(java.util.UUID.fromString(currentUser.subject().value())))
                     .filter(io.github.huahill.vadmin.contracts.auth.LocalUserAccount::enabled);
         } catch (RuntimeException exception) {
             return java.util.Optional.empty();

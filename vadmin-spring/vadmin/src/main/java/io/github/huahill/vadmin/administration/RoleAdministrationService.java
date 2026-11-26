@@ -75,7 +75,7 @@ public class RoleAdministrationService {
     }
 
     private static AuditEvent event(CurrentUser actor, String action, String type, UUID id, Map<String, String> metadata) {
-        return new AuditEvent(actor.userId(), action, type, id.toString(), AuditOutcome.SUCCESS,
+        return new AuditEvent(actor.subject().value(), action, type, id.toString(), AuditOutcome.SUCCESS,
                 Instant.now(), null, metadata);
     }
 }

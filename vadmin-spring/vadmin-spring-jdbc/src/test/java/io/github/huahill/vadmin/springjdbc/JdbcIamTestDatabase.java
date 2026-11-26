@@ -21,9 +21,14 @@ final class JdbcIamTestDatabase {
                 + ", PRIMARY KEY(user_id, role_id))");
         jdbc.execute("CREATE TABLE " + tables.rolePermissions() + " (role_id " + id + ", permission_id " + id
                 + ", PRIMARY KEY(role_id, permission_id))");
-        jdbc.execute("CREATE TABLE " + tables.audit() + " (id " + id + ", actor_user_id " + id + ", action_code VARCHAR(120), "
+        String actor = format == UuidStorage.STRING ? "VARCHAR(190)" : id;
+        jdbc.execute("CREATE TABLE " + tables.audit() + " (id " + id + ", actor_user_id " + actor + ", action_code VARCHAR(120), "
                 + "target_type VARCHAR(120), target_id VARCHAR(255), outcome VARCHAR(16), occurred_at TIMESTAMP, "
                 + "correlation_id VARCHAR(64), metadata " + (format == UuidStorage.NATIVE ? "JSONB" : "TEXT") + ")");
+        jdbc.execute("CREATE TABLE " + tables.externalSubjects()
+                + " (subject VARCHAR(190) PRIMARY KEY, label VARCHAR(255) NOT NULL, auth_version BIGINT NOT NULL)");
+        jdbc.execute("CREATE TABLE " + tables.externalGrants()
+                + " (subject VARCHAR(190) NOT NULL, role_id " + id + " NOT NULL, PRIMARY KEY(subject, role_id))");
         return jdbc;
     }
 }

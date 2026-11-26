@@ -1,6 +1,8 @@
 package io.github.huahill.vadmin.springjdbc;
 
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
+import io.github.huahill.vadmin.contracts.auth.SubjectId;
+import io.github.huahill.vadmin.platform.access.ExternalGrantStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -30,15 +32,17 @@ final class JdbcIamInitializer implements CommandLineRunner {
     private final PermissionCatalog permissionCatalog;
     private final Environment environment;
     private final TransactionOperations transactions;
+    private final ExternalGrantStore externalGrants;
 
     JdbcIamInitializer(JdbcIamStore iamStore, PasswordEncoder passwordEncoder,
                          PermissionCatalog permissionCatalog, Environment environment,
-                         TransactionOperations transactions) {
+                         TransactionOperations transactions, ExternalGrantStore externalGrants) {
         this.iamStore = Objects.requireNonNull(iamStore);
         this.passwordEncoder = Objects.requireNonNull(passwordEncoder);
         this.permissionCatalog = Objects.requireNonNull(permissionCatalog);
         this.environment = Objects.requireNonNull(environment);
         this.transactions = Objects.requireNonNull(transactions);
+        this.externalGrants = externalGrants;
     }
 
     @Override
@@ -52,7 +56,8 @@ final class JdbcIamInitializer implements CommandLineRunner {
             // Another replica may have committed the first admin while this transaction waited.
             // Retry in a fresh transaction so the winning account is visible and never reset.
             transactions.executeWithoutResult(status -> {
-                if (!iamStore.hasAnyUser()) {
+                boolean ready = externalGrants == null ? iamStore.hasAnyUser() : externalGrants.hasAdministrator();
+                if (!ready) {
                     throw concurrentBootstrap;
                 }
                 initialize(codes);
@@ -62,6 +67,10 @@ final class JdbcIamInitializer implements CommandLineRunner {
 
     private void initialize(List<String> codes) {
         iamStore.synchronizePermissions(codes);
+        if (externalGrants != null) {
+            initializeExternal(codes);
+            return;
+        }
         if (iamStore.hasAnyUser()) {
             int granted = iamStore.grantMissingPermissionsToAdministrator(codes);
             if (granted > 0) {
@@ -71,6 +80,22 @@ final class JdbcIamInitializer implements CommandLineRunner {
         }
         int granted = iamStore.bootstrapAdministrator(passwordEncoder.encode(bootstrapPassword()), codes);
         LOG.info("Bootstrapped the initial 'admin' account with the 'administrator' role and {} permissions.", granted);
+    }
+
+    private void initializeExternal(List<String> codes) {
+        iamStore.ensureAdministratorRole(codes);
+        for (String subject : bootstrapSubjects()) {
+            externalGrants.ensureAdministrator(SubjectId.of(subject));
+        }
+        if (!externalGrants.hasAdministrator()) {
+            throw new IllegalStateException(
+                    "vadmin.identity.bootstrap-subjects must name the initial administrator when external identity is enabled");
+        }
+    }
+
+    private List<String> bootstrapSubjects() {
+        String configured = environment.getProperty("vadmin.identity.bootstrap-subjects", "");
+        return Arrays.stream(configured.split(",")).map(String::strip).filter(value -> !value.isEmpty()).toList();
     }
 
     private String bootstrapPassword() {

@@ -47,6 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Layout
 @PermitAll
 @Uses(UsersView.class)
+@Uses(ExternalGrantsView.class)
 @Uses(RolesView.class)
 @Uses(PermissionsView.class)
 @Uses(AuditView.class)

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.vaadin.flow.spring.security.VaadinDefaultRequestCache;
 import com.vaadin.flow.spring.security.VaadinSavedRequestAwareAuthenticationSuccessHandler;
+import io.github.huahill.vadmin.contracts.auth.ExternalAccessResolver;
 import io.github.huahill.vadmin.contracts.auth.ExternalIdentityMapper;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.springsecurity.auth.DiscardingOAuth2AuthorizedClientRepository;
@@ -37,7 +38,7 @@ class SpringSecurityConfigurationTest {
     @Test
     void keepsPasswordLoginWhenNoClientRegistrationExists() {
         var availability = configuration.oidcLoginAvailability(this.<ClientRegistrationRepository>provider(),
-                this.<ExternalIdentityMapper>provider(), defaultProperties());
+                this.<ExternalIdentityMapper>provider(), defaultProperties(), this.<ExternalAccessResolver>provider());
 
         assertThat(availability.isAvailable()).isFalse();
         assertThat(availability.registrationId()).isEqualTo("oidc");
@@ -46,7 +47,7 @@ class SpringSecurityConfigurationTest {
     @Test
     void exposesOidcOnlyForAConfiguredClientAndUniqueMapper() {
         var availability = configuration.oidcLoginAvailability(provider(registrationRepository()),
-                provider((ExternalIdentityMapper) identity -> java.util.Optional.empty()), defaultProperties());
+                provider((ExternalIdentityMapper) identity -> java.util.Optional.empty()), defaultProperties(), this.<ExternalAccessResolver>provider());
 
         assertThat(availability.isAvailable()).isTrue();
         assertThat(availability.registrationId()).isEqualTo("oidc");
@@ -56,7 +57,7 @@ class SpringSecurityConfigurationTest {
     void usesTheConfiguredGenericRegistrationId() {
         var availability = configuration.oidcLoginAvailability(provider(registrationRepository("corp-sso")),
                 provider((ExternalIdentityMapper) identity -> java.util.Optional.empty()),
-                new OidcLoginProperties("corp-sso"));
+                new OidcLoginProperties("corp-sso"), this.<ExternalAccessResolver>provider());
 
         assertThat(availability.isAvailable()).isTrue();
         assertThat(availability.registrationId()).isEqualTo("corp-sso");
@@ -66,7 +67,7 @@ class SpringSecurityConfigurationTest {
     void rejectsAClientRegistrationWithoutAnIdentityMapper() {
         assertThatIllegalStateException().isThrownBy(() ->
                         configuration.oidcLoginAvailability(provider(registrationRepository()),
-                                this.<ExternalIdentityMapper>provider(), defaultProperties()))
+                                this.<ExternalIdentityMapper>provider(), defaultProperties(), this.<ExternalAccessResolver>provider()))
                 .withMessageContaining("ExternalIdentityMapper")
                 .withMessageNotContaining("secret");
     }
@@ -78,7 +79,7 @@ class SpringSecurityConfigurationTest {
 
         assertThatIllegalStateException().isThrownBy(() ->
                         configuration.oidcLoginAvailability(provider(registrationRepository()), provider(first, second),
-                                defaultProperties()))
+                                defaultProperties(), this.<ExternalAccessResolver>provider()))
                 .withMessageContaining("exactly one")
                 .withMessageNotContaining("secret");
     }

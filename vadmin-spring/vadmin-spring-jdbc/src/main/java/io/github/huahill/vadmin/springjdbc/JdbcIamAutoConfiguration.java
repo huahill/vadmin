@@ -2,11 +2,14 @@ package io.github.huahill.vadmin.springjdbc;
 
 import io.github.huahill.vadmin.contracts.audit.AuditMetadataRedactor;
 import io.github.huahill.vadmin.contracts.audit.AuditSink;
+import io.github.huahill.vadmin.contracts.auth.ExternalAccessResolver;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.contracts.auth.LocalUserSessionLookup;
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
+import io.github.huahill.vadmin.platform.access.ExternalGrantStore;
 import io.github.huahill.vadmin.platform.administration.AdministrationStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -47,8 +50,30 @@ public class JdbcIamAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "local", matchIfMissing = true)
     LocalUserSessionLookup localUserSessionLookup(JdbcTemplate jdbc, JdbcIamProperties properties) {
         return new JdbcLocalUserSessionLookup(jdbc, properties.getTablePrefix(), properties.getUuidStorage());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ExternalGrantStore.class)
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "external")
+    ExternalGrantStore externalGrantStore(JdbcTemplate jdbc, JdbcIamProperties properties) {
+        return new JdbcExternalGrantStore(jdbc, properties.getTablePrefix(), properties.getUuidStorage());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "external")
+    LocalUserSessionLookup externalUserSessionLookup(ExternalGrantStore grants) {
+        return new JdbcExternalSessionLookup(grants);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ExternalAccessResolver.class)
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "external")
+    ExternalAccessResolver externalAccessResolver(ExternalGrantStore grants) {
+        return new JdbcExternalAccessResolver(grants);
     }
 
     @Bean
@@ -69,8 +94,10 @@ public class JdbcIamAutoConfiguration {
     @ConditionalOnMissingBean(name = "jdbcIamInitializer")
     CommandLineRunner jdbcIamInitializer(JdbcTemplate jdbc, JdbcIamProperties properties,
                                          PasswordEncoder passwords, PermissionCatalog catalog,
-                                         Environment environment, PlatformTransactionManager transactionManager) {
+                                         Environment environment, PlatformTransactionManager transactionManager,
+                                         ObjectProvider<ExternalGrantStore> externalGrants) {
         return new JdbcIamInitializer(new JdbcIamStore(jdbc, properties.getTablePrefix(), properties.getUuidStorage()),
-                passwords, catalog, environment, new TransactionTemplate(transactionManager));
+                passwords, catalog, environment, new TransactionTemplate(transactionManager),
+                externalGrants.getIfAvailable());
     }
 }

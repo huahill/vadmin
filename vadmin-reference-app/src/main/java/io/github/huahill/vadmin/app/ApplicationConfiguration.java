@@ -96,7 +96,7 @@ public class ApplicationConfiguration {
                         .setParameter("permissionId", permissionId)
                         .executeUpdate();
             }
-            auditSink.append(new AuditEvent(administratorId, "system:bootstrap:create", "user", administratorId.toString(),
+            auditSink.append(new AuditEvent(administratorId.toString(), "system:bootstrap:create", "user", administratorId.toString(),
                     AuditOutcome.SUCCESS, Instant.now(), correlationIdProvider.currentCorrelationId(), Map.of("bootstrap", "true")));
         });
     }

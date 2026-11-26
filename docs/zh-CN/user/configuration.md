@@ -8,7 +8,7 @@
 
 | 属性 | 默认值 | 用途 |
 | --- | --- | --- |
-| `vadmin.brand.name` | `VAdmin` | 外壳品牌区展示的产品名称，留空回退默认值。 |
+| `vadmin.brand.name` | `VAdmin` | 登录页和外壳品牌区展示的产品名称，留空回退默认值。 |
 | `vadmin.shell.workplace-enabled` | `true` | 显示或隐藏内置的工作台首页入口。 |
 
 ```yaml

@@ -54,7 +54,7 @@ class JpaAuditSinkTest {
                 .setParameter("passwordHash", "not-a-real-password")
                 .executeUpdate();
 
-        auditSink.append(new AuditEvent(actorId, "system:role:grant", "role", "operator", AuditOutcome.SUCCESS,
+        auditSink.append(new AuditEvent(actorId.toString(), "system:role:grant", "role", "operator", AuditOutcome.SUCCESS,
                 Instant.parse("2026-08-05T00:00:00Z"), "test-correlation",
                 Map.of("requestId", "safe", "accessToken", "must-not-persist")));
         entityManager.flush();

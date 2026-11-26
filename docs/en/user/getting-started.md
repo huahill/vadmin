@@ -114,7 +114,7 @@ APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 Open `http://localhost:8080` and sign in as `admin`. That is the complete
 baseline — no shell, theme, or system pages to build.
 
-Optionally set the product name shown in the shell without replacing the
+Optionally set the product name shown on the login page and in the shell without replacing the
 layout:
 
 ```yaml

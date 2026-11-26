@@ -34,9 +34,16 @@ public final class JdbcAuditSink implements AuditSink {
                              occurred_at, correlation_id, metadata)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, %s)
                         """.formatted(tables.audit(), uuidStorage == UuidStorage.NATIVE ? "CAST(? AS JSONB)" : "?"),
-                uuidStorage.parameter(UUID.randomUUID()), uuidStorage.parameter(event.actorUserId()), event.actionCode(),
+                uuidStorage.parameter(UUID.randomUUID()), actorParameter(event.actorSubject()), event.actionCode(),
                 event.targetType(), event.targetId(), event.outcome().name(),
                 Timestamp.from(event.occurredAt()), event.correlationId(),
                 json.writeValueAsString(redactor.redact(event.metadata())));
+    }
+
+    private Object actorParameter(String actorSubject) {
+        if (uuidStorage == UuidStorage.NATIVE) {
+            return uuidStorage.parameter(UUID.fromString(actorSubject));
+        }
+        return actorSubject;
     }
 }

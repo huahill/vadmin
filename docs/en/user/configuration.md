@@ -9,7 +9,7 @@ required; everything else has a working default.
 
 | Property | Default | Purpose |
 | --- | --- | --- |
-| `vadmin.brand.name` | `VAdmin` | Product name shown in the shell brand area. Blank values fall back to the default. |
+| `vadmin.brand.name` | `VAdmin` | Product name shown on the login page and in the shell brand area. Blank values fall back to the default. |
 | `vadmin.shell.workplace-enabled` | `true` | Shows or hides the built-in workplace home entry. |
 
 ```yaml

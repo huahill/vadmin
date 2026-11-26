@@ -2,6 +2,7 @@ package io.github.huahill.vadmin.springsecurity.ui;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
@@ -15,6 +16,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinServletResponse;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import io.github.huahill.vadmin.brand.AdminBrandProperties;
+import io.github.huahill.vadmin.springsecurity.LocalLoginAvailability;
 import io.github.huahill.vadmin.springsecurity.OidcLoginAvailability;
 import io.github.huahill.vadmin.springsecurity.auth.LocalLoginAuthenticator;
 
@@ -24,36 +27,59 @@ public final class LoginView extends com.vaadin.flow.component.orderedlayout.Ver
     private final Span deniedMessage = new Span();
     private final LoginOverlay login = new LoginOverlay();
     private final Anchor oidcLogin;
+    private final boolean localLogin;
+    private final String productName;
 
-    public LoginView(OidcLoginAvailability oidcLoginAvailability, LocalLoginAuthenticator localLoginAuthenticator) {
-        login.addLoginListener(event -> authenticateLocally(event, localLoginAuthenticator));
+    public LoginView(OidcLoginAvailability oidcLoginAvailability, LocalLoginAuthenticator localLoginAuthenticator,
+                     LocalLoginAvailability localLoginAvailability, AdminBrandProperties brand) {
+        localLogin = localLoginAvailability.available();
+        productName = brand.getName();
+        if (localLogin) {
+            login.addLoginListener(event -> authenticateLocally(event, localLoginAuthenticator));
+        }
         oidcLogin = oidcLoginAvailability.isAvailable()
                 ? new Anchor(oidcAuthorizationUrl(oidcLoginAvailability.registrationId())) : null;
         if (oidcLogin != null) {
             oidcLogin.getElement().setAttribute("router-ignore", true);
         }
         deniedMessage.setVisible(false);
-        login.getCustomFormArea().add(deniedMessage);
-        if (oidcLogin != null) login.getFooter().add(oidcLogin);
-        add(login);
+        if (localLogin) {
+            login.getCustomFormArea().add(deniedMessage);
+            if (oidcLogin != null) {
+                login.getFooter().add(oidcLogin);
+            }
+            add(login);
+        } else {
+            add(new H1(productName));
+            add(deniedMessage);
+            if (oidcLogin != null) {
+                add(oidcLogin);
+            }
+        }
         updateText();
     }
     @Override protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        login.setOpened(true);
+        if (localLogin) {
+            login.setOpened(true);
+        }
     }
     @Override public void beforeEnter(BeforeEnterEvent event) {
         var errors = event.getLocation().getQueryParameters().getParameters()
                 .getOrDefault("error", java.util.List.of());
         var denied = errors.contains("access-denied");
         deniedMessage.setVisible(denied);
-        login.setError(!errors.isEmpty() && !denied);
+        if (localLogin) {
+            login.setError(!errors.isEmpty() && !denied);
+        }
         if (denied) deniedMessage.setText(getTranslation("flow.login.denied"));
     }
     @Override public void localeChange(LocaleChangeEvent event) { updateText(); updateBrowserTitle(); }
     @Override public String getPageTitle() { return getTranslation("flow.login.title"); }
     private void updateText() {
-        login.setI18n(loginI18n());
+        if (localLogin) {
+            login.setI18n(loginI18n());
+        }
         if (oidcLogin != null) oidcLogin.setText(getTranslation("flow.login.sso"));
         if (deniedMessage.isVisible()) deniedMessage.setText(getTranslation("flow.login.denied"));
     }
@@ -61,7 +87,7 @@ public final class LoginView extends com.vaadin.flow.component.orderedlayout.Ver
     private LoginI18n loginI18n() {
         var i18n = LoginI18n.createDefault();
         var header = new LoginI18n.Header();
-        header.setTitle(getTranslation("flow.login.heading"));
+        header.setTitle(productName);
         header.setDescription("");
         i18n.setHeader(header);
         i18n.getForm().setTitle(getTranslation("flow.login.form.title"));

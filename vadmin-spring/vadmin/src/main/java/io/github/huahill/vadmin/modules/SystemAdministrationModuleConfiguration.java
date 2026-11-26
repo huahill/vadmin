@@ -19,6 +19,7 @@ import io.github.huahill.vadmin.flow.navigation.AdminNavigationGroup;
 import io.github.huahill.vadmin.flow.navigation.AdminPage;
 import io.github.huahill.vadmin.localiam.ConditionalOnSystemAdministration;
 import io.github.huahill.vadmin.views.AuditView;
+import io.github.huahill.vadmin.views.ExternalGrantsView;
 import io.github.huahill.vadmin.views.PermissionsView;
 import io.github.huahill.vadmin.views.RolesView;
 import io.github.huahill.vadmin.views.UsersView;
@@ -28,6 +29,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -75,12 +77,25 @@ public class SystemAdministrationModuleConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "local", matchIfMissing = true)
     public AdminModule systemAdministration() {
+        return systemModule(page("system.users", "system.users.title", "system.users.intent", "users", 100, "users",
+                UsersView.REQUIRED_PERMISSION, UsersView.class));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "external")
+    public AdminModule externalSystemAdministration() {
+        return systemModule(page("system.external-grants", "system.external-grants.title",
+                "system.external-grants.intent", "users", 100, "users",
+                ExternalGrantsView.REQUIRED_PERMISSION, ExternalGrantsView.class));
+    }
+
+    private AdminModule systemModule(AdminPage usersPage) {
         return AdminModule.of("system",
                 List.of(new AdminNavigationGroup("system", "system.navigation", 100)),
                 List.of(
-                        page("system.users", "system.users.title", "system.users.intent", "users", 100, "users",
-                                UsersView.REQUIRED_PERMISSION, UsersView.class),
+                        usersPage,
                         page("system.roles", "system.roles.title", "system.roles.intent", "shield", 200, "roles",
                                 RolesView.REQUIRED_PERMISSION, RolesView.class),
                         page("system.permissions", "system.permissions.title", "system.permissions.intent", "key", 300,

@@ -9,7 +9,7 @@ record JdbcIamTables(String prefix) {
         if (!prefix.endsWith("_")) {
             prefix += "_";
         }
-        if (prefix.length() + "role_permissions".length() > 63) {
+        if (prefix.length() + "external_subjects".length() > 63) {
             throw new IllegalArgumentException("IAM table prefix exceeds the 63-character identifier limit");
         }
     }
@@ -20,4 +20,6 @@ record JdbcIamTables(String prefix) {
     String userRoles() { return prefix + "user_roles"; }
     String rolePermissions() { return prefix + "role_permissions"; }
     String audit() { return prefix + "audit_entries"; }
+    String externalSubjects() { return prefix + "external_subjects"; }
+    String externalGrants() { return prefix + "external_grants"; }
 }

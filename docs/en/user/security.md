@@ -74,6 +74,20 @@ in one transaction. Missing credentials fail initialization outside the `dev` pr
 `dev` alone falls back to `change-me`. Existing accounts are never reset. Later starts
 grant newly declared permissions to the administrator role and invalidate affected sessions.
 
+## External Identity
+
+Set `vadmin.identity.mode=external` to hand login to the configured OIDC client.
+VAdmin no longer uses local passwords and does not copy external users into local accounts.
+Roles and permission codes still decide which pages are visible. The grants page selects
+people from the external directory and stores only the external subject and its roles.
+Set `vadmin.identity.bootstrap-subjects` to the initial administrators' subject identifiers,
+separated by commas. Startup fails when none are configured.
+Role changes require existing sessions to sign in again. A person with no grant can sign in
+but sees no protected pages.
+
+Local accounts remain the default. Optional OIDC that maps an external identity onto an
+existing local account does not replace external mode.
+
 ## OIDC (Optional)
 
 VAdmin supports optional standard OIDC authorization-code login through

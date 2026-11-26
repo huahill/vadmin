@@ -51,7 +51,7 @@ public class UserAdministrationService {
             throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
                     Map.of("username", "already-exists"));
         }
-        auditSink.append(new AuditEvent(actor.userId(), "system:user:create", "user", userId.toString(),
+        auditSink.append(new AuditEvent(actor.subject().value(), "system:user:create", "user", userId.toString(),
                 AuditOutcome.SUCCESS, Instant.now(), null, Map.of()));
     }
 
@@ -72,7 +72,7 @@ public class UserAdministrationService {
                 throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("user", "last-administrator"));
             }
             store.setEnabled(userId, enabled);
-            auditSink.append(new AuditEvent(actor.userId(), "system:user:update", "user", userId.toString(),
+            auditSink.append(new AuditEvent(actor.subject().value(), "system:user:update", "user", userId.toString(),
                     AuditOutcome.SUCCESS, Instant.now(), null, Map.of("enabled", Boolean.toString(enabled))));
         });
     }

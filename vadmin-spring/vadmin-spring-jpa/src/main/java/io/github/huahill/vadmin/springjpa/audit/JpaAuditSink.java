@@ -18,7 +18,7 @@ public final class JpaAuditSink implements AuditSink {
     @Override
     public void append(AuditEvent event) {
         entityManager.persist(new JpaAuditEntryEntity(
-                UUID.randomUUID(), event.actorUserId(), event.actionCode(), event.targetType(), event.targetId(),
+                UUID.randomUUID(), UUID.fromString(event.actorSubject()), event.actionCode(), event.targetType(), event.targetId(),
                 event.outcome(), event.occurredAt(), event.correlationId(), redactor.redact(event.metadata())));
     }
 }

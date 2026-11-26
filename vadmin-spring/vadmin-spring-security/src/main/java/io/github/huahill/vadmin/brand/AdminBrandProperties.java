@@ -3,7 +3,7 @@ package io.github.huahill.vadmin.brand;
 import java.io.Serializable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/// 定义默认管理外壳显示的产品名称。
+/// 定义宿主产品名称。登录页和默认外壳都显示这个名称。
 ///
 /// 此配置只表达宿主应用的产品身份，不改变 Vaadin Aura 的视觉语言或组件样式。
 @ConfigurationProperties("vadmin.brand")

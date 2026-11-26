@@ -67,7 +67,7 @@ class MySqlVarchar36IdentityTest {
                 .extracting(session -> session.userId())
                 .isEqualTo(USER_ID);
 
-        audit.append(new AuditEvent(USER_ID, "user.enabled", "user", USER_ID.toString(), AuditOutcome.SUCCESS,
+        audit.append(new AuditEvent(USER_ID.toString(), "user.enabled", "user", USER_ID.toString(), AuditOutcome.SUCCESS,
                 Instant.parse("2026-11-17T02:00:00Z"), "corr-1", Map.of()));
         entityManager.flush();
         Object storedId = entityManager.createNativeQuery(

@@ -82,7 +82,7 @@ class JdbcIdentityContractsTest {
         var jdbc = JdbcIamTestDatabase.create(format, "ci");
         var sink = new JdbcAuditSink(jdbc, "CI_", format, new AuditMetadataRedactor());
         UUID actor = UUID.randomUUID();
-        var event = new AuditEvent(actor, "system:user:create", "user", "operator", AuditOutcome.SUCCESS,
+        var event = new AuditEvent(actor.toString(), "system:user:create", "user", "operator", AuditOutcome.SUCCESS,
                 Instant.parse("2026-10-19T00:00:00Z"), "trace",
                 Map.of("description", "中文\n\"quoted\"\\value", "password", "must-not-persist"));
         sink.append(event);

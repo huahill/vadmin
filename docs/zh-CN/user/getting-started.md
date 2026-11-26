@@ -102,7 +102,7 @@ APP_BOOTSTRAP_PASSWORD='replace-this-secret' ./mvnw -B -ntp spring-boot:run
 访问 `http://localhost:8080`，以 `admin` 登录。这就是完整的基线——无需构建外壳、
 主题或系统页面。
 
-可选地设置外壳中展示的产品名称，无需替换布局：
+可选地设置登录页和外壳中展示的产品名称，无需替换布局：
 
 ```yaml
 vadmin:

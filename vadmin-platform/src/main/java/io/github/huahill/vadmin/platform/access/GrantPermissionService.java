@@ -56,7 +56,7 @@ public final class GrantPermissionService implements GrantPermissionUseCase {
 
     private BusinessFailure failure(String field) { return new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of(field, "invalid")); }
     private AuditEvent event(CurrentUser actor, GrantPermissionCommand command, AuditOutcome outcome) {
-        return new AuditEvent(actor.userId(), GRANT_PERMISSION.value(), "role", command.roleCode(), outcome, Instant.now(),
+        return new AuditEvent(actor.subject().value(), GRANT_PERMISSION.value(), "role", command.roleCode(), outcome, Instant.now(),
                 correlationIdProvider.currentCorrelationId(), Map.of("permissionCode", command.permissionCode().value()));
     }
 }

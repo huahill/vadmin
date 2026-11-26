@@ -3,12 +3,15 @@ package io.github.huahill.vadmin.springsecurity;
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import com.vaadin.flow.spring.security.VaadinDefaultRequestCache;
 import com.vaadin.flow.spring.security.VaadinSavedRequestAwareAuthenticationSuccessHandler;
+import io.github.huahill.vadmin.brand.AdminBrandProperties;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.CurrentUserProvider;
+import io.github.huahill.vadmin.contracts.auth.ExternalAccessResolver;
 import io.github.huahill.vadmin.contracts.auth.ExternalIdentityMapper;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.contracts.auth.LocalUserSessionLookup;
 import io.github.huahill.vadmin.springsecurity.auth.AuthenticationVersionFilter;
+import io.github.huahill.vadmin.springsecurity.auth.ExternalAuthenticationSuccessHandler;
 import io.github.huahill.vadmin.springsecurity.auth.DiscardingOAuth2AuthorizedClientRepository;
 import io.github.huahill.vadmin.springsecurity.auth.LocalUserDetailsService;
 import io.github.huahill.vadmin.springsecurity.auth.LocalLoginAuthenticator;
@@ -21,6 +24,7 @@ import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -30,13 +34,14 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
-@EnableConfigurationProperties(OidcLoginProperties.class)
+@EnableConfigurationProperties({OidcLoginProperties.class, AdminBrandProperties.class})
 public class SpringSecurityConfiguration {
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -73,20 +78,32 @@ public class SpringSecurityConfiguration {
     }
 
     @Bean
+    LocalLoginAvailability localLoginAvailability(Environment environment) {
+        boolean external = "external".equalsIgnoreCase(environment.getProperty("vadmin.identity.mode", "local"));
+        return new LocalLoginAvailability(!external);
+    }
+
+    @Bean
     OidcLoginAvailability oidcLoginAvailability(
             ObjectProvider<ClientRegistrationRepository> registrations,
             ObjectProvider<ExternalIdentityMapper> identityMappers,
-            OidcLoginProperties properties) {
+            OidcLoginProperties properties,
+            ObjectProvider<ExternalAccessResolver> externalResolvers) {
         var registrationId = properties.registrationId();
         var registrationRepository = registrations.getIfAvailable();
+        boolean external = externalResolvers.getIfAvailable() != null;
+        if (external && registrationRepository == null) {
+            throw new IllegalStateException("External identity requires an OAuth2 client registration");
+        }
         if (registrationRepository == null) {
             return new OidcLoginAvailability(false, registrationId);
         }
-
-        List<ExternalIdentityMapper> mappers = identityMappers.orderedStream().toList();
-        if (mappers.size() != 1) {
-            throw new IllegalStateException("OIDC client registrations require exactly one ExternalIdentityMapper bean "
-                    + "to resolve external subjects to existing local users");
+        if (!external) {
+            List<ExternalIdentityMapper> mappers = identityMappers.orderedStream().toList();
+            if (mappers.size() != 1) {
+                throw new IllegalStateException("OIDC client registrations require exactly one ExternalIdentityMapper bean "
+                        + "to resolve external subjects to existing local users");
+            }
         }
         if (registrationRepository.findByRegistrationId(registrationId) == null) {
             throw new IllegalStateException("OIDC client registrations must include the default registration id '"
@@ -101,6 +118,7 @@ public class SpringSecurityConfiguration {
                                             LocalUserAccountLookup accountLookup,
                                             OidcLoginAvailability oidcLoginAvailability,
                                             ObjectProvider<ExternalIdentityMapper> identityMappers,
+                                            ObjectProvider<ExternalAccessResolver> externalResolvers,
                                             VaadinDefaultRequestCache requestCache) throws Exception {
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(new AuthenticationVersionFilter(sessionLookup), AuthorizationFilter.class);
@@ -109,17 +127,31 @@ public class SpringSecurityConfiguration {
                 .requestMatchers("/VAADIN/**").permitAll());
         http.with(VaadinSecurityConfigurer.vaadin(), configurer -> configurer.loginView(LoginView.class));
         if (oidcLoginAvailability.isAvailable()) {
-            var mapper = identityMappers.getIfUnique();
-            if (mapper == null) {
-                throw new IllegalStateException("OIDC login requires exactly one ExternalIdentityMapper bean");
+            var resolver = externalResolvers.getIfAvailable();
+            AuthenticationSuccessHandler successHandler;
+            if (resolver != null) {
+                successHandler = externalSuccessHandler(resolver, requestCache);
+            } else {
+                var mapper = identityMappers.getIfUnique();
+                if (mapper == null) {
+                    throw new IllegalStateException("OIDC login requires exactly one ExternalIdentityMapper bean");
+                }
+                successHandler = oidcSuccessHandler(mapper, accountLookup, requestCache);
             }
             http.oauth2Login(configurer -> configurer
                     .loginPage("/login")
                     .authorizedClientRepository(discardingAuthorizedClientRepository())
-                    .successHandler(oidcSuccessHandler(mapper, accountLookup, requestCache))
+                    .successHandler(successHandler)
                     .failureHandler(new OidcAccessDeniedFailureHandler()));
         }
         return http.build();
+    }
+
+    ExternalAuthenticationSuccessHandler externalSuccessHandler(ExternalAccessResolver resolver,
+                                                                VaadinDefaultRequestCache requestCache) {
+        var savedRequestHandler = new VaadinSavedRequestAwareAuthenticationSuccessHandler();
+        savedRequestHandler.setRequestCache(requestCache);
+        return new ExternalAuthenticationSuccessHandler(resolver, savedRequestHandler);
     }
 
     OidcLocalUserAuthenticationSuccessHandler oidcSuccessHandler(ExternalIdentityMapper identityMapper,
