@@ -2,6 +2,8 @@ package io.github.huahill.vadmin.springjdbc;
 
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.contracts.auth.SubjectId;
+import io.github.huahill.vadmin.contracts.auth.ExternalDirectory;
+import io.github.huahill.vadmin.contracts.auth.ExternalPerson;
 import io.github.huahill.vadmin.platform.access.ExternalGrantStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +35,25 @@ final class JdbcIamInitializer implements CommandLineRunner {
     private final Environment environment;
     private final TransactionOperations transactions;
     private final ExternalGrantStore externalGrants;
+    private final ExternalDirectory directory;
 
     JdbcIamInitializer(JdbcIamStore iamStore, PasswordEncoder passwordEncoder,
                          PermissionCatalog permissionCatalog, Environment environment,
                          TransactionOperations transactions, ExternalGrantStore externalGrants) {
+        this(iamStore, passwordEncoder, permissionCatalog, environment, transactions, externalGrants, null);
+    }
+
+    JdbcIamInitializer(JdbcIamStore iamStore, PasswordEncoder passwordEncoder,
+                         PermissionCatalog permissionCatalog, Environment environment,
+                         TransactionOperations transactions, ExternalGrantStore externalGrants,
+                         ExternalDirectory directory) {
         this.iamStore = Objects.requireNonNull(iamStore);
         this.passwordEncoder = Objects.requireNonNull(passwordEncoder);
         this.permissionCatalog = Objects.requireNonNull(permissionCatalog);
         this.environment = Objects.requireNonNull(environment);
         this.transactions = Objects.requireNonNull(transactions);
         this.externalGrants = externalGrants;
+        this.directory = directory;
     }
 
     @Override
@@ -84,8 +95,9 @@ final class JdbcIamInitializer implements CommandLineRunner {
 
     private void initializeExternal(List<String> codes) {
         iamStore.ensureAdministratorRole(codes);
-        for (String subject : bootstrapSubjects()) {
-            externalGrants.ensureAdministrator(SubjectId.of(subject));
+        for (String configured : bootstrapSubjects()) {
+            ExternalPerson person = resolveBootstrapPerson(configured);
+            externalGrants.ensureAdministrator(person.subject(), person.username());
         }
         if (!externalGrants.hasAdministrator()) {
             throw new IllegalStateException(
@@ -96,6 +108,33 @@ final class JdbcIamInitializer implements CommandLineRunner {
     private List<String> bootstrapSubjects() {
         String configured = environment.getProperty("vadmin.identity.bootstrap-subjects", "");
         return Arrays.stream(configured.split(",")).map(String::strip).filter(value -> !value.isEmpty()).toList();
+    }
+
+    private ExternalPerson resolveBootstrapPerson(String configured) {
+        if (directory == null) {
+            return new ExternalPerson(SubjectId.of(configured), configured, configured);
+        }
+        List<ExternalPerson> people;
+        try {
+            people = directory.search(configured);
+        } catch (RuntimeException failure) {
+            throw new IllegalStateException(
+                    "vadmin.identity.bootstrap-subjects could not resolve '" + configured + "'", failure);
+        }
+        List<ExternalPerson> byId = people.stream()
+                .filter(person -> person.subject().value().equals(configured))
+                .toList();
+        if (byId.size() == 1) {
+            return byId.getFirst();
+        }
+        List<ExternalPerson> byUsername = people.stream()
+                .filter(person -> person.username().equalsIgnoreCase(configured))
+                .toList();
+        if (byUsername.size() == 1) {
+            return byUsername.getFirst();
+        }
+        throw new IllegalStateException(
+                "vadmin.identity.bootstrap-subjects could not resolve '" + configured + "' to one person");
     }
 
     private String bootstrapPassword() {

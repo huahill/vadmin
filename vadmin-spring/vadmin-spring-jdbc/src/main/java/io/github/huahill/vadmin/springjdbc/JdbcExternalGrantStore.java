@@ -101,13 +101,18 @@ public final class JdbcExternalGrantStore implements ExternalGrantStore {
 
     @Override
     public void ensureAdministrator(SubjectId subject) {
+        ensureAdministrator(subject, subject.value());
+    }
+
+    @Override
+    public void ensureAdministrator(SubjectId subject, String label) {
         List<String> roleIds = jdbc.queryForList(
                 "SELECT id FROM " + tables.roles() + " WHERE code = 'administrator'", String.class);
         if (roleIds.isEmpty()) {
             throw new IllegalStateException("administrator role must exist before granting an external subject");
         }
         UUID roleId = UUID.fromString(roleIds.getFirst());
-        upsertSubject(subject, subject.value(), true);
+        upsertSubject(subject, label, true);
         int inserted = jdbc.update(
                 "INSERT INTO " + tables.externalGrants() + " (subject, role_id) "
                         + "SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM " + tables.externalGrants()

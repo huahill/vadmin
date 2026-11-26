@@ -3,6 +3,7 @@ package io.github.huahill.vadmin.springjdbc;
 import io.github.huahill.vadmin.contracts.audit.AuditMetadataRedactor;
 import io.github.huahill.vadmin.contracts.audit.AuditSink;
 import io.github.huahill.vadmin.contracts.auth.ExternalAccessResolver;
+import io.github.huahill.vadmin.contracts.auth.ExternalDirectory;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.contracts.auth.LocalUserSessionLookup;
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
@@ -95,9 +96,10 @@ public class JdbcIamAutoConfiguration {
     CommandLineRunner jdbcIamInitializer(JdbcTemplate jdbc, JdbcIamProperties properties,
                                          PasswordEncoder passwords, PermissionCatalog catalog,
                                          Environment environment, PlatformTransactionManager transactionManager,
-                                         ObjectProvider<ExternalGrantStore> externalGrants) {
+                                         ObjectProvider<ExternalGrantStore> externalGrants,
+                                         ObjectProvider<ExternalDirectory> directory) {
         return new JdbcIamInitializer(new JdbcIamStore(jdbc, properties.getTablePrefix(), properties.getUuidStorage()),
                 passwords, catalog, environment, new TransactionTemplate(transactionManager),
-                externalGrants.getIfAvailable());
+                externalGrants.getIfAvailable(), directory.getIfAvailable());
     }
 }

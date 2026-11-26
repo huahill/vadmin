@@ -80,8 +80,9 @@ Set `vadmin.identity.mode=external` to hand login to the configured OIDC client.
 VAdmin no longer uses local passwords and does not copy external users into local accounts.
 Roles and permission codes still decide which pages are visible. The grants page selects
 people from the external directory and stores only the external subject and its roles.
-Set `vadmin.identity.bootstrap-subjects` to the initial administrators' subject identifiers,
-separated by commas. Startup fails when none are configured.
+Set `vadmin.identity.bootstrap-subjects` to the initial administrators' login names,
+separated by commas. Startup resolves each name through the external directory and stores
+only the stable subject. It fails when a name is missing, ambiguous, or resolves to nobody.
 Role changes require existing sessions to sign in again. A person with no grant can sign in
 but sees no protected pages.
 

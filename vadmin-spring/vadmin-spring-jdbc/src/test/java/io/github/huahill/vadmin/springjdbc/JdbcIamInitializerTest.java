@@ -2,6 +2,9 @@ package io.github.huahill.vadmin.springjdbc;
 
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
+import io.github.huahill.vadmin.contracts.auth.ExternalDirectory;
+import io.github.huahill.vadmin.contracts.auth.ExternalPerson;
+import io.github.huahill.vadmin.contracts.auth.SubjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
@@ -12,6 +15,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.mock.env.MockEnvironment;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -152,5 +156,52 @@ class JdbcIamInitializerTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_users", Long.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_roles", Long.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_user_roles", Long.class)).isEqualTo(1);
+    }
+
+    @Test
+    void should_resolveABootstrapLoginNameToTheExternalSubject() {
+        var environment = new MockEnvironment().withProperty("vadmin.identity.bootstrap-subjects", "HuangX10");
+        ExternalDirectory directory = query -> List.of(
+                new ExternalPerson(SubjectId.of("someone-else"), "other", "其他"),
+                new ExternalPerson(SubjectId.of("user-480"), "huangx10", "黄校"));
+        var runner = externalInitializer(environment, directory);
+
+        runner.run();
+
+        assertThat(jdbc.queryForObject("SELECT subject FROM vadmin_external_subjects", String.class)).isEqualTo("user-480");
+        assertThat(jdbc.queryForObject("SELECT label FROM vadmin_external_subjects", String.class)).isEqualTo("huangx10");
+        assertThat(jdbc.queryForObject(
+                "SELECT r.code FROM vadmin_external_grants g JOIN vadmin_roles r ON r.id = g.role_id", String.class))
+                .isEqualTo("administrator");
+    }
+
+    @Test
+    void should_keepABootstrapSubjectIdWhenTheDirectoryReturnsThatPerson() {
+        var environment = new MockEnvironment().withProperty("vadmin.identity.bootstrap-subjects", "user-480");
+        ExternalDirectory directory = query -> List.of(
+                new ExternalPerson(SubjectId.of("user-480"), "huangx10", "黄校"));
+        externalInitializer(environment, directory).run();
+
+        assertThat(jdbc.queryForObject("SELECT subject FROM vadmin_external_subjects", String.class)).isEqualTo("user-480");
+        assertThat(jdbc.queryForObject("SELECT label FROM vadmin_external_subjects", String.class)).isEqualTo("huangx10");
+    }
+
+    @Test
+    void should_rejectABootstrapLoginNameThatDoesNotIdentifyOnePerson() {
+        var environment = new MockEnvironment().withProperty("vadmin.identity.bootstrap-subjects", "huangx10");
+        ExternalDirectory directory = query -> List.of(
+                new ExternalPerson(SubjectId.of("one"), "huangx10", "黄校"),
+                new ExternalPerson(SubjectId.of("two"), "HuangX10", "另一人"));
+
+        assertThatThrownBy(externalInitializer(environment, directory)::run)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("huangx10");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_external_subjects", Long.class)).isZero();
+    }
+
+    private JdbcIamInitializer externalInitializer(MockEnvironment environment, ExternalDirectory directory) {
+        return new JdbcIamInitializer(new JdbcIamStore(jdbc, "vadmin", UuidStorage.STRING), mock(PasswordEncoder.class),
+                new PermissionCatalog(Set.of(PermissionCode.of("system:user:read"))), environment, transactions,
+                new JdbcExternalGrantStore(jdbc, "vadmin", UuidStorage.STRING), directory);
     }
 }

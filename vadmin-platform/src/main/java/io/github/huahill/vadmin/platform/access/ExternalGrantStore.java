@@ -22,6 +22,8 @@ public interface ExternalGrantStore {
 
     void ensureAdministrator(SubjectId subject);
 
+    void ensureAdministrator(SubjectId subject, String label);
+
     List<ExternalGrant> list();
 
     record ExternalAccess(Set<PermissionCode> permissions, long authVersion) {
