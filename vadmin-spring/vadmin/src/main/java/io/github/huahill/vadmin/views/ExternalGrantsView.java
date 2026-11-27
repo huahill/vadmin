@@ -58,6 +58,7 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
         this.grants = grants;
         this.roles = roles;
         assigned.addColumn(ExternalGrantStore.ExternalGrant::label).setHeader("").setAutoWidth(true);
+        assigned.addColumn(ExternalGrantStore.ExternalGrant::displayName).setHeader("").setAutoWidth(true);
         assigned.addColumn(grant -> grant.subject().value()).setHeader("").setAutoWidth(true);
         assigned.addColumn(grant -> String.join(", ", grant.roleCodes())).setHeader("").setAutoWidth(true);
         assigned.addComponentColumn(grant -> assignedActions(grant, authorization)).setAutoWidth(true);
@@ -95,9 +96,10 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
     private void updateText() {
         addAction.setText(getTranslation("system.external-grants.add"));
         addAction.setAriaLabel(getTranslation("system.external-grants.add"));
-        assigned.getColumns().get(0).setHeader(getTranslation("system.external-grants.person"));
-        assigned.getColumns().get(1).setHeader(getTranslation("system.external-grants.subject"));
-        assigned.getColumns().get(2).setHeader(getTranslation("system.external-grants.roles"));
+        assigned.getColumns().get(0).setHeader(getTranslation("system.external-grants.login"));
+        assigned.getColumns().get(1).setHeader(getTranslation("system.external-grants.name"));
+        assigned.getColumns().get(2).setHeader(getTranslation("system.external-grants.subject"));
+        assigned.getColumns().get(3).setHeader(getTranslation("system.external-grants.roles"));
     }
 
     private void openAdd() {
@@ -156,11 +158,7 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
     }
 
     private static String personLabel(ExternalPerson person) {
-        String name = person.displayName();
-        if (name == null || name.isBlank() || name.equals(person.username())) {
-            return person.username();
-        }
-        return name + " (" + person.username() + ")";
+        return person.accountLabel();
     }
 
     private void updateAddAvailability(EditorDialog dialog, ComboBox<ExternalPerson> people,

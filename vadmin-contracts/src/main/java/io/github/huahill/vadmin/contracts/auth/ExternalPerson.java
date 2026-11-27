@@ -9,4 +9,12 @@ public record ExternalPerson(SubjectId subject, String username, String displayN
         username = username.strip();
         displayName = displayName == null || displayName.isBlank() ? username : displayName.strip();
     }
+
+    /** Readable account shown to administrators: the name, and the login when they differ. */
+    public String accountLabel() {
+        if (displayName.equals(username)) {
+            return username;
+        }
+        return displayName + " (" + username + ")";
+    }
 }

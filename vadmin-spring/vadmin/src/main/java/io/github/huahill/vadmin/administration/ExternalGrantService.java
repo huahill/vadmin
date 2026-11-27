@@ -40,7 +40,50 @@ public class ExternalGrantService {
     }
 
     public List<ExternalGrantStore.ExternalGrant> grants() {
-        return store.list();
+        return store.list().stream().map(this::withDirectoryName).toList();
+    }
+
+    private ExternalGrantStore.ExternalGrant withDirectoryName(ExternalGrantStore.ExternalGrant grant) {
+        String login = loginOf(grant);
+        try {
+            return directory.search(lookupQuery(grant)).stream()
+                    .filter(person -> person.subject().equals(grant.subject())
+                            || person.username().equalsIgnoreCase(storedLogin(grant)))
+                    .findFirst()
+                    .map(person -> new ExternalGrantStore.ExternalGrant(
+                            grant.subject(), person.username(), person.displayName(), grant.authVersion(), grant.roleCodes()))
+                    .orElseGet(() -> unnamed(grant, login));
+        } catch (RuntimeException failure) {
+            return unnamed(grant, login);
+        }
+    }
+
+    private static ExternalGrantStore.ExternalGrant unnamed(ExternalGrantStore.ExternalGrant grant, String login) {
+        return new ExternalGrantStore.ExternalGrant(grant.subject(), login, "", grant.authVersion(), grant.roleCodes());
+    }
+
+    private static String loginOf(ExternalGrantStore.ExternalGrant grant) {
+        String login = storedLogin(grant);
+        return login.isBlank() ? grant.subject().value() : login;
+    }
+
+    private static String lookupQuery(ExternalGrantStore.ExternalGrant grant) {
+        String login = storedLogin(grant);
+        if (!login.isBlank()) {
+            return login;
+        }
+        return grant.subject().value();
+    }
+
+    private static String storedLogin(ExternalGrantStore.ExternalGrant grant) {
+        String label = grant.label() == null ? "" : grant.label().strip();
+        if (label.endsWith(")") && label.contains(" (")) {
+            return label.substring(label.lastIndexOf(" (") + 2, label.length() - 1).strip();
+        }
+        if (!label.isBlank() && !label.equals(grant.subject().value())) {
+            return label;
+        }
+        return "";
     }
 
     public List<ExternalPerson> search(String query) {

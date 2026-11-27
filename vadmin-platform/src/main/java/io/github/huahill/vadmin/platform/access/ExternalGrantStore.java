@@ -34,9 +34,10 @@ public interface ExternalGrantStore {
         }
     }
 
-    record ExternalGrant(SubjectId subject, String label, long authVersion, List<String> roleCodes) {
+    record ExternalGrant(SubjectId subject, String label, String displayName, long authVersion, List<String> roleCodes) {
         public ExternalGrant {
             roleCodes = List.copyOf(roleCodes);
+            displayName = displayName == null ? "" : displayName;
         }
     }
 }

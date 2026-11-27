@@ -149,7 +149,7 @@ public final class JdbcExternalGrantStore implements ExternalGrantStore {
             if (row.roleCode() != null) {
                 codes.add(row.roleCode());
             }
-            grouped.put(row.subject(), new ExternalGrant(SubjectId.of(row.subject()), row.label(), row.authVersion(), codes));
+            grouped.put(row.subject(), new ExternalGrant(SubjectId.of(row.subject()), row.label(), "", row.authVersion(), codes));
         }
         return List.copyOf(grouped.values());
     }
