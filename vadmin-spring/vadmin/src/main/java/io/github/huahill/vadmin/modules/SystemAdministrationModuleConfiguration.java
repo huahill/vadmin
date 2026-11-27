@@ -1,8 +1,11 @@
 package io.github.huahill.vadmin.modules;
 
+import io.github.huahill.vadmin.administration.ExternalGrantService;
+import io.github.huahill.vadmin.contracts.auth.ExternalDirectory;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
 import io.github.huahill.vadmin.contracts.auth.PermissionCatalog;
+import io.github.huahill.vadmin.platform.access.ExternalGrantStore;
 import io.github.huahill.vadmin.contracts.audit.AuditSink;
 import io.github.huahill.vadmin.contracts.audit.CorrelationIdProvider;
 import io.github.huahill.vadmin.platform.access.AccessControlRepository;
@@ -81,6 +84,15 @@ public class SystemAdministrationModuleConfiguration {
     public AdminModule systemAdministration() {
         return systemModule(page("system.users", "system.users.title", "system.users.intent", "users", 100, "users",
                 UsersView.REQUIRED_PERMISSION, UsersView.class));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "vadmin.identity", name = "mode", havingValue = "external")
+    @ConditionalOnBean({ExternalGrantStore.class, ExternalDirectory.class})
+    @ConditionalOnMissingBean
+    ExternalGrantService externalGrantService(ExternalGrantStore store, ExternalDirectory directory,
+                                              AuthorizationService authorization, AuditSink audit) {
+        return new ExternalGrantService(store, directory, authorization, audit);
     }
 
     @Bean

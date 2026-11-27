@@ -2,11 +2,17 @@ package io.github.huahill.vadmin.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.huahill.vadmin.administration.ExternalGrantService;
+import io.github.huahill.vadmin.contracts.audit.AuditSink;
+import io.github.huahill.vadmin.contracts.auth.AuthorizationService;
+import io.github.huahill.vadmin.contracts.auth.ExternalDirectory;
+import io.github.huahill.vadmin.platform.access.ExternalGrantStore;
 import io.github.huahill.vadmin.views.AuditView;
 import io.github.huahill.vadmin.views.PermissionsView;
 import io.github.huahill.vadmin.views.RolesView;
 import io.github.huahill.vadmin.views.UsersView;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -66,5 +72,26 @@ class SystemAdministrationModuleConfigurationTest {
                         () -> org.mockito.Mockito.mock(org.springframework.transaction.PlatformTransactionManager.class))
                 .run(application -> assertThat(application)
                         .hasSingleBean(io.github.huahill.vadmin.platform.access.GrantPermissionUseCase.class));
+    }
+
+    @Test
+    void registersExternalGrantServiceWhenTheHostSuppliesADirectory() {
+        externalIdentityContext()
+                .withBean(ExternalDirectory.class, () -> Mockito.mock(ExternalDirectory.class))
+                .run(application -> assertThat(application).hasSingleBean(ExternalGrantService.class));
+    }
+
+    @Test
+    void doesNotRegisterExternalGrantServiceWithoutADirectory() {
+        externalIdentityContext()
+                .run(application -> assertThat(application).doesNotHaveBean(ExternalGrantService.class));
+    }
+
+    private ApplicationContextRunner externalIdentityContext() {
+        return context.withPropertyValues("vadmin.local-iam.enabled=false", "vadmin.system-admin.enabled=true",
+                        "vadmin.identity.mode=external")
+                .withBean(ExternalGrantStore.class, () -> Mockito.mock(ExternalGrantStore.class))
+                .withBean(AuthorizationService.class, () -> Mockito.mock(AuthorizationService.class))
+                .withBean(AuditSink.class, () -> Mockito.mock(AuditSink.class));
     }
 }
