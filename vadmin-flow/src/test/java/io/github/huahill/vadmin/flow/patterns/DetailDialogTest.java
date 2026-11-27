@@ -17,6 +17,7 @@ class DetailDialogTest {
         assertThat(username.getElement().getTag()).isEqualTo("vaadin-form-item");
         assertThat(username.getLabel()).isEqualTo("Username");
         assertThat(username.getValue()).isEqualTo("ada");
+        assertThat(dialog.getForm().getColspan(username)).isEqualTo(2);
     }
 
     @Test

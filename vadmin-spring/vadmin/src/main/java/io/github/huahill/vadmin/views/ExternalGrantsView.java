@@ -136,8 +136,6 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
             }
         });
         dialog.addField(people, choices);
-        dialog.getForm().setColspan(people, 2);
-        dialog.getForm().setColspan(choices, 2);
         dialog.open();
     }
 

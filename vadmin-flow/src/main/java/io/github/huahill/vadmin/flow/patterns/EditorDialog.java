@@ -39,7 +39,16 @@ public final class EditorDialog extends AdminDialog {
     }
 
     public FormLayout getForm() { return form; }
-    public void addField(Component... fields) { form.add(fields); }
+
+    /** Places each field on its own full row. Pair related fields with {@link #addFormRow}. */
+    public void addField(Component... fields) {
+        form.add(fields);
+        for (Component field : fields) {
+            form.setColspan(field, 2);
+        }
+    }
+
+    /** Places fields that belong together on one row. This is the only pairing declaration. */
     public void addFormRow(Component... fields) { form.addFormRow(fields); }
     public Button getPrimaryAction() { return primaryAction(); }
     public Button getCancelAction() { return cancelAction(); }

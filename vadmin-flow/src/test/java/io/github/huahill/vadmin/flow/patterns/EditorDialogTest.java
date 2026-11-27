@@ -29,6 +29,19 @@ class EditorDialogTest {
 
         assertThat(saves).hasValue(1);
         assertThat(dialog.getForm().getChildren()).contains(username);
+        assertThat(dialog.getForm().getColspan(username)).isEqualTo(2);
+    }
+
+    @Test
+    void pairsOnlyFieldsDeclaredOnTheSameRow() {
+        var dialog = new EditorDialog("Grant permission", "Save", () -> { });
+        var role = new TextField("Role");
+        var permission = new TextField("Permission");
+
+        dialog.addFormRow(role, permission);
+
+        assertThat(dialog.getForm().getColspan(role)).isNotEqualTo(2);
+        assertThat(dialog.getForm().getColspan(permission)).isNotEqualTo(2);
     }
 
     @Test

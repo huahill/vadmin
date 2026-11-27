@@ -54,9 +54,11 @@ public final class DetailDialog extends AdminDialog {
         public String getValue() { return value.getText(); }
     }
 
+    /** One detail value on its own row. Group related values with {@link #addFormRow}. */
     public DetailField addField(String label, String value) {
         var field = new DetailField(label, value);
         form.add(field);
+        form.setColspan(field, 2);
         return field;
     }
 

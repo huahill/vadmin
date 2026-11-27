@@ -154,7 +154,7 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         });
         role.addValueChangeListener(event -> updateGrantAvailability(dialog, role, permission));
         permission.addValueChangeListener(event -> updateGrantAvailability(dialog, role, permission));
-        dialog.addField(role, permission);
+        dialog.addFormRow(role, permission);
         return dialog;
     }
 
@@ -187,7 +187,7 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
             updateRevokeAvailability(dialog, role, permission);
         });
         permission.addValueChangeListener(event -> updateRevokeAvailability(dialog, role, permission));
-        dialog.addField(role, permission);
+        dialog.addFormRow(role, permission);
         return dialog;
     }
 
