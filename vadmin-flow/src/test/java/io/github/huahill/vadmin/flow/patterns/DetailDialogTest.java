@@ -40,13 +40,13 @@ class DetailDialogTest {
     }
 
     @Test
-    void keepsResponsiveStepsForStableDetailRows() {
+    void expandsDetailRowsAcrossTheDialog() {
         var dialog = new DetailDialog("User details");
 
-        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isFalse();
-        assertThat(dialog.getForm().getElement().getPropertyRaw("responsiveSteps").toString())
-                .contains("40em")
-                .contains("\"columns\":2");
+        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isTrue();
+        assertThat(dialog.getForm().isExpandColumns()).isTrue();
+        assertThat(dialog.getForm().isExpandFields()).isTrue();
+        assertThat(dialog.getForm().getMaxColumns()).isEqualTo(2);
     }
 
     @Test

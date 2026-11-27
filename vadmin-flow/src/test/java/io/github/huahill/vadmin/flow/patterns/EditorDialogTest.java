@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 
 class EditorDialogTest {
     @Test
-    void keepsResponsiveStepsForStableFormRows() {
+    void expandsPairedRowsAcrossTheDialog() {
         var dialog = new EditorDialog("Create user", "Save", () -> { });
 
-        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isFalse();
-        assertThat(dialog.getForm().getElement().getPropertyRaw("responsiveSteps").toString())
-                .contains("40em")
-                .contains("\"columns\":2");
+        assertThat(dialog.getForm().getElement().getProperty("autoResponsive", false)).isTrue();
+        assertThat(dialog.getForm().isExpandColumns()).isTrue();
+        assertThat(dialog.getForm().isExpandFields()).isTrue();
+        assertThat(dialog.getForm().getMaxColumns()).isEqualTo(2);
     }
 
     @Test
