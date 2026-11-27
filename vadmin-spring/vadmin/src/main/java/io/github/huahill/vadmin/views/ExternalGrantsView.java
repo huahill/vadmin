@@ -1,6 +1,7 @@
 package io.github.huahill.vadmin.views;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -46,22 +47,15 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
 
     private final ExternalGrantService grants;
     private final AdministrationQueryService roles;
-    private final TextField query = new TextField();
-    private final Grid<ExternalPerson> people = new Grid<>();
     private final Grid<ExternalGrantStore.ExternalGrant> assigned = new Grid<>();
     private final OperationFeedback feedback = new OperationFeedback();
-    private final Button searchAction;
+    private final Button addAction;
 
     public ExternalGrantsView(CurrentUserProvider currentUser, AuthorizationService authorization,
                               ExternalGrantService grants, AdministrationQueryService roles) {
         super(currentUser, authorization);
         this.grants = grants;
         this.roles = roles;
-        query.setClearButtonVisible(true);
-        people.addColumn(ExternalPerson::username).setAutoWidth(true);
-        people.addColumn(ExternalPerson::displayName).setAutoWidth(true);
-        people.addComponentColumn(person -> grantAction(person, authorization, Set.of()));
-        people.setAllRowsVisible(true);
         assigned.addColumn(ExternalGrantStore.ExternalGrant::label).setHeader("").setAutoWidth(true);
         assigned.addColumn(grant -> grant.subject().value()).setHeader("").setAutoWidth(true);
         assigned.addColumn(grant -> String.join(", ", grant.roleCodes())).setHeader("").setAutoWidth(true);
@@ -70,10 +64,10 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
         assigned.setAllRowsVisible(true);
         var header = PageHeader.translated("system.external-grants.title", "system.external-grants.intent");
         var toolbar = new PageToolbar();
-        toolbar.addFilter(query);
-        searchAction = new Button(AdminIcon.of(AdminIconName.USERS), event -> search());
-        toolbar.setPrimaryAction(searchAction);
-        var workspace = new VerticalLayout(people, assigned);
+        addAction = new Button(AdminIcon.of(AdminIconName.ADD), event -> openAdd());
+        addAction.setVisible(authorization.hasPermission(requireCurrentUser(), ASSIGN));
+        toolbar.setPrimaryAction(addAction);
+        var workspace = new VerticalLayout(assigned);
         workspace.setPadding(false);
         workspace.setSizeFull();
         var frame = new AdminPageFrame(header, toolbar, workspace);
@@ -98,21 +92,64 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
     }
 
     private void updateText() {
-        query.setLabel(getTranslation("system.external-grants.search"));
-        searchAction.setText(getTranslation("system.external-grants.search-action"));
-        searchAction.setAriaLabel(getTranslation("system.external-grants.search-action"));
-        searchAction.setTooltipText(getTranslation("system.external-grants.search-action"));
+        addAction.setText(getTranslation("system.external-grants.add"));
+        addAction.setAriaLabel(getTranslation("system.external-grants.add"));
         assigned.getColumns().get(0).setHeader(getTranslation("system.external-grants.person"));
         assigned.getColumns().get(1).setHeader(getTranslation("system.external-grants.subject"));
         assigned.getColumns().get(2).setHeader(getTranslation("system.external-grants.roles"));
     }
 
-    private void search() {
-        try {
-            people.setItems(grants.search(query.getValue()));
-        } catch (RuntimeException failure) {
-            feedback.error(getTranslation("system.external-grants.search-failed"));
-        }
+    private void openAdd() {
+        var query = new TextField(getTranslation("system.external-grants.search"));
+        query.setClearButtonVisible(true);
+        var results = new ComboBox<ExternalPerson>(getTranslation("system.external-grants.person"));
+        results.setItemLabelGenerator(person -> person.displayName() + " (" + person.username() + ")");
+        results.setAllowCustomValue(false);
+        var choices = new MultiSelectComboBox<AdministrationQueryService.RoleRow>(
+                getTranslation("system.external-grants.roles"));
+        List<AdministrationQueryService.RoleRow> available = roles.roles();
+        choices.setItems(available);
+        choices.setItemLabelGenerator(AdministrationQueryService.RoleRow::code);
+        var dialog = EditorDialog.translated("system.external-grants.add", "system.users.save", () -> { });
+        dialog.getPrimaryAction().setEnabled(false);
+        var search = new Button(getTranslation("system.external-grants.search-action"), event -> {
+            try {
+                var found = grants.search(query.getValue());
+                results.setItems(found);
+                results.clear();
+                dialog.showValidationMessage(found.isEmpty()
+                        ? getTranslation("system.external-grants.add-empty") : "");
+            } catch (RuntimeException failure) {
+                dialog.showValidationMessage(getTranslation("system.external-grants.search-failed"));
+            }
+        });
+        results.addValueChangeListener(event -> updateAddAvailability(dialog, results, choices));
+        choices.addValueChangeListener(event -> updateAddAvailability(dialog, results, choices));
+        dialog.getPrimaryAction().addClickListener(event -> {
+            ExternalPerson person = results.getValue();
+            if (person == null || choices.getValue().isEmpty()) {
+                dialog.showValidationMessage(getTranslation("system.external-grants.add-required"));
+                return;
+            }
+            try {
+                grants.replaceRoles(requireCurrentUser(), person.subject(), person.username(),
+                        choices.getValue().stream().map(AdministrationQueryService.RoleRow::id).collect(Collectors.toSet()));
+                dialog.close();
+                refreshAssigned();
+                feedback.success(getTranslation("system.external-grants.saved"));
+            } catch (BusinessFailure failure) {
+                ViewBusinessFailureHandler.handle(failure, validation -> dialog.showValidationMessage(
+                        getTranslation("system.external-grants.invalid")));
+            }
+        });
+        dialog.addFormRow(query, search);
+        dialog.addField(results, choices);
+        dialog.open();
+    }
+
+    private void updateAddAvailability(EditorDialog dialog, ComboBox<ExternalPerson> results,
+                                       MultiSelectComboBox<AdministrationQueryService.RoleRow> choices) {
+        dialog.getPrimaryAction().setEnabled(results.getValue() != null && !choices.getValue().isEmpty());
     }
 
     private HorizontalLayout assignedActions(ExternalGrantStore.ExternalGrant grant, AuthorizationService authorization) {
