@@ -14,10 +14,18 @@ public final class JdbcAccessControlRepository implements AccessControlRepositor
     private final JdbcIamTables tables;
     private final UuidStorage uuids;
 
+    private final boolean externalIdentity;
+
     public JdbcAccessControlRepository(JdbcTemplate jdbc, String tablePrefix, UuidStorage uuids) {
+        this(jdbc, tablePrefix, uuids, false);
+    }
+
+    public JdbcAccessControlRepository(JdbcTemplate jdbc, String tablePrefix, UuidStorage uuids,
+                                       boolean externalIdentity) {
         this.jdbc = java.util.Objects.requireNonNull(jdbc);
         this.tables = new JdbcIamTables(tablePrefix);
         this.uuids = java.util.Objects.requireNonNull(uuids);
+        this.externalIdentity = externalIdentity;
     }
 
     @Override
@@ -45,6 +53,12 @@ public final class JdbcAccessControlRepository implements AccessControlRepositor
 
     @Override
     public void incrementAuthVersionForRole(UUID roleId) {
+        if (externalIdentity) {
+            jdbc.update("UPDATE " + tables.externalSubjects() + " SET auth_version = auth_version + 1 "
+                    + "WHERE subject IN (SELECT subject FROM " + tables.externalGrants() + " WHERE role_id = ?)",
+                    uuids.parameter(roleId));
+            return;
+        }
         jdbc.update("UPDATE " + tables.users() + " SET auth_version = auth_version + 1 WHERE id IN (SELECT user_id FROM "
                 + tables.userRoles() + " WHERE role_id = ?)", uuids.parameter(roleId));
     }

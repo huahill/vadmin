@@ -39,8 +39,11 @@ public class JdbcIamAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    AccessControlRepository accessControlRepository(JdbcTemplate jdbc, JdbcIamProperties properties) {
-        return new JdbcAccessControlRepository(jdbc, properties.getTablePrefix(), properties.getUuidStorage());
+    AccessControlRepository accessControlRepository(JdbcTemplate jdbc, JdbcIamProperties properties,
+                                                    Environment environment) {
+        boolean externalIdentity = "external".equalsIgnoreCase(environment.getProperty("vadmin.identity.mode", "local"));
+        return new JdbcAccessControlRepository(jdbc, properties.getTablePrefix(), properties.getUuidStorage(),
+                externalIdentity);
     }
 
     @Bean

@@ -98,4 +98,28 @@ class JdbcIdentityContractsTest {
         })).hasMessage("rollback");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ci_audit_entries", Long.class)).isEqualTo(1);
     }
+
+    @ParameterizedTest
+    @EnumSource(UuidStorage.class)
+    void bumpsExternalSubjectVersionsWithoutLocalAccountTables(UuidStorage format) {
+        var jdbc = JdbcIamTestDatabase.create(format, "ci");
+        var tables = new JdbcIamTables("ci");
+        jdbc.execute("DROP TABLE " + tables.userRoles());
+        jdbc.execute("DROP TABLE " + tables.users());
+        UUID role = UUID.randomUUID();
+        UUID other = UUID.randomUUID();
+        jdbc.update("INSERT INTO " + tables.roles() + " (id, code) VALUES (?, 'operators')", format.parameter(role));
+        jdbc.update("INSERT INTO " + tables.roles() + " (id, code) VALUES (?, 'readers')", format.parameter(other));
+        jdbc.update("INSERT INTO " + tables.externalSubjects() + " (subject, label, auth_version) VALUES ('huangx10', 'operator', 3)");
+        jdbc.update("INSERT INTO " + tables.externalSubjects() + " (subject, label, auth_version) VALUES ('other', 'reader', 1)");
+        jdbc.update("INSERT INTO " + tables.externalGrants() + " (subject, role_id) VALUES ('huangx10', ?)", format.parameter(role));
+        jdbc.update("INSERT INTO " + tables.externalGrants() + " (subject, role_id) VALUES ('other', ?)", format.parameter(other));
+
+        new JdbcAccessControlRepository(jdbc, "ci", format, true).incrementAuthVersionForRole(role);
+
+        assertThat(jdbc.queryForObject("SELECT auth_version FROM " + tables.externalSubjects() + " WHERE subject = 'huangx10'", Long.class))
+                .isEqualTo(4);
+        assertThat(jdbc.queryForObject("SELECT auth_version FROM " + tables.externalSubjects() + " WHERE subject = 'other'", Long.class))
+                .isEqualTo(1);
+    }
 }
