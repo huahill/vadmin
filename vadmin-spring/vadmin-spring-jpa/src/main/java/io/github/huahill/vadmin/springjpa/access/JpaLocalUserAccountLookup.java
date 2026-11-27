@@ -4,6 +4,7 @@ import io.github.huahill.vadmin.contracts.auth.LocalUserAccount;
 import io.github.huahill.vadmin.contracts.auth.LocalUserAccountLookup;
 import io.github.huahill.vadmin.contracts.auth.PermissionCode;
 import io.github.huahill.vadmin.springjpa.AccessControlTables;
+import io.github.huahill.vadmin.springjpa.IdentityUuidParameter;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import java.util.Set;
@@ -50,7 +51,7 @@ public final class JpaLocalUserAccountLookup implements LocalUserAccountLookup {
                 join %s user_role on user_role.role_id = role_permission.role_id
                 where user_role.user_id = :userId
                 """.formatted(tables.permissions(), tables.rolePermissions(), tables.userRoles()))
-                .setParameter("userId", userId)
+                .setParameter("userId", IdentityUuidParameter.value(entityManager, userId))
                 .getResultList();
         return codes.stream()
                 .map(code -> PermissionCode.of((String) code))

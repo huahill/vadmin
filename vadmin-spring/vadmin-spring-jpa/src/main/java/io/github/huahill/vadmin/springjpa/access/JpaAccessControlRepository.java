@@ -5,6 +5,7 @@ import io.github.huahill.vadmin.platform.access.AccessControlRepository;
 import io.github.huahill.vadmin.platform.access.Permission;
 import io.github.huahill.vadmin.platform.access.Role;
 import io.github.huahill.vadmin.springjpa.AccessControlTables;
+import io.github.huahill.vadmin.springjpa.IdentityUuidParameter;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,8 +46,8 @@ public final class JpaAccessControlRepository implements AccessControlRepository
                 values (:roleId, :permissionId)
                 on conflict do nothing
                 """.formatted(tables.rolePermissions()))
-                .setParameter("roleId", roleId)
-                .setParameter("permissionId", permissionId)
+                .setParameter("roleId", IdentityUuidParameter.value(entityManager, roleId))
+                .setParameter("permissionId", IdentityUuidParameter.value(entityManager, permissionId))
                 .executeUpdate();
     }
 
@@ -55,8 +56,8 @@ public final class JpaAccessControlRepository implements AccessControlRepository
         Number count = (Number) entityManager.createNativeQuery(
                 "select count(*) from %s where role_id = :roleId and permission_id = :permissionId"
                         .formatted(tables.rolePermissions()))
-                .setParameter("roleId", roleId)
-                .setParameter("permissionId", permissionId)
+                .setParameter("roleId", IdentityUuidParameter.value(entityManager, roleId))
+                .setParameter("permissionId", IdentityUuidParameter.value(entityManager, permissionId))
                 .getSingleResult();
         return count != null && count.longValue() > 0L;
     }
@@ -65,7 +66,7 @@ public final class JpaAccessControlRepository implements AccessControlRepository
     public int grantedPermissionCount(UUID roleId) {
         Number count = (Number) entityManager.createNativeQuery(
                 "select count(*) from %s where role_id = :roleId".formatted(tables.rolePermissions()))
-                .setParameter("roleId", roleId)
+                .setParameter("roleId", IdentityUuidParameter.value(entityManager, roleId))
                 .getSingleResult();
         return count == null ? 0 : count.intValue();
     }
@@ -75,8 +76,8 @@ public final class JpaAccessControlRepository implements AccessControlRepository
         return entityManager.createNativeQuery(
                 "delete from %s where role_id = :roleId and permission_id = :permissionId"
                         .formatted(tables.rolePermissions()))
-                .setParameter("roleId", roleId)
-                .setParameter("permissionId", permissionId)
+                .setParameter("roleId", IdentityUuidParameter.value(entityManager, roleId))
+                .setParameter("permissionId", IdentityUuidParameter.value(entityManager, permissionId))
                 .executeUpdate() > 0;
     }
 
@@ -87,7 +88,7 @@ public final class JpaAccessControlRepository implements AccessControlRepository
                 set auth_version = auth_version + 1
                 where id in (select user_id from %s where role_id = :roleId)
                 """.formatted(tables.users(), tables.userRoles()))
-                .setParameter("roleId", roleId)
+                .setParameter("roleId", IdentityUuidParameter.value(entityManager, roleId))
                 .executeUpdate();
     }
 }
