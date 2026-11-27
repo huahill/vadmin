@@ -6,7 +6,6 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -31,6 +30,7 @@ import jakarta.annotation.security.PermitAll;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Scope;
@@ -100,33 +100,25 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
     }
 
     private void openAdd() {
-        var query = new TextField(getTranslation("system.external-grants.search"));
-        query.setClearButtonVisible(true);
-        var results = new ComboBox<ExternalPerson>(getTranslation("system.external-grants.person"));
-        results.setItemLabelGenerator(person -> person.displayName() + " (" + person.username() + ")");
-        results.setAllowCustomValue(false);
+        var people = new ComboBox<ExternalPerson>(getTranslation("system.external-grants.search"));
+        people.setItemLabelGenerator(this::personLabel);
+        people.setAllowCustomValue(false);
+        people.setClearButtonVisible(true);
+        people.setPageSize(20);
+        people.setWidthFull();
         var choices = new MultiSelectComboBox<AdministrationQueryService.RoleRow>(
                 getTranslation("system.external-grants.roles"));
         List<AdministrationQueryService.RoleRow> available = roles.roles();
         choices.setItems(available);
         choices.setItemLabelGenerator(AdministrationQueryService.RoleRow::code);
+        choices.setWidthFull();
         var dialog = EditorDialog.translated("system.external-grants.add", "system.users.save", () -> { });
         dialog.getPrimaryAction().setEnabled(false);
-        var search = new Button(getTranslation("system.external-grants.search-action"), event -> {
-            try {
-                var found = grants.search(query.getValue());
-                results.setItems(found);
-                results.clear();
-                dialog.showValidationMessage(found.isEmpty()
-                        ? getTranslation("system.external-grants.add-empty") : "");
-            } catch (RuntimeException failure) {
-                dialog.showValidationMessage(getTranslation("system.external-grants.search-failed"));
-            }
-        });
-        results.addValueChangeListener(event -> updateAddAvailability(dialog, results, choices));
-        choices.addValueChangeListener(event -> updateAddAvailability(dialog, results, choices));
+        people.setItems(query -> searchPeople(dialog, query.getFilter().orElse(""), query.getOffset()));
+        people.addValueChangeListener(event -> updateAddAvailability(dialog, people, choices));
+        choices.addValueChangeListener(event -> updateAddAvailability(dialog, people, choices));
         dialog.getPrimaryAction().addClickListener(event -> {
-            ExternalPerson person = results.getValue();
+            ExternalPerson person = people.getValue();
             if (person == null || choices.getValue().isEmpty()) {
                 dialog.showValidationMessage(getTranslation("system.external-grants.add-required"));
                 return;
@@ -142,14 +134,36 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
                         getTranslation("system.external-grants.invalid")));
             }
         });
-        dialog.addFormRow(query, search);
-        dialog.addField(results, choices);
+        dialog.addField(people, choices);
+        dialog.getForm().setColspan(people, 2);
+        dialog.getForm().setColspan(choices, 2);
         dialog.open();
     }
 
-    private void updateAddAvailability(EditorDialog dialog, ComboBox<ExternalPerson> results,
+    private Stream<ExternalPerson> searchPeople(EditorDialog dialog, String filter, int offset) {
+        if (offset > 0 || filter.isBlank()) {
+            return Stream.empty();
+        }
+        try {
+            dialog.showValidationMessage("");
+            return grants.search(filter).stream();
+        } catch (RuntimeException failure) {
+            dialog.showValidationMessage(getTranslation("system.external-grants.search-failed"));
+            return Stream.empty();
+        }
+    }
+
+    private static String personLabel(ExternalPerson person) {
+        String name = person.displayName();
+        if (name == null || name.isBlank() || name.equals(person.username())) {
+            return person.username();
+        }
+        return name + " (" + person.username() + ")";
+    }
+
+    private void updateAddAvailability(EditorDialog dialog, ComboBox<ExternalPerson> people,
                                        MultiSelectComboBox<AdministrationQueryService.RoleRow> choices) {
-        dialog.getPrimaryAction().setEnabled(results.getValue() != null && !choices.getValue().isEmpty());
+        dialog.getPrimaryAction().setEnabled(people.getValue() != null && !choices.getValue().isEmpty());
     }
 
     private HorizontalLayout assignedActions(ExternalGrantStore.ExternalGrant grant, AuthorizationService authorization) {
@@ -197,15 +211,17 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
 
     private void confirmRemove(ExternalGrantStore.ExternalGrant grant) {
         var confirmation = ConfirmationDialog.translated("system.external-grants.remove-title",
-                "system.external-grants.remove-message", "system.external-grants.remove", () -> {
+                "system.external-grants.remove-message", "system.external-grants.remove", () -> { });
+        confirmation.getConfirmAction().addClickListener(event -> {
             try {
                 grants.remove(requireCurrentUser(), grant.subject());
             } catch (BusinessFailure failure) {
-                ViewBusinessFailureHandler.handle(failure, validation -> feedback.error(getTranslation(
+                ViewBusinessFailureHandler.handle(failure, validation -> confirmation.showFailureMessage(getTranslation(
                         validation.fieldErrors().containsValue("last-administrator")
                                 ? "system.users.last-administrator" : "system.external-grants.invalid")));
                 return;
             }
+            confirmation.close();
             refreshAssigned();
             feedback.success(getTranslation("system.external-grants.removed"));
         });
