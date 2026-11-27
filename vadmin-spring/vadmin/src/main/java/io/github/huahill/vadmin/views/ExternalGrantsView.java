@@ -101,7 +101,7 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
 
     private void openAdd() {
         var people = new ComboBox<ExternalPerson>(getTranslation("system.external-grants.search"));
-        people.setItemLabelGenerator(this::personLabel);
+        people.setItemLabelGenerator(ExternalGrantsView::personLabel);
         people.setAllowCustomValue(false);
         people.setClearButtonVisible(true);
         people.setPageSize(20);
