@@ -10,9 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class StatusNotificationTest {
+    private UI ui;
+
     @BeforeEach
     void setUp() {
-        UI.setCurrent(new UI());
+        ui = new UI();
+        UI.setCurrent(ui);
     }
 
     @AfterEach
