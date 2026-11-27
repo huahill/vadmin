@@ -51,6 +51,36 @@ public final class JpaAccessControlRepository implements AccessControlRepository
     }
 
     @Override
+    public boolean hasGrantedPermission(UUID roleId, UUID permissionId) {
+        Number count = (Number) entityManager.createNativeQuery(
+                "select count(*) from %s where role_id = :roleId and permission_id = :permissionId"
+                        .formatted(tables.rolePermissions()))
+                .setParameter("roleId", roleId)
+                .setParameter("permissionId", permissionId)
+                .getSingleResult();
+        return count != null && count.longValue() > 0L;
+    }
+
+    @Override
+    public int grantedPermissionCount(UUID roleId) {
+        Number count = (Number) entityManager.createNativeQuery(
+                "select count(*) from %s where role_id = :roleId".formatted(tables.rolePermissions()))
+                .setParameter("roleId", roleId)
+                .getSingleResult();
+        return count == null ? 0 : count.intValue();
+    }
+
+    @Override
+    public boolean revokePermission(UUID roleId, UUID permissionId) {
+        return entityManager.createNativeQuery(
+                "delete from %s where role_id = :roleId and permission_id = :permissionId"
+                        .formatted(tables.rolePermissions()))
+                .setParameter("roleId", roleId)
+                .setParameter("permissionId", permissionId)
+                .executeUpdate() > 0;
+    }
+
+    @Override
     public void incrementAuthVersionForRole(UUID roleId) {
         entityManager.createNativeQuery("""
                 update %s

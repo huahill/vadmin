@@ -54,6 +54,31 @@ public final class GrantPermissionService implements GrantPermissionUseCase {
         }
     }
 
+    @Override public void revoke(CurrentUser actor, GrantPermissionCommand command) {
+        try {
+            authorization.requirePermission(actor, GRANT_PERMISSION);
+            catalog.requireKnown(command.permissionCode());
+            var role = repository.findRoleByCode(command.roleCode()).orElseThrow(() -> failure("roleCode"));
+            var permission = repository.findPermissionByCode(command.permissionCode()).orElseThrow(() -> failure("permissionCode"));
+            if ("administrator".equals(role.code())
+                    && repository.grantedPermissionCount(role.id()) <= 1
+                    && repository.hasGrantedPermission(role.id(), permission.id())) {
+                throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
+                        Map.of("permissionCode", "last-administrator-permission"));
+            }
+            if (repository.revokePermission(role.id(), permission.id())) {
+                repository.incrementAuthVersionForRole(role.id());
+            }
+            audit.append(event(actor, command, AuditOutcome.SUCCESS));
+        } catch (BusinessFailure failure) {
+            audit.append(event(actor, command, AuditOutcome.FAILURE));
+            throw failure;
+        } catch (RuntimeException failure) {
+            audit.append(event(actor, command, AuditOutcome.DENIED));
+            throw failure;
+        }
+    }
+
     private BusinessFailure failure(String field) { return new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of(field, "invalid")); }
     private AuditEvent event(CurrentUser actor, GrantPermissionCommand command, AuditOutcome outcome) {
         return new AuditEvent(actor.subject().value(), GRANT_PERMISSION.value(), "role", command.roleCode(), outcome, Instant.now(),

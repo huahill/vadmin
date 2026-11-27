@@ -52,6 +52,27 @@ public final class JdbcAccessControlRepository implements AccessControlRepositor
     }
 
     @Override
+    public boolean hasGrantedPermission(UUID roleId, UUID permissionId) {
+        Long count = jdbc.queryForObject("SELECT COUNT(*) FROM " + tables.rolePermissions()
+                + " WHERE role_id = ? AND permission_id = ?", Long.class,
+                uuids.parameter(roleId), uuids.parameter(permissionId));
+        return count != null && count > 0L;
+    }
+
+    @Override
+    public int grantedPermissionCount(UUID roleId) {
+        Long count = jdbc.queryForObject("SELECT COUNT(*) FROM " + tables.rolePermissions() + " WHERE role_id = ?",
+                Long.class, uuids.parameter(roleId));
+        return count == null ? 0 : count.intValue();
+    }
+
+    @Override
+    public boolean revokePermission(UUID roleId, UUID permissionId) {
+        return jdbc.update("DELETE FROM " + tables.rolePermissions() + " WHERE role_id = ? AND permission_id = ?",
+                uuids.parameter(roleId), uuids.parameter(permissionId)) > 0;
+    }
+
+    @Override
     public void incrementAuthVersionForRole(UUID roleId) {
         if (externalIdentity) {
             jdbc.update("UPDATE " + tables.externalSubjects() + " SET auth_version = auth_version + 1 "

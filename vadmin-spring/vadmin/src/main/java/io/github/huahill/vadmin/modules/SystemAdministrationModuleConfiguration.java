@@ -76,7 +76,19 @@ public class SystemAdministrationModuleConfiguration {
         var delegate = new GrantPermissionService(authorization, repository, catalog, audit,
                 correlationIds.getIfAvailable(() -> () -> null));
         var transaction = new TransactionTemplate(transactionManager);
-        return (actor, command) -> transaction.executeWithoutResult(status -> delegate.grant(actor, command));
+        return new GrantPermissionUseCase() {
+            @Override
+            public void grant(io.github.huahill.vadmin.contracts.auth.CurrentUser actor,
+                              io.github.huahill.vadmin.platform.access.GrantPermissionCommand command) {
+                transaction.executeWithoutResult(status -> delegate.grant(actor, command));
+            }
+
+            @Override
+            public void revoke(io.github.huahill.vadmin.contracts.auth.CurrentUser actor,
+                               io.github.huahill.vadmin.platform.access.GrantPermissionCommand command) {
+                transaction.executeWithoutResult(status -> delegate.revoke(actor, command));
+            }
+        };
     }
 
     @Bean

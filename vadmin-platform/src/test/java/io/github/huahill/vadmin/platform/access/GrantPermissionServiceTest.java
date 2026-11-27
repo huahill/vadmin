@@ -54,6 +54,41 @@ class GrantPermissionServiceTest {
         assertThat(audit.events).singleElement().extracting(AuditEvent::outcome).isEqualTo(AuditOutcome.FAILURE);
     }
 
+    @Test
+    void revokingTheLastAdministratorPermissionIsRejected() {
+        var grantPermission = PermissionCode.of("system:role:grant");
+        var userRead = PermissionCode.of("system:user:read");
+        var repository = new InMemoryRepository(new Role(UUID.randomUUID(), "administrator"), new Permission(UUID.randomUUID(), userRead));
+        repository.granted = true;
+        var audit = new Events();
+        var service = new GrantPermissionService(new SetAuthorizationService(), repository,
+                new PermissionCatalog(Set.of(grantPermission, userRead)), audit);
+        var actor = new CurrentUser(UUID.randomUUID(), "admin", Set.of(grantPermission), 1);
+
+        assertThatThrownBy(() -> service.revoke(actor, new GrantPermissionCommand("administrator", userRead)))
+                .isInstanceOf(io.github.huahill.vadmin.contracts.error.BusinessFailure.class);
+        assertThat(repository.granted).isTrue();
+        assertThat(repository.authVersionIncremented).isFalse();
+    }
+
+    @Test
+    void revokingAPermissionBumpsTheSessionVersion() {
+        var grantPermission = PermissionCode.of("system:role:grant");
+        var userRead = PermissionCode.of("system:user:read");
+        var repository = new InMemoryRepository(new Role(UUID.randomUUID(), "operator"), new Permission(UUID.randomUUID(), userRead));
+        repository.granted = true;
+        var audit = new Events();
+        var service = new GrantPermissionService(new SetAuthorizationService(), repository,
+                new PermissionCatalog(Set.of(grantPermission, userRead)), audit);
+
+        service.revoke(new CurrentUser(UUID.randomUUID(), "admin", Set.of(grantPermission), 1),
+                new GrantPermissionCommand("operator", userRead));
+
+        assertThat(repository.granted).isFalse();
+        assertThat(repository.authVersionIncremented).isTrue();
+        assertThat(audit.events).singleElement().extracting(AuditEvent::outcome).isEqualTo(AuditOutcome.SUCCESS);
+    }
+
     private static final class SetAuthorizationService implements AuthorizationService {
         public boolean hasPermission(CurrentUser user, PermissionCode permission) { return user.permissions().contains(permission); }
         public void requirePermission(CurrentUser user, PermissionCode permission) { if (!hasPermission(user, permission)) throw new IllegalStateException("denied"); }
@@ -66,6 +101,15 @@ class GrantPermissionServiceTest {
         public Optional<Permission> findPermissionByCode(PermissionCode code) { return Optional.ofNullable(permission.code().equals(code) ? permission : null); }
         boolean authVersionIncremented;
         public void grantPermission(UUID roleId, UUID permissionId) { granted = role.id().equals(roleId) && permission.id().equals(permissionId); }
+        public boolean hasGrantedPermission(UUID roleId, UUID permissionId) { return granted && role.id().equals(roleId) && permission.id().equals(permissionId); }
+        public int grantedPermissionCount(UUID roleId) { return granted && role.id().equals(roleId) ? 1 : 0; }
+        public boolean revokePermission(UUID roleId, UUID permissionId) {
+            boolean matches = granted && role.id().equals(roleId) && permission.id().equals(permissionId);
+            if (matches) {
+                granted = false;
+            }
+            return matches;
+        }
         public void incrementAuthVersionForRole(UUID roleId) { authVersionIncremented = role.id().equals(roleId); }
     }
 }

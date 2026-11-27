@@ -48,7 +48,19 @@ public class ApplicationConfiguration {
                                                   PlatformTransactionManager transactionManager) {
         var delegate = new GrantPermissionService(authorization, repository, catalog, auditSink, correlationIdProvider);
         var transactionTemplate = new TransactionTemplate(transactionManager);
-        return (actor, command) -> transactionTemplate.executeWithoutResult(status -> delegate.grant(actor, command));
+        return new GrantPermissionUseCase() {
+            @Override
+            public void grant(io.github.huahill.vadmin.contracts.auth.CurrentUser actor,
+                              io.github.huahill.vadmin.platform.access.GrantPermissionCommand command) {
+                transactionTemplate.executeWithoutResult(status -> delegate.grant(actor, command));
+            }
+
+            @Override
+            public void revoke(io.github.huahill.vadmin.contracts.auth.CurrentUser actor,
+                               io.github.huahill.vadmin.platform.access.GrantPermissionCommand command) {
+                transactionTemplate.executeWithoutResult(status -> delegate.revoke(actor, command));
+            }
+        };
     }
 
     @Bean

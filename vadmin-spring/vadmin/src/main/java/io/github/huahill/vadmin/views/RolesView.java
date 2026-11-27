@@ -47,6 +47,7 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
     private final Grid.Column<AdministrationQueryService.RoleRow> actionsColumn;
     private final PagedGrid<AdministrationQueryService.RoleRow> pages;
     private final Button grantAction;
+    private final Button revokeAction;
     private final Button createAction;
 
     public RolesView(CurrentUserProvider currentUser, AuthorizationService authorization,
@@ -68,9 +69,13 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         grantAction = new Button();
         grantAction.addClickListener(event -> grantDialog(queries, catalog, grants, pages, new OperationFeedback()).open());
         grantAction.setVisible(authorization.hasPermission(requireCurrentUser(), GRANT));
+        revokeAction = new Button();
+        revokeAction.addClickListener(event -> revokeDialog(queries, grants, pages, new OperationFeedback()).open());
+        revokeAction.setVisible(authorization.hasPermission(requireCurrentUser(), GRANT));
         var toolbar = new PageToolbar();
         toolbar.getElement().setAttribute("data-testid", "roles-toolbar");
         toolbar.addAction(grantAction);
+        toolbar.addAction(revokeAction);
         createAction = new Button(AdminIcon.of(AdminIconName.ADD), event -> createRole(commands));
         createAction.setVisible(authorization.hasPermission(requireCurrentUser(), CREATE));
         toolbar.setPrimaryAction(createAction);
@@ -153,6 +158,44 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         return dialog;
     }
 
+    private EditorDialog revokeDialog(AdministrationQueryService queries, GrantPermissionUseCase grants,
+                                      PagedGrid<AdministrationQueryService.RoleRow> pages, OperationFeedback feedback) {
+        var role = new ComboBox<AdministrationQueryService.RoleRow>(getTranslation("system.roles.role"));
+        role.setItems(queries.roles());
+        role.setItemLabelGenerator(AdministrationQueryService.RoleRow::code);
+        var permission = new ComboBox<String>(getTranslation("system.roles.permission"));
+        var dialog = EditorDialog.translated("system.roles.revoke", "system.roles.save-revoke", () -> { });
+        dialog.getPrimaryAction().setEnabled(false);
+        dialog.getPrimaryAction().addClickListener(event -> {
+            try {
+                grants.revoke(requireCurrentUser(), new GrantPermissionCommand(role.getValue().code(),
+                        PermissionCode.of(permission.getValue())));
+            } catch (BusinessFailure failure) {
+                ViewBusinessFailureHandler.handle(failure, validation -> dialog.showValidationMessage(getTranslation(
+                        "last-administrator-permission".equals(validation.fieldErrors().get("permissionCode"))
+                                ? "system.roles.last-administrator-permission" : "system.roles.required")));
+                return;
+            }
+            dialog.close();
+            pages.refresh();
+            feedback.success(getTranslation("system.roles.revoked-success"));
+        });
+        role.addValueChangeListener(event -> {
+            var selected = event.getValue();
+            permission.setItems(selected == null ? java.util.List.of() : selected.permissionCodes());
+            permission.clear();
+            updateRevokeAvailability(dialog, role, permission);
+        });
+        permission.addValueChangeListener(event -> updateRevokeAvailability(dialog, role, permission));
+        dialog.addField(role, permission);
+        return dialog;
+    }
+
+    private void updateRevokeAvailability(EditorDialog dialog, ComboBox<AdministrationQueryService.RoleRow> role,
+                                          ComboBox<String> permission) {
+        dialog.getPrimaryAction().setEnabled(role.getValue() != null && permission.getValue() != null);
+    }
+
     private void updateGrantAvailability(EditorDialog dialog, ComboBox<String> role,
                                          ComboBox<PermissionCode> permission) {
         dialog.getPrimaryAction().setEnabled(role.getValue() != null && permission.getValue() != null);
@@ -167,6 +210,7 @@ public final class RolesView extends PermissionProtectedView implements LocaleCh
         permissionCountColumn.setHeader(getTranslation("system.roles.permission-count"));
         actionsColumn.setHeader(getTranslation("system.roles.actions"));
         grantAction.setText(getTranslation("system.roles.grant"));
+        revokeAction.setText(getTranslation("system.roles.revoke"));
         createAction.setText(getTranslation("system.roles.create"));
     }
 
