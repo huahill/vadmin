@@ -100,6 +100,12 @@ public final class JdbcExternalGrantStore implements ExternalGrantStore {
     }
 
     @Override
+    public void remove(SubjectId subject) {
+        jdbc.update("DELETE FROM " + tables.externalGrants() + " WHERE subject = ?", subject.value());
+        jdbc.update("DELETE FROM " + tables.externalSubjects() + " WHERE subject = ?", subject.value());
+    }
+
+    @Override
     public void ensureAdministrator(SubjectId subject) {
         ensureAdministrator(subject, subject.value());
     }

@@ -43,5 +43,9 @@ class JdbcExternalGrantStoreTest {
         assertThat(store.access(subject).authVersion()).isEqualTo(1);
         assertThat(store.isLastAdministrator(subject)).isTrue();
         assertThat(store.list()).singleElement().extracting(grant -> grant.label()).isEqualTo("zhangsan");
+        store.remove(subject);
+        assertThat(store.list()).isEmpty();
+        assertThat(store.access(subject).permissions()).isEmpty();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM vadmin_external_subjects", Long.class)).isZero();
     }
 }

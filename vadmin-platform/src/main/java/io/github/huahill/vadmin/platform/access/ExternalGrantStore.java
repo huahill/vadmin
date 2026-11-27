@@ -20,6 +20,8 @@ public interface ExternalGrantStore {
 
     void replaceRoles(SubjectId subject, String label, Set<UUID> roleIds);
 
+    void remove(SubjectId subject);
+
     void ensureAdministrator(SubjectId subject);
 
     void ensureAdministrator(SubjectId subject, String label);

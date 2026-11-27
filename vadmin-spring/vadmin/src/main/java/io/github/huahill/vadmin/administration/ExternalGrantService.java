@@ -64,4 +64,19 @@ public class ExternalGrantService {
         auditSink.append(new AuditEvent(actor.subject().value(), "system:user:roles", "external-subject", subject.value(),
                 AuditOutcome.SUCCESS, Instant.now(), null, Map.of()));
     }
+
+    @Transactional
+    public void remove(CurrentUser actor, SubjectId subject) {
+        authorization.requirePermission(actor, ASSIGN);
+        if (subject == null) {
+            throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed", Map.of("subject", "required"));
+        }
+        if (store.isLastAdministrator(subject)) {
+            throw new BusinessFailure(ErrorCode.VALIDATION_FAILED, "validation.failed",
+                    Map.of("subject", "last-administrator"));
+        }
+        store.remove(subject);
+        auditSink.append(new AuditEvent(actor.subject().value(), "system:user:roles", "external-subject", subject.value(),
+                AuditOutcome.SUCCESS, Instant.now(), null, Map.of("removed", "true")));
+    }
 }
