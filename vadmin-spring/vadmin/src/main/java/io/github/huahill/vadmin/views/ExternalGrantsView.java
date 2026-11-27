@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -114,7 +115,7 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
         choices.setWidthFull();
         var dialog = EditorDialog.translated("system.external-grants.add", "system.users.save", () -> { });
         dialog.getPrimaryAction().setEnabled(false);
-        people.setItems(query -> searchPeople(dialog, query.getFilter().orElse(""), query.getOffset()));
+        people.setItems(query -> searchPeople(dialog, query));
         people.addValueChangeListener(event -> updateAddAvailability(dialog, people, choices));
         choices.addValueChangeListener(event -> updateAddAvailability(dialog, people, choices));
         dialog.getPrimaryAction().addClickListener(event -> {
@@ -140,13 +141,16 @@ public final class ExternalGrantsView extends PermissionProtectedView implements
         dialog.open();
     }
 
-    private Stream<ExternalPerson> searchPeople(EditorDialog dialog, String filter, int offset) {
-        if (offset > 0 || filter.isBlank()) {
+    private Stream<ExternalPerson> searchPeople(EditorDialog dialog, Query<ExternalPerson, String> query) {
+        int limit = query.getLimit();
+        int offset = query.getOffset();
+        String filter = query.getFilter().orElse("").strip();
+        if (offset > 0 || filter.isBlank() || limit <= 0) {
             return Stream.empty();
         }
         try {
             dialog.showValidationMessage("");
-            return grants.search(filter).stream();
+            return grants.search(filter).stream().limit(limit);
         } catch (RuntimeException failure) {
             dialog.showValidationMessage(getTranslation("system.external-grants.search-failed"));
             return Stream.empty();
